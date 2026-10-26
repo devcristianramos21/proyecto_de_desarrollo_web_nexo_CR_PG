@@ -1,0 +1,78 @@
+.upcoming-exam {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background-color: #fff5df;
+  border: 1px solid #ffe3a3;
+  border-radius: 12px;
+}
+
+.upcoming-exam__icono {
+  flex-shrink: 0;
+  font-size: 1.4rem;
+  color: #a66a00;
+}
+
+.upcoming-exam__contenido {
+  flex: 1;
+  min-width: 0;
+}
+
+.upcoming-exam__titulo {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  color: #8f5200;
+}
+
+.upcoming-exam__descripcion {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: #a66a00;
+}
+
+.upcoming-exam__acciones {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.upcoming-exam__boton {
+  padding: 9px 12px;
+  border-radius: 7px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.upcoming-exam__boton--secundario {
+  background-color: transparent;
+  color: #6d3b00;
+  border: 1px solid #e7a83d;
+}
+
+.upcoming-exam__boton--principal {
+  background-color: #ffb52e;
+  color: #382000;
+  border: 1px solid #ffb52e;
+}
+
+.upcoming-exam__boton:hover {
+  filter: brightness(0.96);
+}
+
+@media (max-width: 650px) {
+  .upcoming-exam {
+    flex-wrap: wrap;
+  }
+
+  .upcoming-exam__contenido {
+    flex-basis: calc(100% - 40px);
+  }
+
+  .upcoming-exam__acciones {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

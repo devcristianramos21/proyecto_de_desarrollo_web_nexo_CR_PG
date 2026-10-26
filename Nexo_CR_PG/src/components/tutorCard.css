@@ -1,0 +1,154 @@
+.tutor-card {
+  min-width: 0;
+  padding: 16px;
+  background-color: #ffffff;
+  border: 1px solid #e8e5e8;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgb(35 20 30 / 3%);
+}
+
+.tutor-card__encabezado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tutor-card__avatar {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background-color: #fbecef;
+  color: #a20f28;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.tutor-card__identidad {
+  flex: 1;
+  min-width: 0;
+}
+
+.tutor-card__nombre {
+  margin: 0 0 4px;
+  color: #20202a;
+  font-size: 0.85rem;
+}
+
+.tutor-card__especialidad {
+  margin: 0;
+  color: #656575;
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.tutor-card__favorito {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  border: 1px solid #dedbe0;
+  border-radius: 7px;
+  color: #38343b;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.tutor-card__favorito--activo {
+  color: #a20f28;
+  border-color: #a20f28;
+}
+
+.tutor-card__calificacion {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 12px 0;
+  font-size: 0.75rem;
+}
+
+.tutor-card__calificacion > span:first-child {
+  color: #f4a62a;
+  letter-spacing: 1px;
+}
+
+.tutor-card__calificacion strong {
+  color: #33303a;
+}
+
+.tutor-card__resenas {
+  color: #777481;
+}
+
+.tutor-card__materias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tutor-card__etiqueta {
+  padding: 4px 7px;
+  background-color: #f1eff4;
+  border-radius: 5px;
+  color: #37313e;
+  font-size: 0.65rem;
+}
+
+.tutor-card__disponibilidad {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 12px 0;
+  color: #45424b;
+  font-size: 0.7rem;
+}
+
+.tutor-card__indicador {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background-color: #a5a5a5;
+}
+
+.tutor-card__indicador--disponible {
+  background-color: #18ad61;
+}
+
+.tutor-card__acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.tutor-card__boton {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 6px;
+  border-radius: 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tutor-card__boton--secundario {
+  color: #28232c;
+  background-color: #ffffff;
+  border: 1px solid #dedbe0;
+}
+
+.tutor-card__boton--principal {
+  color: #ffffff;
+  background-color: #a20f28;
+  border: 1px solid #a20f28;
+}
+
+.tutor-card__boton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tutor-card__boton:not(:disabled):hover {
+  filter: brightness(0.94);
+}

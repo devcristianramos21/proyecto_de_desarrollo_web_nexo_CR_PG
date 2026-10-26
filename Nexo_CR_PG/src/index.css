@@ -1,0 +1,125 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #20202a;
+  background-color: #fbf1f1;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button {
+  font: inherit;
+}
+
+.dashboard {
+  width: 100%;
+  max-width: 1200px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dashboard__bienvenida {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+  background-color: #ffffff;
+  border: 1px solid #eee4e7;
+  border-radius: 12px;
+}
+
+.dashboard__saludo {
+  margin: 0 0 5px;
+  color: #a20f28;
+  font-size: 0.8rem;
+}
+
+.dashboard__bienvenida h1 {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+}
+
+.dashboard__bienvenida > div:first-child > p:last-child {
+  margin: 0;
+  color: #666371;
+  font-size: 0.85rem;
+}
+
+.dashboard__tutores {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.dashboard__seccion-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.dashboard__seccion-encabezado h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.dashboard__ver-todos {
+  padding: 6px 0;
+  color: #a20f28;
+  background: transparent;
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.dashboard__tutores-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 800px) {
+  .dashboard {
+    padding: 20px;
+  }
+
+  .dashboard__bienvenida {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard__tutores-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 550px) {
+  .dashboard {
+    padding: 14px;
+    gap: 18px;
+  }
+
+  .dashboard__tutores-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard__bienvenida {
+    padding: 18px;
+  }
+}

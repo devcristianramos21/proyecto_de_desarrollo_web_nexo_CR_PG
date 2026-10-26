@@ -1,0 +1,35 @@
+.student-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  align-items: center;
+}
+
+.student-stats__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.student-stats__valor {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #171923;
+}
+
+.student-stats__etiqueta {
+  font-size: 0.8rem;
+  color: #555967;
+}
+
+@media (max-width: 500px) {
+  .student-stats {
+    gap: 10px;
+  }
+
+  .student-stats__etiqueta {
+    font-size: 0.7rem;
+  }
+}
