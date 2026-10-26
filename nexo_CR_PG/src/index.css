@@ -1,0 +1,20 @@
+:root {
+  --color-primario: #9b1c2c;
+  --color-primario-suave: #fbe9ec;
+  --color-texto: #1f1f1f;
+  --color-texto-suave: #6b6b6b;
+  --color-borde: #e8e8e8;
+  --color-fondo: #f6f6f7;
+  --color-blanco: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, Arial, sans-serif;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+}
