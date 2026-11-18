@@ -1,0 +1,21 @@
+$kind: http-request
+name: "6. Error: crear sin campos obligatorios"
+url: "{{baseUrl}}/api/monitorias"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Responde 400', () => pm.response.to.have.status(400));
+      pm.test('Informa cada campo obligatorio que falta', () => {
+        const errores = pm.response.json().errores;
+        ['materia', 'tutor', 'fecha', 'horaInicio', 'horaFin', 'modalidad'].forEach((campo) => {
+          pm.expect(errores).to.have.property(campo);
+        });
+      });
+    language: text/javascript
+order: 6000

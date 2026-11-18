@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/api/monitorias/{{monitoriaId}}"
+method: DELETE
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Responde 200', () => pm.response.to.have.status(200));
+      pm.test('Confirma la eliminación', () => {
+        pm.expect(pm.response.json().mensaje).to.eql('Monitoría eliminada');
+      });
+    language: text/javascript
+order: 13000

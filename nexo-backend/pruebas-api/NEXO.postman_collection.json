@@ -1,0 +1,362 @@
+{
+  "info": {
+    "name": "NEXO - API de monitorías",
+    "description": "Pruebas del backend de NEXO. Ejecutar en orden con Run collection: crea una monitoría de prueba, la consulta, la actualiza, prueba los casos de error y al final la elimina.\n\nRequiere el servidor corriendo (npm run dev en nexo-backend).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3001" },
+    { "key": "monitoriaId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Estado de la API",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+              "pm.test('Indica que la API funciona', () => {",
+              "  pm.expect(pm.response.json().mensaje).to.eql('API de NEXO funcionando');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/"
+      }
+    },
+    {
+      "name": "2. Crear monitoría",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+              "const monitoria = pm.response.json();",
+              "pm.test('Devuelve los datos guardados', () => {",
+              "  pm.expect(monitoria._id).to.be.a('string');",
+              "  pm.expect(monitoria.materia).to.eql('Cálculo Diferencial');",
+              "  pm.expect(monitoria.modalidad).to.eql('virtual');",
+              "});",
+              "pm.test('El estado por defecto es programada', () => {",
+              "  pm.expect(monitoria.estado).to.eql('programada');",
+              "});",
+              "pm.test('Agrega fechas de creación y actualización', () => {",
+              "  pm.expect(monitoria).to.have.property('createdAt');",
+              "  pm.expect(monitoria).to.have.property('updatedAt');",
+              "});",
+              "// Guarda el id para las peticiones siguientes",
+              "pm.collectionVariables.set('monitoriaId', monitoria._id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Límites y continuidad\",\n  \"tutor\": \"Ana Pérez\",\n  \"fecha\": \"2026-11-20\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"16:00\",\n  \"modalidad\": \"virtual\",\n  \"descripcion\": \"Monitoría de prueba creada desde Postman\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/monitorias"
+      }
+    },
+    {
+      "name": "3. Listar monitorías",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+              "const lista = pm.response.json();",
+              "pm.test('Devuelve una lista', () => pm.expect(lista).to.be.an('array'));",
+              "pm.test('Incluye la monitoría creada', () => {",
+              "  const id = pm.collectionVariables.get('monitoriaId');",
+              "  pm.expect(lista.some((m) => m._id === id)).to.be.true;",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/monitorias"
+      }
+    },
+    {
+      "name": "4. Obtener monitoría por id",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+              "pm.test('Es la monitoría creada', () => {",
+              "  pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('monitoriaId'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/monitorias/{{monitoriaId}}"
+      }
+    },
+    {
+      "name": "5. Actualizar monitoría",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+              "const monitoria = pm.response.json();",
+              "pm.test('Aplica los cambios', () => {",
+              "  pm.expect(monitoria.tema).to.eql('Derivadas');",
+              "  pm.expect(monitoria.modalidad).to.eql('presencial');",
+              "  pm.expect(monitoria.estado).to.eql('en_curso');",
+              "});",
+              "pm.test('Conserva los campos que no se enviaron', () => {",
+              "  pm.expect(monitoria.materia).to.eql('Cálculo Diferencial');",
+              "  pm.expect(monitoria.tutor).to.eql('Ana Pérez');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"tema\": \"Derivadas\",\n  \"modalidad\": \"presencial\",\n  \"estado\": \"en_curso\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/monitorias/{{monitoriaId}}"
+      }
+    },
+    {
+      "name": "6. Error: crear sin campos obligatorios",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+              "pm.test('Informa cada campo obligatorio que falta', () => {",
+              "  const errores = pm.response.json().errores;",
+              "  ['materia', 'tutor', 'fecha', 'horaInicio', 'horaFin', 'modalidad'].forEach((campo) => {",
+              "    pm.expect(errores).to.have.property(campo);",
+              "  });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/monitorias"
+      }
+    },
+    {
+      "name": "7. Error: hora de fin antes de la de inicio",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+              "pm.test('Señala el campo horaFin', () => {",
+              "  pm.expect(pm.response.json().errores.horaFin).to.eql('La hora de fin debe ser posterior a la hora de inicio');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"materia\": \"Física\",\n  \"tutor\": \"Luis Gómez\",\n  \"fecha\": \"2026-11-21\",\n  \"horaInicio\": \"16:00\",\n  \"horaFin\": \"14:00\",\n  \"modalidad\": \"virtual\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/monitorias"
+      }
+    },
+    {
+      "name": "8. Error: modalidad no válida",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+              "pm.test('Señala el campo modalidad', () => {",
+              "  pm.expect(pm.response.json().errores).to.have.property('modalidad');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"materia\": \"Física\",\n  \"tutor\": \"Luis Gómez\",\n  \"fecha\": \"2026-11-21\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"16:00\",\n  \"modalidad\": \"hibrida\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/monitorias"
+      }
+    },
+    {
+      "name": "9. Error: JSON mal formado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+              "pm.test('Explica que el JSON no es válido', () => {",
+              "  pm.expect(pm.response.json().mensaje).to.eql('El cuerpo de la petición no es un JSON válido');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"materia\": \"Física\", ",
+          "options": { "raw": { "language": "text" } }
+        },
+        "url": "{{baseUrl}}/api/monitorias"
+      }
+    },
+    {
+      "name": "10. Error: id con formato no válido",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+              "pm.test('Indica que el identificador no es válido', () => {",
+              "  pm.expect(pm.response.json().mensaje).to.eql('Identificador no válido');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/monitorias/abc"
+      }
+    },
+    {
+      "name": "11. Error: id que no existe",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+              "pm.test('Indica que no se encontró', () => {",
+              "  pm.expect(pm.response.json().mensaje).to.eql('Monitoría no encontrada');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/monitorias/000000000000000000000000"
+      }
+    },
+    {
+      "name": "12. Error: ruta que no existe",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/no-existe"
+      }
+    },
+    {
+      "name": "13. Eliminar monitoría",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+              "pm.test('Confirma la eliminación', () => {",
+              "  pm.expect(pm.response.json().mensaje).to.eql('Monitoría eliminada');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/monitorias/{{monitoriaId}}"
+      }
+    },
+    {
+      "name": "14. Verificar que fue eliminada",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/monitorias/{{monitoriaId}}"
+      }
+    }
+  ]
+}

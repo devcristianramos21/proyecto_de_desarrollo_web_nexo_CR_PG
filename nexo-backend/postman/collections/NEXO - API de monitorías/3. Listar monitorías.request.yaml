@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/api/monitorias"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Responde 200', () => pm.response.to.have.status(200));
+      const lista = pm.response.json();
+      pm.test('Devuelve una lista', () => pm.expect(lista).to.be.an('array'));
+      pm.test('Incluye la monitoría creada', () => {
+        const id = pm.collectionVariables.get('monitoriaId');
+        pm.expect(lista.some((m) => m._id === id)).to.be.true;
+      });
+    language: text/javascript
+order: 3000

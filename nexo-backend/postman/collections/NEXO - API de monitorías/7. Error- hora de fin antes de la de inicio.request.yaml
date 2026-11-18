@@ -1,0 +1,26 @@
+$kind: http-request
+name: "7. Error: hora de fin antes de la de inicio"
+url: "{{baseUrl}}/api/monitorias"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "materia": "Física",
+      "tutor": "Luis Gómez",
+      "fecha": "2026-11-21",
+      "horaInicio": "16:00",
+      "horaFin": "14:00",
+      "modalidad": "virtual"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Responde 400', () => pm.response.to.have.status(400));
+      pm.test('Señala el campo horaFin', () => {
+        pm.expect(pm.response.json().errores.horaFin).to.eql('La hora de fin debe ser posterior a la hora de inicio');
+      });
+    language: text/javascript
+order: 7000

@@ -1,0 +1,26 @@
+$kind: http-request
+name: "8. Error: modalidad no válida"
+url: "{{baseUrl}}/api/monitorias"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "materia": "Física",
+      "tutor": "Luis Gómez",
+      "fecha": "2026-11-21",
+      "horaInicio": "14:00",
+      "horaFin": "16:00",
+      "modalidad": "hibrida"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Responde 400', () => pm.response.to.have.status(400));
+      pm.test('Señala el campo modalidad', () => {
+        pm.expect(pm.response.json().errores).to.have.property('modalidad');
+      });
+    language: text/javascript
+order: 8000

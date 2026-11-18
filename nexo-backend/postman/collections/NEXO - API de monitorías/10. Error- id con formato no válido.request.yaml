@@ -1,0 +1,13 @@
+$kind: http-request
+name: "10. Error: id con formato no válido"
+url: "{{baseUrl}}/api/monitorias/abc"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Responde 400', () => pm.response.to.have.status(400));
+      pm.test('Indica que el identificador no es válido', () => {
+        pm.expect(pm.response.json().mensaje).to.eql('Identificador no válido');
+      });
+    language: text/javascript
+order: 10000

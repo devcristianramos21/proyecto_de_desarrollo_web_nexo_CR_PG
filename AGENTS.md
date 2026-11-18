@@ -6,6 +6,20 @@ Compact guidance for agents working in this repository. Verify against configs b
 
 - NEXO (`nexo-cr-pg`): React 19 + TypeScript + Vite single-page app for a mentor/tutoring platform. Currently a UI shell: `src/App.tsx` composes `src/components/Sidebar.tsx`; page content is placeholder. No backend, router, or state library yet — navigation uses hash anchors + local state.
 
+Quiero que analices este proyecto antes de realizar cualquier modificación.
+
+Identifica:
+1. La arquitectura y la estructura de carpetas.
+2. Las tecnologías y dependencias utilizadas.
+3. Cómo funciona el flujo principal de la aplicación.
+4. Cómo se conecta a la base de datos.
+5. Los posibles errores, riesgos y problemas de organización.
+6. Las pruebas existentes y cómo ejecutar el proyecto.
+
+Por ahora, trabaja únicamente en modo de análisis. No modifiques archivos, no instales dependencias, no ejecutes migraciones ni cambies la base de datos.
+
+Al terminar, dame un diagnóstico organizado y un plan de trabajo por prioridades.
+
 ## Commands
 
 - `npm run dev` — Vite dev server with HMR (default http://localhost:5173)
