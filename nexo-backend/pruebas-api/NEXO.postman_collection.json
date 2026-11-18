@@ -1,14 +1,422 @@
 {
   "info": {
     "name": "NEXO - API de monitorías",
-    "description": "Pruebas del backend de NEXO. Ejecutar en orden con Run collection: crea una monitoría de prueba, la consulta, la actualiza, prueba los casos de error y al final la elimina.\n\nRequiere el servidor corriendo (npm run dev en nexo-backend).",
+    "description": "Pruebas del backend de NEXO, organizadas por carpeta. Ejecutar en orden con Run collection.\n\n- Auth y perfil: registra un usuario de prueba con correo único (prueba.postman.<número>@urosario.edu.co), inicia sesión, edita el perfil y cambia la contraseña. Cada ejecución deja ese usuario en la base.\n- Monitorías: crea una monitoría de prueba, la consulta, la actualiza, prueba los casos de error y al final la elimina.\n\nRequiere el servidor corriendo (npm run dev en nexo-backend).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3001" },
-    { "key": "monitoriaId", "value": "" }
+    { "key": "monitoriaId", "value": "" },
+    { "key": "correoPrueba", "value": "" },
+    { "key": "token", "value": "" }
   ],
   "item": [
+    {
+      "name": "Auth y perfil",
+      "item": [
+        {
+          "name": "1. Registro",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Correo único en cada ejecución para que el registro no choque con uno anterior",
+                  "pm.collectionVariables.set('correoPrueba', `prueba.postman.${Date.now()}@urosario.edu.co`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "const { token, usuario } = pm.response.json();",
+                  "pm.test('Devuelve un token', () => pm.expect(token).to.be.a('string'));",
+                  "pm.test('Ignora el rol enviado: siempre crea un estudiante', () => {",
+                  "  pm.expect(usuario.rol).to.eql('estudiante');",
+                  "});",
+                  "pm.test('No devuelve la contraseña', () => pm.expect(usuario).to.not.have.property('password'));",
+                  "pm.collectionVariables.set('token', token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario de Prueba\",\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"secreta123\",\n  \"carrera\": \"Ingeniería de Sistemas\",\n  \"semestre\": 6,\n  \"rol\": \"admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "2. Error: correo no institucional",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala el campo correo', () => {",
+                  "  pm.expect(pm.response.json().errores.correo).to.include('urosario.edu.co');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Externo\",\n  \"correo\": \"alguien@gmail.com\",\n  \"password\": \"secreta123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "3. Error: correo ya registrado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Indica que el correo ya existe', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('Ya existe una cuenta con ese correo');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Otro Usuario\",\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"secreta123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "4. Error: contraseña muy corta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala el campo password', () => {",
+                  "  pm.expect(pm.response.json().errores).to.have.property('password');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Corto\",\n  \"correo\": \"corta.{{$timestamp}}@urosario.edu.co\",\n  \"password\": \"123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "5. Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const { token, usuario } = pm.response.json();",
+                  "pm.test('Devuelve token y usuario', () => {",
+                  "  pm.expect(token).to.be.a('string');",
+                  "  pm.expect(usuario.correo).to.eql(pm.collectionVariables.get('correoPrueba'));",
+                  "});",
+                  "pm.collectionVariables.set('token', token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"secreta123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "6. Error: login con contraseña incorrecta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Mensaje genérico (no revela si el correo existe)', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('Correo o contraseña incorrectos');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"incorrecta1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "7. Error: perfil sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Pide iniciar sesión', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('Debes iniciar sesión');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "8. Error: perfil con token inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Indica token no válido', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('Token no válido');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer token-inventado" }],
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "9. Ver mi perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const usuario = pm.response.json();",
+                  "pm.test('Es el usuario que inició sesión', () => {",
+                  "  pm.expect(usuario.correo).to.eql(pm.collectionVariables.get('correoPrueba'));",
+                  "});",
+                  "pm.test('No devuelve la contraseña', () => pm.expect(usuario).to.not.have.property('password'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "10. Actualizar mi perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const usuario = pm.response.json();",
+                  "pm.test('Aplica los cambios permitidos', () => {",
+                  "  pm.expect(usuario.nombre).to.eql('Nombre Actualizado');",
+                  "  pm.expect(usuario.semestre).to.eql(7);",
+                  "  pm.expect(usuario.biografia).to.eql('Me gustan las matemáticas');",
+                  "});",
+                  "pm.test('Ignora rol y correo', () => {",
+                  "  pm.expect(usuario.rol).to.eql('estudiante');",
+                  "  pm.expect(usuario.correo).to.eql(pm.collectionVariables.get('correoPrueba'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre Actualizado\",\n  \"semestre\": 7,\n  \"biografia\": \"Me gustan las matemáticas\",\n  \"rol\": \"admin\",\n  \"correo\": \"otro@urosario.edu.co\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "11. Error: semestre fuera de rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala el campo semestre', () => {",
+                  "  pm.expect(pm.response.json().errores).to.have.property('semestre');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"semestre\": 20\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "12. Error: cambiar contraseña con la actual incorrecta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Indica que la actual no es correcta', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('La contraseña actual no es correcta');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordActual\": \"incorrecta1\",\n  \"passwordNueva\": \"nueva12345\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/usuarios/me/password"
+          }
+        },
+        {
+          "name": "13. Cambiar contraseña",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Confirma el cambio', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('Contraseña actualizada');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordActual\": \"secreta123\",\n  \"passwordNueva\": \"nueva12345\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/usuarios/me/password"
+          }
+        },
+        {
+          "name": "14. Login con la contraseña nueva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve un token', () => pm.expect(pm.response.json().token).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"nueva12345\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Monitorías",
+      "item": [
     {
       "name": "1. Estado de la API",
       "event": [
@@ -357,6 +765,8 @@
         "method": "GET",
         "url": "{{baseUrl}}/api/monitorias/{{monitoriaId}}"
       }
+    }
+      ]
     }
   ]
 }

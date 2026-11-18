@@ -1,47 +1,26 @@
-import { Monitoria } from '../models/Monitoria.js';
+import * as monitoriaService from '../services/monitoriaService.js';
 
-// Los errores de validación o de base de datos los atiende el manejador de errores de server.js.
+// Los controladores solo traducen HTTP: leen la petición, llaman al service y responden.
+// Los errores los atiende el middleware manejadorErrores.
 
 export async function listarMonitorias(_req, res) {
-  const monitorias = await Monitoria.find().sort({ fecha: 1, horaInicio: 1 });
-  res.json(monitorias);
+  res.json(await monitoriaService.listar());
 }
 
 export async function obtenerMonitoria(req, res) {
-  const monitoria = await Monitoria.findById(req.params.id);
-
-  if (!monitoria) {
-    return res.status(404).json({ mensaje: 'Monitoría no encontrada' });
-  }
-
-  res.json(monitoria);
+  res.json(await monitoriaService.obtenerPorId(req.params.id));
 }
 
 export async function crearMonitoria(req, res) {
-  const monitoria = await Monitoria.create(req.body ?? {});
+  const monitoria = await monitoriaService.crear(req.body ?? {});
   res.status(201).json(monitoria);
 }
 
 export async function actualizarMonitoria(req, res) {
-  const monitoria = await Monitoria.findById(req.params.id);
-
-  if (!monitoria) {
-    return res.status(404).json({ mensaje: 'Monitoría no encontrada' });
-  }
-
-  // Se usa save() para que se ejecuten todas las validaciones del modelo.
-  monitoria.set(req.body ?? {});
-  await monitoria.save();
-
-  res.json(monitoria);
+  res.json(await monitoriaService.actualizar(req.params.id, req.body ?? {}));
 }
 
 export async function eliminarMonitoria(req, res) {
-  const monitoria = await Monitoria.findByIdAndDelete(req.params.id);
-
-  if (!monitoria) {
-    return res.status(404).json({ mensaje: 'Monitoría no encontrada' });
-  }
-
+  await monitoriaService.eliminar(req.params.id);
   res.json({ mensaje: 'Monitoría eliminada' });
 }
