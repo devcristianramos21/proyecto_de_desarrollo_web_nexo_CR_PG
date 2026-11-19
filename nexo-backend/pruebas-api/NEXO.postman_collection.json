@@ -8,7 +8,8 @@
     { "key": "baseUrl", "value": "http://localhost:3001" },
     { "key": "monitoriaId", "value": "" },
     { "key": "correoPrueba", "value": "" },
-    { "key": "token", "value": "" }
+    { "key": "token", "value": "" },
+    { "key": "tokenInvalido", "value": "no-es-un-token-real" }
   ],
   "item": [
     {
@@ -232,7 +233,7 @@
           ],
           "request": {
             "method": "GET",
-            "header": [{ "key": "Authorization", "value": "Bearer token-inventado" }],
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenInvalido}}" }],
             "url": "{{baseUrl}}/api/usuarios/me"
           }
         },

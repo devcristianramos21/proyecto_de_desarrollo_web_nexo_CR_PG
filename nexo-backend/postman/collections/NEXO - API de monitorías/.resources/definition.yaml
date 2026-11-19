@@ -1,8 +1,0 @@
-$kind: collection
-description: |-
-  Pruebas del backend de NEXO. Ejecutar en orden con Run collection: crea una monitoría de prueba, la consulta, la actualiza, prueba los casos de error y al final la elimina.
-
-  Requiere el servidor corriendo (npm run dev en nexo-backend).
-variables:
-  baseUrl: http://localhost:3001
-  monitoriaId: ""
