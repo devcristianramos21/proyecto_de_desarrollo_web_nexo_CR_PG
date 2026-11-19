@@ -5,6 +5,8 @@ import { elegirCampos } from '../utils/elegirCampos.js';
 // Información básica que el usuario puede editar de su propio perfil.
 // Correo, rol y contraseña quedan fuera a propósito.
 const CAMPOS_PERFIL = ['nombre', 'carrera', 'semestre', 'foto', 'biografia'];
+// Un tutor además puede ajustar las materias que dicta
+const CAMPOS_PERFIL_TUTOR = [...CAMPOS_PERFIL, 'materias'];
 
 export async function obtenerPerfil(idUsuario) {
   const usuario = await Usuario.findById(idUsuario);
@@ -19,7 +21,8 @@ export async function obtenerPerfil(idUsuario) {
 export async function actualizarPerfil(idUsuario, datos) {
   const usuario = await obtenerPerfil(idUsuario);
 
-  usuario.set(elegirCampos(datos, CAMPOS_PERFIL));
+  const permitidos = usuario.rol === 'tutor' ? CAMPOS_PERFIL_TUTOR : CAMPOS_PERFIL;
+  usuario.set(elegirCampos(datos, permitidos));
   return usuario.save();
 }
 

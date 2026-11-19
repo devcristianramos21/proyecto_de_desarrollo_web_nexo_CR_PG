@@ -8,6 +8,10 @@ export const DOMINIO_INSTITUCIONAL = 'urosario.edu.co';
 const FORMATO_CORREO = /^[^\s@]+@urosario\.edu\.co$/;
 
 const RONDAS_BCRYPT = 10;
+export const MAX_MATERIAS = 15;
+
+// Campos que cualquier usuario puede ver del perfil de un tutor
+export const CAMPOS_PUBLICOS_TUTOR = 'nombre carrera semestre foto biografia materias';
 
 const usuarioSchema = new mongoose.Schema(
   {
@@ -57,6 +61,16 @@ const usuarioSchema = new mongoose.Schema(
       trim: true,
       maxlength: [500, 'La biografía no puede superar los 500 caracteres'],
     },
+    // Materias que dicta. Solo aplica a tutores: se llenan al aprobar su solicitud.
+    materias: {
+      type: [{ type: String, trim: true, maxlength: 100 }],
+      validate: {
+        validator: (materias) => materias.length <= MAX_MATERIAS && materias.every(Boolean),
+        message: `Las materias no pueden estar vacías y como máximo son ${MAX_MATERIAS}`,
+      },
+    },
+    // Tutores marcados como favoritos por el estudiante
+    favoritos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Usuario' }],
   },
   {
     timestamps: true,
