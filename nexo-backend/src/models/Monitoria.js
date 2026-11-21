@@ -108,6 +108,11 @@ const monitoriaSchema = new mongoose.Schema(
       ref: 'Usuario',
       required: true,
     },
+    // Solo en las preparcial: el parcial para el que prepara
+    parcial: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Parcial',
+    },
     // Motivo de rechazo o cancelación
     motivo: {
       type: String,
@@ -121,10 +126,18 @@ const monitoriaSchema = new mongoose.Schema(
 // Índices para las consultas más frecuentes: cruces de horario y "mis monitorías"
 monitoriaSchema.index({ tutor: 1, fecha: 1 });
 monitoriaSchema.index({ estudiantes: 1, fecha: 1 });
+monitoriaSchema.index({ parcial: 1 });
 
 monitoriaSchema.pre('validate', function () {
   if (esHoraValida(this.horaInicio) && esHoraValida(this.horaFin) && this.horaFin <= this.horaInicio) {
     this.invalidate('horaFin', 'La hora de fin debe ser posterior a la hora de inicio');
+  }
+
+  if (this.tipo === 'preparcial' && !this.parcial) {
+    this.invalidate('parcial', 'Una monitoría preparcial debe indicar el parcial para el que prepara');
+  }
+  if (this.tipo !== 'preparcial' && this.parcial) {
+    this.parcial = undefined;
   }
 
   const reglas = REGLAS_CUPO[this.tipo];

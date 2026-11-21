@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "NEXO - API de monitorías",
-    "description": "Pruebas del backend de NEXO, organizadas por carpeta. Ejecutar en orden con Run collection.\n\nANTES DE EJECUTAR: crea un administrador (npm run crear-admin) y escribe su correo y contraseña en las variables adminCorreo y adminPassword (pestaña Variables de la colección).\n\n- Auth y perfil: registra un usuario de prueba con correo único (prueba.postman.<número>@urosario.edu.co), inicia sesión, edita el perfil y cambia la contraseña.\n- Tutores, disponibilidad y favoritos: el usuario anterior solicita ser tutor, el admin lo aprueba, gestiona su disponibilidad y un segundo estudiante lo marca como favorito. También prueba un rechazo.\n- Monitorías: el tutor publica disponibilidad; el segundo estudiante solicita monitorías par (una aceptada, una rechazada); el admin crea una Saber Pro (mínimo 7, máximo 20) y dos grupos de obligatoria; inscripción, cambio de grupo, calendario y cancelaciones.\n\nCada ejecución deja dos usuarios de prueba en la base.\n\nRequiere el servidor corriendo (npm run dev en nexo-backend).",
+    "description": "Pruebas del backend de NEXO, organizadas por carpeta. Ejecutar en orden con Run collection.\n\nANTES DE EJECUTAR: crea un administrador (npm run crear-admin) y escribe su correo y contraseña en las variables adminCorreo y adminPassword (pestaña Variables de la colección).\n\n- Auth y perfil: registra un usuario de prueba con correo único (prueba.postman.<número>@urosario.edu.co), inicia sesión, edita el perfil y cambia la contraseña.\n- Tutores, disponibilidad y favoritos: el usuario anterior solicita ser tutor, el admin lo aprueba, gestiona su disponibilidad y un segundo estudiante lo marca como favorito. También prueba un rechazo.\n- Monitorías: el tutor publica disponibilidad; el segundo estudiante solicita monitorías par (una aceptada, una rechazada); el admin crea una Saber Pro (mínimo 7, máximo 20) y dos grupos de obligatoria; inscripción, cambio de grupo, calendario y cancelaciones.\n- Parciales: el admin publica un parcial, crea una preparcial ligada a él (debe terminar antes del parcial), aparece en el calendario y se valida que no se borre un parcial con preparciales activas.\n- Chat: mensajes directos solo con monitoría vigente, chat de grupo por monitoría grupal, no leídos, paginación e historial de solo lectura.\n\nCada ejecución deja tres usuarios de prueba en la base.\n\nRequiere el servidor corriendo (npm run dev en nexo-backend).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -115,6 +115,46 @@
     },
     {
       "key": "monOblBId",
+      "value": ""
+    },
+    {
+      "key": "parcialId",
+      "value": ""
+    },
+    {
+      "key": "preparcialId",
+      "value": ""
+    },
+    {
+      "key": "correoEstudiante3",
+      "value": ""
+    },
+    {
+      "key": "tokenEstudiante3",
+      "value": ""
+    },
+    {
+      "key": "estudiante3Id",
+      "value": ""
+    },
+    {
+      "key": "franjaChatId",
+      "value": ""
+    },
+    {
+      "key": "monChatParId",
+      "value": ""
+    },
+    {
+      "key": "monChatGrupoId",
+      "value": ""
+    },
+    {
+      "key": "convDirectaId",
+      "value": ""
+    },
+    {
+      "key": "convGrupoId",
       "value": ""
     }
   ],
@@ -3361,6 +3401,1736 @@
               }
             ],
             "url": "{{baseUrl}}/api/disponibilidad/{{franjaMonId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parciales",
+      "item": [
+        {
+          "name": "1. Error: un estudiante no publica parciales",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materia\": \"Cálculo Diferencial\",\n  \"nombre\": \"Primer parcial\",\n  \"fecha\": \"{{fechaJueves}}\",\n  \"hora\": \"08:00\",\n  \"descripcion\": \"Temas: límites y derivadas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales"
+          }
+        },
+        {
+          "name": "2. Error: parcial sin fecha",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala fecha', () => pm.expect(pm.response.json().errores).to.have.property('fecha'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materia\": \"Cálculo Diferencial\",\n  \"nombre\": \"Primer parcial\",\n  \"hora\": \"08:00\",\n  \"descripcion\": \"Temas: límites y derivadas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales"
+          }
+        },
+        {
+          "name": "3. Error: parcial en el pasado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala fecha', () => pm.expect(pm.response.json().errores).to.have.property('fecha'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materia\": \"Cálculo Diferencial\",\n  \"nombre\": \"Primer parcial\",\n  \"fecha\": \"2020-03-10\",\n  \"hora\": \"08:00\",\n  \"descripcion\": \"Temas: límites y derivadas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales"
+          }
+        },
+        {
+          "name": "4. Admin: publicar parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('nombre = Primer parcial', () => pm.expect(pm.response.json().nombre).to.eql(\"Primer parcial\"));",
+                  "pm.test('hora = 08:00', () => pm.expect(pm.response.json().hora).to.eql(\"08:00\"));",
+                  "pm.collectionVariables.set('parcialId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materia\": \"Cálculo Diferencial\",\n  \"nombre\": \"Primer parcial\",\n  \"fecha\": \"{{fechaJueves}}\",\n  \"hora\": \"08:00\",\n  \"descripcion\": \"Temas: límites y derivadas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales"
+          }
+        },
+        {
+          "name": "5. Buscar parciales por materia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el parcial publicado', () => {",
+                  "  pm.expect(pm.response.json().map((x) => x._id)).to.include(pm.collectionVariables.get('parcialId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parciales?materia=cálculo"
+          }
+        },
+        {
+          "name": "6. Error: preparcial sin parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala parcial', () => pm.expect(pm.response.json().errores).to.have.property('parcial'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"preparcial\",\n  \"tutor\": \"{{tutorId}}\",\n  \"fecha\": \"{{fechaMiercoles}}\",\n  \"horaInicio\": \"16:00\",\n  \"horaFin\": \"18:00\",\n  \"modalidad\": \"virtual\",\n  \"lugar\": \"Enlace de Teams\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "7. Error: preparcial después del parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: La monitoría preparcial debe terminar antes de que empiece el parcial', () => pm.expect(pm.response.json().mensaje).to.eql('La monitoría preparcial debe terminar antes de que empiece el parcial'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"preparcial\",\n  \"parcial\": \"{{parcialId}}\",\n  \"tutor\": \"{{tutorId}}\",\n  \"fecha\": \"{{fechaJueves}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"virtual\",\n  \"lugar\": \"Enlace de Teams\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "8. Admin: crear preparcial ligada al parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Toma la materia del parcial', () => pm.expect(pm.response.json().materia).to.eql('Cálculo Diferencial'));",
+                  "pm.test('Trae los datos del parcial', () => pm.expect(pm.response.json().parcial.nombre).to.eql('Primer parcial'));",
+                  "pm.collectionVariables.set('preparcialId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"preparcial\",\n  \"parcial\": \"{{parcialId}}\",\n  \"tutor\": \"{{tutorId}}\",\n  \"fecha\": \"{{fechaMiercoles}}\",\n  \"horaInicio\": \"16:00\",\n  \"horaFin\": \"18:00\",\n  \"modalidad\": \"virtual\",\n  \"lugar\": \"Enlace de Teams\",\n  \"materia\": \"Otra materia (se ignora)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "9. Ver las preparciales de un parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la preparcial', () => {",
+                  "  pm.expect(pm.response.json().map((x) => x._id)).to.include(pm.collectionVariables.get('preparcialId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}/preparciales"
+          }
+        },
+        {
+          "name": "10. Inscribirse en la preparcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('inscrito = true', () => pm.expect(pm.response.json().inscrito).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{preparcialId}}/inscripcion"
+          }
+        },
+        {
+          "name": "11. Error: adelantar el parcial antes de su preparcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{fechaLunes}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}"
+          }
+        },
+        {
+          "name": "12. Admin: cambiar la hora del parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('hora = 09:00', () => pm.expect(pm.response.json().hora).to.eql(\"09:00\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hora\": \"09:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}"
+          }
+        },
+        {
+          "name": "13. El calendario muestra el parcial y la preparcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el parcial', () => {",
+                  "  pm.expect(pm.response.json().parciales.map((x) => x._id)).to.include(pm.collectionVariables.get('parcialId'));",
+                  "});",
+                  "pm.test('Incluye la preparcial inscrita', () => {",
+                  "  pm.expect(pm.response.json().monitorias.map((x) => x._id)).to.include(pm.collectionVariables.get('preparcialId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/calendario?desde={{calDesde}}&hasta={{calHasta}}"
+          }
+        },
+        {
+          "name": "14. Error: eliminar un parcial con preparcial programada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}"
+          }
+        },
+        {
+          "name": "15. Admin: cancelar la preparcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('estado = cancelada', () => pm.expect(pm.response.json().estado).to.eql(\"cancelada\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba automática\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{preparcialId}}/cancelar"
+          }
+        },
+        {
+          "name": "16. Admin: eliminar el parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Mensaje: Parcial eliminado', () => pm.expect(pm.response.json().mensaje).to.eql('Parcial eliminado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}"
+          }
+        },
+        {
+          "name": "17. El parcial ya no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Mensaje: Parcial no encontrado', () => pm.expect(pm.response.json().mensaje).to.eql('Parcial no encontrado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "1. Preparación: registrar un tercer estudiante",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const texto = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, \"0\")}-${String(d.getDate()).padStart(2, \"0\")}`;",
+                  "const lunes = new Date();",
+                  "lunes.setDate(lunes.getDate() + 7);",
+                  "while (lunes.getDay() !== 1) lunes.setDate(lunes.getDate() + 1);",
+                  "const dia = (n) => { const d = new Date(lunes); d.setDate(d.getDate() + n); return texto(d); };",
+                  "pm.collectionVariables.set('fechaLunes', dia(0));",
+                  "pm.collectionVariables.set('fechaMiercoles', dia(2));",
+                  "pm.collectionVariables.set('correoEstudiante3', `prueba.postman.${Date.now()}.c@urosario.edu.co`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('tokenEstudiante3', pm.response.json().token);",
+                  "pm.collectionVariables.set('estudiante3Id', pm.response.json().usuario._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Estudiante Tres\",\n  \"correo\": \"{{correoEstudiante3}}\",\n  \"password\": \"secreta123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "2. Preparación: el tutor publica disponibilidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('franjaChatId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"lunes\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"18:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/disponibilidad"
+          }
+        },
+        {
+          "name": "3. Error: chat directo sin monitoría vigente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Mensaje: Solo puedes escribirle a personas con las que tienes o tuviste una monitoría', () => pm.expect(pm.response.json().mensaje).to.eql('Solo puedes escribirle a personas con las que tienes o tuviste una monitoría'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{tutorId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "4. Preparación: solicitar monitoría par",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('monChatParId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"15:00\",\n  \"horaFin\": \"16:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "5. Error: una solicitud sin aceptar no habilita el chat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{tutorId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "6. Preparación: el tutor acepta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monChatParId}}/aceptar"
+          }
+        },
+        {
+          "name": "7. Contactos del estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye a su tutor', () => pm.expect(pm.response.json().map((u) => u._id)).to.include(pm.collectionVariables.get('tutorId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/contactos"
+          }
+        },
+        {
+          "name": "8. Abrir chat directo con el tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('tipo = directa', () => pm.expect(pm.response.json().tipo).to.eql(\"directa\"));",
+                  "pm.test('El otro participante es el tutor', () => pm.expect(pm.response.json().otroParticipante._id).to.eql(pm.collectionVariables.get('tutorId')));",
+                  "pm.collectionVariables.set('convDirectaId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{tutorId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "9. Abrirlo desde el otro lado no lo duplica",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es la misma conversación', () => pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('convDirectaId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{estudiante2Id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "10. Error: chat consigo mismo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{estudiante2Id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "11. Error: un estudiante sin relación no puede escribirle al tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante3}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{tutorId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "12. Error: el administrador no usa el chat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones"
+          }
+        },
+        {
+          "name": "13. Enviar mensaje",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('texto = Hola, ¿qué temas vemos el lunes?', () => pm.expect(pm.response.json().texto).to.eql(\"Hola, ¿qué temas vemos el lunes?\"));",
+                  "pm.test('Trae el nombre del autor', () => pm.expect(pm.response.json().autor.nombre).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Hola, ¿qué temas vemos el lunes?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "14. Error: mensaje vacío",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"   \"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "15. Error: escribir en una conversación ajena",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante3}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Intruso\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "16. Bandeja del tutor: 1 mensaje sin leer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const conv = pm.response.json().find((c) => c._id === pm.collectionVariables.get('convDirectaId'));",
+                  "pm.test('Tiene 1 no leído y muestra el último mensaje', () => {",
+                  "  pm.expect(conv.noLeidos).to.eql(1);",
+                  "  pm.expect(conv.ultimoMensaje.texto).to.eql('Hola, ¿qué temas vemos el lunes?');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones"
+          }
+        },
+        {
+          "name": "17. El tutor responde",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Derivadas e integrales. ¡Nos vemos!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "18. Leer la conversación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const { mensajes, hayMas } = pm.response.json();",
+                  "pm.test('2 mensajes en orden cronológico', () => {",
+                  "  pm.expect(mensajes).to.have.lengthOf(2);",
+                  "  pm.expect(mensajes[0].texto).to.eql('Hola, ¿qué temas vemos el lunes?');",
+                  "});",
+                  "pm.test('No hay más páginas', () => pm.expect(hayMas).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "19. Al leer, se marcan como leídos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const conv = pm.response.json().find((c) => c._id === pm.collectionVariables.get('convDirectaId'));",
+                  "pm.test('0 no leídos', () => pm.expect(conv.noLeidos).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones"
+          }
+        },
+        {
+          "name": "20. Paginación: solo el último mensaje",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const { mensajes, hayMas } = pm.response.json();",
+                  "pm.test('1 mensaje, el más reciente, y hay más', () => {",
+                  "  pm.expect(mensajes).to.have.lengthOf(1);",
+                  "  pm.expect(mensajes[0].texto).to.eql('Derivadas e integrales. ¡Nos vemos!');",
+                  "  pm.expect(hayMas).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes?limite=1"
+          }
+        },
+        {
+          "name": "21. Error: límite fuera de rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes?limite=500"
+          }
+        },
+        {
+          "name": "22. Preparación: admin crea una obligatoria con el estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('monChatGrupoId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"obligatoria\",\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"grupo\": \"C\",\n  \"fecha\": \"{{fechaMiercoles}}\",\n  \"horaInicio\": \"07:00\",\n  \"horaFin\": \"09:00\",\n  \"modalidad\": \"presencial\",\n  \"estudiantes\": [\n    \"{{estudiante2Id}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "23. El chat del grupo aparece en la bandeja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const grupo = pm.response.json().find((c) => c.tipo === 'grupo' && c.monitoria._id === pm.collectionVariables.get('monChatGrupoId'));",
+                  "pm.test('Existe el chat del grupo C', () => {",
+                  "  pm.expect(grupo).to.be.an('object');",
+                  "  pm.expect(grupo.titulo).to.eql('Cálculo Diferencial - Grupo C');",
+                  "});",
+                  "if (grupo) pm.collectionVariables.set('convGrupoId', grupo._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones"
+          }
+        },
+        {
+          "name": "24. El tutor abre el mismo chat de grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es la misma conversación', () => pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('convGrupoId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monitoria\": \"{{monChatGrupoId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/grupo"
+          }
+        },
+        {
+          "name": "25. Error: entrar al chat de un grupo ajeno",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante3}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monitoria\": \"{{monChatGrupoId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/grupo"
+          }
+        },
+        {
+          "name": "26. Error: una monitoría par no tiene chat de grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monitoria\": \"{{monChatParId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/grupo"
+          }
+        },
+        {
+          "name": "27. El tutor escribe en el grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Recuerden traer calculadora.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convGrupoId}}/mensajes"
+          }
+        },
+        {
+          "name": "28. El estudiante lee el grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Ve el mensaje del tutor', () => pm.expect(pm.response.json().mensajes[0].texto).to.eql('Recuerden traer calculadora.'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convGrupoId}}/mensajes"
+          }
+        },
+        {
+          "name": "29. Preparación: el estudiante cancela la par",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monChatParId}}/cancelar"
+          }
+        },
+        {
+          "name": "30. Preparación: el admin cancela la obligatoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba automática\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monChatGrupoId}}/cancelar"
+          }
+        },
+        {
+          "name": "31. Error: sin monitoría vigente ya no se puede escribir",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"¿Sigues ahí?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "32. Pero el historial sigue disponible",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('2 mensajes', () => pm.expect(pm.response.json().mensajes).to.have.lengthOf(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "33. Error: el chat de un grupo cancelado es solo de lectura",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Hola\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convGrupoId}}/mensajes"
+          }
+        },
+        {
+          "name": "34. Limpieza: el tutor elimina su franja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/disponibilidad/{{franjaChatId}}"
           }
         }
       ]

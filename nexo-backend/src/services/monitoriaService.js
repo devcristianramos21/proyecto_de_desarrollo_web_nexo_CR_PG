@@ -21,10 +21,12 @@ import {
   parsearFecha,
 } from '../utils/fechas.js';
 import { esHoraValida } from '../utils/horas.js';
+import * as parcialService from './parcialService.js';
 
 const POBLAR = [
   { path: 'tutor', select: 'nombre foto materias' },
   { path: 'estudiantes', select: 'nombre correo carrera semestre' },
+  { path: 'parcial', select: 'materia nombre fecha hora' },
 ];
 const CAMPOS_PAR = ['materia', 'tema', 'descripcion', 'modalidad', 'lugar'];
 const CAMPOS_GRUPAL = ['tipo', 'materia', 'tema', 'descripcion', 'grupo', 'modalidad', 'lugar', 'cupoMaximo'];
@@ -61,6 +63,10 @@ export function presentar(monitoria, usuario) {
     cupoMinimoAlcanzado: inscritos >= minimo,
     inscrito: estaInscrito(monitoria, usuario),
   });
+
+  if (resultado.parcial?.fecha instanceof Date) {
+    resultado.parcial.fecha = aTextoFecha(resultado.parcial.fecha);
+  }
 
   if (usuario.rol !== 'admin' && !esTutorDe(monitoria, usuario)) {
     delete resultado.estudiantes;
@@ -151,6 +157,13 @@ async function validarEstudiantes(ids, idTutor) {
   }
 
   return unicos;
+}
+
+/** Verifica que una preparcial termine antes de su parcial. */
+function verificarAntesDelParcial(horario, parcial) {
+  if (!parcialService.terminaAntesDelParcial(horario, parcial)) {
+    throw new AppError(400, 'La monitoría preparcial debe terminar antes de que empiece el parcial');
+  }
 }
 
 // Agrega un estudiante sin superar el cupo, aunque dos personas se inscriban al mismo tiempo
@@ -245,11 +258,20 @@ export async function crearGrupal(admin, datos) {
   const horario = leerHorario(datos);
   const estudiantes = await validarEstudiantes(datos.estudiantes ?? [], tutor.id);
 
+  // La preparcial toma la materia de su parcial y debe terminar antes de él
+  const datosPreparcial = {};
+  if (datos.tipo === 'preparcial') {
+    const parcial = await parcialService.obtenerParaPreparcial(datos.parcial);
+    verificarAntesDelParcial(horario, parcial);
+    Object.assign(datosPreparcial, { parcial: parcial._id, materia: parcial.materia });
+  }
+
   await verificarCruce(tutor._id, horario, 'El tutor ya tiene una monitoría en ese horario');
 
   const monitoria = await Monitoria.create({
     ...elegirCampos(datos, CAMPOS_GRUPAL),
     ...horario,
+    ...datosPreparcial,
     tutor: tutor._id,
     estudiantes,
     estado: 'programada',
@@ -288,6 +310,13 @@ export async function actualizarGrupal(admin, id, datos) {
       throw new AppError(400, 'El nuevo tutor está inscrito como estudiante en esta monitoría');
     }
     monitoria.tutor = tutor._id;
+  }
+
+  // En una preparcial la materia siempre es la del parcial
+  if (monitoria.tipo === 'preparcial' && (cambiaHorario || datos.parcial !== undefined || datos.materia !== undefined)) {
+    const parcial = await parcialService.obtenerParaPreparcial(datos.parcial ?? monitoria.parcial);
+    verificarAntesDelParcial(monitoria, parcial);
+    monitoria.set({ parcial: parcial._id, materia: parcial.materia });
   }
 
   if (cambiaHorario || datos.tutor !== undefined) {
@@ -520,6 +549,17 @@ export async function listarComoTutor(usuario, { estado } = {}) {
   return buscar({ tutor: usuario.id, ...(estado && { estado }) }, usuario);
 }
 
+/** Preparciales programadas de un parcial que aún no han comenzado. */
+export async function listarPreparcialesDe(usuario, idParcial) {
+  await parcialService.obtenerPorId(idParcial);
+
+  const monitorias = await Monitoria.find({ tipo: 'preparcial', parcial: idParcial, estado: 'programada' })
+    .populate(POBLAR)
+    .sort(ORDEN);
+
+  return monitorias.filter((monitoria) => !yaEmpezo(monitoria)).map((monitoria) => presentar(monitoria, usuario));
+}
+
 export async function obtenerDetalle(usuario, id) {
   const monitoria = await obtenerPoblada(id);
 
@@ -534,7 +574,7 @@ export async function obtenerDetalle(usuario, id) {
   return presentar(monitoria, usuario);
 }
 
-/** Calendario del usuario entre dos fechas (incluidas). */
+/** Calendario del usuario entre dos fechas (incluidas): sus monitorías y los parciales publicados. */
 export async function calendario(usuario, { desde, hasta } = {}) {
   const inicio = parsearFecha(desde);
   const fin = parsearFecha(hasta);
@@ -563,5 +603,6 @@ export async function calendario(usuario, { desde, hasta } = {}) {
       ...presentar(monitoria, usuario),
       rolEnMonitoria: esTutorDe(monitoria, usuario) ? 'tutor' : 'estudiante',
     })),
+    parciales: await parcialService.enRango(inicio, fin),
   };
 }
