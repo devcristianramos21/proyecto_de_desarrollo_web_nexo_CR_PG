@@ -3,6 +3,7 @@ import express from 'express';
 import { manejadorErrores } from './middlewares/manejadorErrores.js';
 import { rutaNoEncontrada } from './middlewares/rutaNoEncontrada.js';
 import authRoutes from './routes/authRoutes.js';
+import calendarioRoutes from './routes/calendarioRoutes.js';
 import disponibilidadRoutes from './routes/disponibilidadRoutes.js';
 import monitoriaRoutes from './routes/monitoriaRoutes.js';
 import solicitudTutorRoutes from './routes/solicitudTutorRoutes.js';
@@ -24,8 +25,8 @@ app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/solicitudes-tutor', solicitudTutorRoutes);
 app.use('/api/disponibilidad', disponibilidadRoutes);
 app.use('/api/tutores', tutorRoutes);
-// Aún sin autenticación: se protege al rehacer las monitorías en la fase 3
 app.use('/api/monitorias', monitoriaRoutes);
+app.use('/api/calendario', calendarioRoutes);
 
 // Estos dos van siempre al final
 app.use(rutaNoEncontrada);

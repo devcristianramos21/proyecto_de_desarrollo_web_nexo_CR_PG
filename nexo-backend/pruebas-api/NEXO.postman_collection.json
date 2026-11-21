@@ -1,17 +1,13 @@
 {
   "info": {
     "name": "NEXO - API de monitorías",
-    "description": "Pruebas del backend de NEXO, organizadas por carpeta. Ejecutar en orden con Run collection.\n\nANTES DE EJECUTAR: crea un administrador (npm run crear-admin) y escribe su correo y contraseña en las variables adminCorreo y adminPassword (pestaña Variables de la colección).\n\n- Auth y perfil: registra un usuario de prueba con correo único (prueba.postman.<número>@urosario.edu.co), inicia sesión, edita el perfil y cambia la contraseña.\n- Tutores, disponibilidad y favoritos: el usuario anterior solicita ser tutor, el admin lo aprueba, gestiona su disponibilidad y un segundo estudiante lo marca como favorito. También prueba un rechazo.\n- Monitorías: crea una monitoría de prueba, la consulta, la actualiza, prueba los casos de error y al final la elimina.\n\nCada ejecución deja dos usuarios de prueba en la base.\n\nRequiere el servidor corriendo (npm run dev en nexo-backend).",
+    "description": "Pruebas del backend de NEXO, organizadas por carpeta. Ejecutar en orden con Run collection.\n\nANTES DE EJECUTAR: crea un administrador (npm run crear-admin) y escribe su correo y contraseña en las variables adminCorreo y adminPassword (pestaña Variables de la colección).\n\n- Auth y perfil: registra un usuario de prueba con correo único (prueba.postman.<número>@urosario.edu.co), inicia sesión, edita el perfil y cambia la contraseña.\n- Tutores, disponibilidad y favoritos: el usuario anterior solicita ser tutor, el admin lo aprueba, gestiona su disponibilidad y un segundo estudiante lo marca como favorito. También prueba un rechazo.\n- Monitorías: el tutor publica disponibilidad; el segundo estudiante solicita monitorías par (una aceptada, una rechazada); el admin crea una Saber Pro (mínimo 7, máximo 20) y dos grupos de obligatoria; inscripción, cambio de grupo, calendario y cancelaciones.\n\nCada ejecución deja dos usuarios de prueba en la base.\n\nRequiere el servidor corriendo (npm run dev en nexo-backend).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:3001"
-    },
-    {
-      "key": "monitoriaId",
-      "value": ""
     },
     {
       "key": "correoPrueba",
@@ -71,6 +67,54 @@
     },
     {
       "key": "franja2Id",
+      "value": ""
+    },
+    {
+      "key": "fechaLunes",
+      "value": ""
+    },
+    {
+      "key": "fechaMartes",
+      "value": ""
+    },
+    {
+      "key": "fechaMiercoles",
+      "value": ""
+    },
+    {
+      "key": "fechaJueves",
+      "value": ""
+    },
+    {
+      "key": "calDesde",
+      "value": ""
+    },
+    {
+      "key": "calHasta",
+      "value": ""
+    },
+    {
+      "key": "franjaMonId",
+      "value": ""
+    },
+    {
+      "key": "monParId",
+      "value": ""
+    },
+    {
+      "key": "monPar2Id",
+      "value": ""
+    },
+    {
+      "key": "monSaberId",
+      "value": ""
+    },
+    {
+      "key": "monOblAId",
+      "value": ""
+    },
+    {
+      "key": "monOblBId",
       "value": ""
     }
   ],
@@ -1755,14 +1799,32 @@
           "name": "1. Estado de la API",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Fechas futuras para que la colección funcione cualquier día que se ejecute",
+                  "const texto = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, \"0\")}-${String(d.getDate()).padStart(2, \"0\")}`;",
+                  "const lunes = new Date();",
+                  "lunes.setDate(lunes.getDate() + 7);",
+                  "while (lunes.getDay() !== 1) lunes.setDate(lunes.getDate() + 1);",
+                  "const dia = (n) => { const d = new Date(lunes); d.setDate(d.getDate() + n); return texto(d); };",
+                  "pm.collectionVariables.set('fechaLunes', dia(0));",
+                  "pm.collectionVariables.set('fechaMartes', dia(1));",
+                  "pm.collectionVariables.set('fechaMiercoles', dia(2));",
+                  "pm.collectionVariables.set('fechaJueves', dia(3));",
+                  "pm.collectionVariables.set('calDesde', texto(new Date()));",
+                  "pm.collectionVariables.set('calHasta', dia(30));"
+                ]
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Responde 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Indica que la API funciona', () => {",
-                  "  pm.expect(pm.response.json().mensaje).to.eql('API de NEXO funcionando');",
-                  "});"
+                  "pm.test('Mensaje: API de NEXO funcionando', () => pm.expect(pm.response.json().mensaje).to.eql('API de NEXO funcionando'));"
                 ]
               }
             }
@@ -1773,29 +1835,15 @@
           }
         },
         {
-          "name": "2. Crear monitoría",
+          "name": "2. Preparación: el tutor publica disponibilidad el lunes",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
-                  "const monitoria = pm.response.json();",
-                  "pm.test('Devuelve los datos guardados', () => {",
-                  "  pm.expect(monitoria._id).to.be.a('string');",
-                  "  pm.expect(monitoria.materia).to.eql('Cálculo Diferencial');",
-                  "  pm.expect(monitoria.modalidad).to.eql('virtual');",
-                  "});",
-                  "pm.test('El estado por defecto es programada', () => {",
-                  "  pm.expect(monitoria.estado).to.eql('programada');",
-                  "});",
-                  "pm.test('Agrega fechas de creación y actualización', () => {",
-                  "  pm.expect(monitoria).to.have.property('createdAt');",
-                  "  pm.expect(monitoria).to.have.property('updatedAt');",
-                  "});",
-                  "// Guarda el id para las peticiones siguientes",
-                  "pm.collectionVariables.set('monitoriaId', monitoria._id);"
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('franjaMonId', pm.response.json()._id);"
                 ]
               }
             }
@@ -1806,22 +1854,274 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Límites y continuidad\",\n  \"tutor\": \"Ana Pérez\",\n  \"fecha\": \"2026-11-20\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"16:00\",\n  \"modalidad\": \"virtual\",\n  \"descripcion\": \"Monitoría de prueba creada desde Postman\"\n}",
+              "raw": "{\n  \"diaSemana\": \"lunes\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"18:00\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "url": "{{baseUrl}}/api/monitorias"
+            "url": "{{baseUrl}}/api/disponibilidad"
           }
         },
         {
-          "name": "3. Listar monitorías",
+          "name": "3. Error: sin sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/monitorias/mis-tutorias"
+          }
+        },
+        {
+          "name": "4. Error: par fuera de la disponibilidad del tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: El horario no está dentro de la disponibilidad del tutor', () => pm.expect(pm.response.json().mensaje).to.eql('El horario no está dentro de la disponibilidad del tutor'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"08:00\",\n  \"horaFin\": \"09:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "5. Error: par de una materia que el tutor no dicta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Química Orgánica\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"15:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "6. Error: par en una fecha pasada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: La monitoría debe programarse para una fecha y hora futuras', () => pm.expect(pm.response.json().mensaje).to.eql('La monitoría debe programarse para una fecha y hora futuras'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"2020-01-06\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"15:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "7. Error: solicitarse una par a sí mismo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: No puedes solicitarte una monitoría a ti mismo', () => pm.expect(pm.response.json().mensaje).to.eql('No puedes solicitarte una monitoría a ti mismo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"15:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "8. Solicitar monitoría par",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('estado = solicitada', () => pm.expect(pm.response.json().estado).to.eql(\"solicitada\"));",
+                  "pm.test('tipo = par', () => pm.expect(pm.response.json().tipo).to.eql(\"par\"));",
+                  "pm.test('El estudiante queda inscrito', () => pm.expect(pm.response.json().inscrito).to.be.true);",
+                  "pm.test('El estudiante no ve la lista de inscritos', () => pm.expect(pm.response.json()).to.not.have.property('estudiantes'));",
+                  "pm.collectionVariables.set('monParId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"calculo diferencial\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"15:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "9. Error: otra par que se cruza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"14:30\",\n  \"horaFin\": \"15:30\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "10. Tutor: ver solicitudes pendientes",
           "event": [
             {
               "listen": "test",
@@ -1829,11 +2129,8 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Responde 200', () => pm.response.to.have.status(200));",
-                  "const lista = pm.response.json();",
-                  "pm.test('Devuelve una lista', () => pm.expect(lista).to.be.an('array'));",
-                  "pm.test('Incluye la monitoría creada', () => {",
-                  "  const id = pm.collectionVariables.get('monitoriaId');",
-                  "  pm.expect(lista.some((m) => m._id === id)).to.be.true;",
+                  "pm.test('Incluye la solicitud', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.include(pm.collectionVariables.get('monParId'));",
                   "});"
                 ]
               }
@@ -1841,11 +2138,41 @@
           ],
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/monitorias"
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/como-tutor?estado=solicitada"
           }
         },
         {
-          "name": "4. Obtener monitoría por id",
+          "name": "11. Error: un estudiante no puede aceptar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/aceptar"
+          }
+        },
+        {
+          "name": "12. Tutor: aceptar solicitud",
           "event": [
             {
               "listen": "test",
@@ -1853,8 +2180,59 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Responde 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Es la monitoría creada', () => {",
-                  "  pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('monitoriaId'));",
+                  "pm.test('estado = programada', () => pm.expect(pm.response.json().estado).to.eql(\"programada\"));",
+                  "pm.test('El tutor sí ve a los inscritos', () => pm.expect(pm.response.json().estudiantes).to.have.lengthOf(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/aceptar"
+          }
+        },
+        {
+          "name": "13. Error: aceptar dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: La monitoría ya está programada', () => pm.expect(pm.response.json().mensaje).to.eql('La monitoría ya está programada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/aceptar"
+          }
+        },
+        {
+          "name": "14. Estudiante: mis tutorías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la monitoría par', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.include(pm.collectionVariables.get('monParId'));",
                   "});"
                 ]
               }
@@ -1862,11 +2240,55 @@
           ],
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/monitorias/{{monitoriaId}}"
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/mis-tutorias"
           }
         },
         {
-          "name": "5. Actualizar monitoría",
+          "name": "15. Solicitar una segunda par",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('monPar2Id', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Integrales\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"16:00\",\n  \"horaFin\": \"17:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "16. Tutor: rechazar con motivo",
           "event": [
             {
               "listen": "test",
@@ -1874,16 +2296,599 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Responde 200', () => pm.response.to.have.status(200));",
-                  "const monitoria = pm.response.json();",
-                  "pm.test('Aplica los cambios', () => {",
-                  "  pm.expect(monitoria.tema).to.eql('Derivadas');",
-                  "  pm.expect(monitoria.modalidad).to.eql('presencial');",
-                  "  pm.expect(monitoria.estado).to.eql('en_curso');",
-                  "});",
-                  "pm.test('Conserva los campos que no se enviaron', () => {",
-                  "  pm.expect(monitoria.materia).to.eql('Cálculo Diferencial');",
-                  "  pm.expect(monitoria.tutor).to.eql('Ana Pérez');",
+                  "pm.test('estado = rechazada', () => pm.expect(pm.response.json().estado).to.eql(\"rechazada\"));",
+                  "pm.test('motivo = Tengo un compromiso a esa hora', () => pm.expect(pm.response.json().motivo).to.eql(\"Tengo un compromiso a esa hora\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Tengo un compromiso a esa hora\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monPar2Id}}/rechazar"
+          }
+        },
+        {
+          "name": "17. Error: Saber Pro con cupo menor a 7",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala cupoMaximo', () => pm.expect(pm.response.json().errores).to.have.property('cupoMaximo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Saber Pro: Razonamiento cuantitativo\",\n  \"fecha\": \"{{fechaMartes}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"saber_pro\",\n  \"cupoMaximo\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "18. Error: Saber Pro con cupo mayor a 20",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala cupoMaximo', () => pm.expect(pm.response.json().errores).to.have.property('cupoMaximo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Saber Pro: Razonamiento cuantitativo\",\n  \"fecha\": \"{{fechaMartes}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"saber_pro\",\n  \"cupoMaximo\": 25\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "19. Error: un estudiante no crea grupales",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"fecha\": \"{{fechaMartes}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"preparcial\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "20. Error: asignar como tutor a quien no lo es",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Mensaje: Tutor no encontrado', () => pm.expect(pm.response.json().mensaje).to.eql('Tutor no encontrado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{estudiante2Id}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"fecha\": \"{{fechaMartes}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"preparcial\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "21. Admin: crear Saber Pro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('cupoMaximo = 20', () => pm.expect(pm.response.json().cupoMaximo).to.eql(20));",
+                  "pm.test('cupoMinimo = 7', () => pm.expect(pm.response.json().cupoMinimo).to.eql(7));",
+                  "pm.test('cupoMinimoAlcanzado = false', () => pm.expect(pm.response.json().cupoMinimoAlcanzado).to.eql(false));",
+                  "pm.collectionVariables.set('monSaberId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Saber Pro: Razonamiento cuantitativo\",\n  \"fecha\": \"{{fechaMartes}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"saber_pro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "22. Catálogo: monitorías Saber Pro disponibles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la Saber Pro creada', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.include(pm.collectionVariables.get('monSaberId'));",
                   "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/disponibles?tipo=saber_pro"
+          }
+        },
+        {
+          "name": "23. Inscribirse en Saber Pro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('inscrito = true', () => pm.expect(pm.response.json().inscrito).to.eql(true));",
+                  "pm.test('inscritos = 1', () => pm.expect(pm.response.json().inscritos).to.eql(1));",
+                  "pm.test('cuposDisponibles = 19', () => pm.expect(pm.response.json().cuposDisponibles).to.eql(19));",
+                  "pm.test('Aún no alcanza el mínimo de 7', () => pm.expect(pm.response.json().cupoMinimoAlcanzado).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monSaberId}}/inscripcion"
+          }
+        },
+        {
+          "name": "24. Error: inscribirse dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: Ya estás inscrito en esta monitoría', () => pm.expect(pm.response.json().mensaje).to.eql('Ya estás inscrito en esta monitoría'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monSaberId}}/inscripcion"
+          }
+        },
+        {
+          "name": "25. Error: el tutor no se inscribe en su propia monitoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: Eres el tutor de esta monitoría', () => pm.expect(pm.response.json().mensaje).to.eql('Eres el tutor de esta monitoría'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monSaberId}}/inscripcion"
+          }
+        },
+        {
+          "name": "26. Cancelar mi inscripción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('inscrito = false', () => pm.expect(pm.response.json().inscrito).to.eql(false));",
+                  "pm.test('inscritos = 0', () => pm.expect(pm.response.json().inscritos).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monSaberId}}/inscripcion"
+          }
+        },
+        {
+          "name": "27. Admin: crear obligatoria grupo A con un estudiante asignado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('inscritos = 1', () => pm.expect(pm.response.json().inscritos).to.eql(1));",
+                  "pm.collectionVariables.set('monOblAId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"fecha\": \"{{fechaMiercoles}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"obligatoria\",\n  \"grupo\": \"A\",\n  \"cupoMaximo\": 2,\n  \"estudiantes\": [\n    \"{{estudiante2Id}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "28. Admin: crear obligatoria grupo B (cupo 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('inscritos = 0', () => pm.expect(pm.response.json().inscritos).to.eql(0));",
+                  "pm.collectionVariables.set('monOblBId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"fecha\": \"{{fechaJueves}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"obligatoria\",\n  \"grupo\": \"B\",\n  \"cupoMaximo\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "29. Error: inscribirse por su cuenta en una obligatoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: En las monitorías obligatorias te asigna la administración; puedes cambiarte de grupo', () => pm.expect(pm.response.json().mensaje).to.eql('En las monitorías obligatorias te asigna la administración; puedes cambiarte de grupo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monOblBId}}/inscripcion"
+          }
+        },
+        {
+          "name": "30. Error: salirse de una obligatoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monOblAId}}/inscripcion"
+          }
+        },
+        {
+          "name": "31. Cambiarse del grupo A al grupo B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Ahora está en el grupo B', () => {",
+                  "  pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('monOblBId'));",
+                  "  pm.expect(pm.response.json().inscrito).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"{{monOblBId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblAId}}/cambio-grupo"
+          }
+        },
+        {
+          "name": "32. Ya no está en el grupo A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('inscrito = false', () => pm.expect(pm.response.json().inscrito).to.eql(false));",
+                  "pm.test('inscritos = 0', () => pm.expect(pm.response.json().inscritos).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monOblAId}}"
+          }
+        },
+        {
+          "name": "33. Error: cambiarse a un grupo de otro tipo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"{{monSaberId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblBId}}/cambio-grupo"
+          }
+        },
+        {
+          "name": "34. Error: cupo máximo menor que los inscritos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
                 ]
               }
             }
@@ -1894,45 +2899,164 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"tema\": \"Derivadas\",\n  \"modalidad\": \"presencial\",\n  \"estado\": \"en_curso\"\n}",
+              "raw": "{\n  \"cupoMaximo\": 0\n}",
               "options": {
                 "raw": {
                   "language": "json"
                 }
               }
             },
-            "url": "{{baseUrl}}/api/monitorias/{{monitoriaId}}"
+            "url": "{{baseUrl}}/api/monitorias/{{monOblBId}}"
           }
         },
         {
-          "name": "6. Error: crear sin campos obligatorios",
+          "name": "35. Admin: ampliar el cupo de un grupo",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
-                  "pm.test('Informa cada campo obligatorio que falta', () => {",
-                  "  const errores = pm.response.json().errores;",
-                  "  ['materia', 'tutor', 'fecha', 'horaInicio', 'horaFin', 'modalidad'].forEach((campo) => {",
-                  "    pm.expect(errores).to.have.property(campo);",
-                  "  });",
-                  "});"
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('cupoMaximo = 30', () => pm.expect(pm.response.json().cupoMaximo).to.eql(30));"
                 ]
               }
             }
           ],
           "request": {
-            "method": "POST",
+            "method": "PUT",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cupoMaximo\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblAId}}"
+          }
+        },
+        {
+          "name": "36. Calendario del estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const ids = pm.response.json().monitorias.map((m) => m._id);",
+                  "pm.test('Incluye la par aceptada y el grupo B', () => {",
+                  "  pm.expect(ids).to.include(pm.collectionVariables.get('monParId'));",
+                  "  pm.expect(ids).to.include(pm.collectionVariables.get('monOblBId'));",
+                  "});",
+                  "pm.test('No incluye la par rechazada', () => pm.expect(ids).to.not.include(pm.collectionVariables.get('monPar2Id')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/calendario?desde={{calDesde}}&hasta={{calHasta}}"
+          }
+        },
+        {
+          "name": "37. Error: calendario sin rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/calendario"
+          }
+        },
+        {
+          "name": "38. Error: finalizar una monitoría que no ha comenzado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: La monitoría aún no ha comenzado', () => pm.expect(pm.response.json().mensaje).to.eql('La monitoría aún no ha comenzado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/finalizar"
+          }
+        },
+        {
+          "name": "39. Error: un estudiante no cancela una grupal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
               }
             ],
             "body": {
@@ -1944,179 +3068,11 @@
                 }
               }
             },
-            "url": "{{baseUrl}}/api/monitorias"
+            "url": "{{baseUrl}}/api/monitorias/{{monOblBId}}/cancelar"
           }
         },
         {
-          "name": "7. Error: hora de fin antes de la de inicio",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
-                  "pm.test('Señala el campo horaFin', () => {",
-                  "  pm.expect(pm.response.json().errores.horaFin).to.eql('La hora de fin debe ser posterior a la hora de inicio');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"materia\": \"Física\",\n  \"tutor\": \"Luis Gómez\",\n  \"fecha\": \"2026-11-21\",\n  \"horaInicio\": \"16:00\",\n  \"horaFin\": \"14:00\",\n  \"modalidad\": \"virtual\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{baseUrl}}/api/monitorias"
-          }
-        },
-        {
-          "name": "8. Error: modalidad no válida",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
-                  "pm.test('Señala el campo modalidad', () => {",
-                  "  pm.expect(pm.response.json().errores).to.have.property('modalidad');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"materia\": \"Física\",\n  \"tutor\": \"Luis Gómez\",\n  \"fecha\": \"2026-11-21\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"16:00\",\n  \"modalidad\": \"hibrida\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": "{{baseUrl}}/api/monitorias"
-          }
-        },
-        {
-          "name": "9. Error: JSON mal formado",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
-                  "pm.test('Explica que el JSON no es válido', () => {",
-                  "  pm.expect(pm.response.json().mensaje).to.eql('El cuerpo de la petición no es un JSON válido');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{ \"materia\": \"Física\", ",
-              "options": {
-                "raw": {
-                  "language": "text"
-                }
-              }
-            },
-            "url": "{{baseUrl}}/api/monitorias"
-          }
-        },
-        {
-          "name": "10. Error: id con formato no válido",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
-                  "pm.test('Indica que el identificador no es válido', () => {",
-                  "  pm.expect(pm.response.json().mensaje).to.eql('Identificador no válido');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "url": "{{baseUrl}}/api/monitorias/abc"
-          }
-        },
-        {
-          "name": "11. Error: id que no existe",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
-                  "pm.test('Indica que no se encontró', () => {",
-                  "  pm.expect(pm.response.json().mensaje).to.eql('Monitoría no encontrada');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "url": "{{baseUrl}}/api/monitorias/000000000000000000000000"
-          }
-        },
-        {
-          "name": "12. Error: ruta que no existe",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "url": "{{baseUrl}}/api/no-existe"
-          }
-        },
-        {
-          "name": "13. Eliminar monitoría",
+          "name": "40. Estudiante: cancelar su monitoría par",
           "event": [
             {
               "listen": "test",
@@ -2124,34 +3080,287 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('Responde 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Confirma la eliminación', () => {",
-                  "  pm.expect(pm.response.json().mensaje).to.eql('Monitoría eliminada');",
-                  "});"
+                  "pm.test('estado = cancelada', () => pm.expect(pm.response.json().estado).to.eql(\"cancelada\"));"
                 ]
               }
             }
           ],
           "request": {
-            "method": "DELETE",
-            "url": "{{baseUrl}}/api/monitorias/{{monitoriaId}}"
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Ya entendí el tema\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/cancelar"
           }
         },
         {
-          "name": "14. Verificar que fue eliminada",
+          "name": "41. Error: cancelar dos veces",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: La monitoría ya está cancelada', () => pm.expect(pm.response.json().mensaje).to.eql('La monitoría ya está cancelada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/cancelar"
+          }
+        },
+        {
+          "name": "42. Admin: listar obligatorias",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el grupo A', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.include(pm.collectionVariables.get('monOblAId'));",
+                  "});",
+                  "pm.test('Incluye el grupo B', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.include(pm.collectionVariables.get('monOblBId'));",
+                  "});"
                 ]
               }
             }
           ],
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/monitorias/{{monitoriaId}}"
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias?tipo=obligatoria"
+          }
+        },
+        {
+          "name": "43. Error: un estudiante no lista todas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias"
+          }
+        },
+        {
+          "name": "44. Limpieza: admin cancela la Saber Pro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba automática\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monSaberId}}/cancelar"
+          }
+        },
+        {
+          "name": "45. Limpieza: admin cancela el grupo A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba automática\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblAId}}/cancelar"
+          }
+        },
+        {
+          "name": "46. Limpieza: admin cancela el grupo B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba automática\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblBId}}/cancelar"
+          }
+        },
+        {
+          "name": "47. Ya no aparecen en el catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('No incluye la Saber Pro cancelada', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.not.include(pm.collectionVariables.get('monSaberId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/disponibles"
+          }
+        },
+        {
+          "name": "48. Limpieza: el tutor elimina su franja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/disponibilidad/{{franjaMonId}}"
           }
         }
       ]
