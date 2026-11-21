@@ -1,6 +1,8 @@
 import 'dotenv/config';
+import { createServer } from 'node:http';
 import app from './app.js';
 import { conectarBaseDeDatos } from './config/database.js';
+import { configurarSockets } from './sockets/chatSocket.js';
 
 const PUERTO = process.env.PORT || 3001;
 
@@ -10,7 +12,12 @@ try {
   }
 
   await conectarBaseDeDatos();
-  app.listen(PUERTO, () => {
+
+  // Express (API REST) y Socket.IO (chat en tiempo real) comparten el mismo puerto
+  const servidor = createServer(app);
+  configurarSockets(servidor);
+
+  servidor.listen(PUERTO, () => {
     console.log(`Servidor escuchando en http://localhost:${PUERTO}`);
   });
 } catch (error) {

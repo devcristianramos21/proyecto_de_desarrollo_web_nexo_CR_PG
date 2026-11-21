@@ -255,6 +255,13 @@ export async function listarMensajes(usuario, idConversacion, { antes, limite } 
   return { mensajes: mensajes.slice(0, cantidad).reverse(), hayMas };
 }
 
+/** Ids de los miembros de una conversación, verificando que el usuario pertenezca a ella. */
+export async function obtenerDestinatarios(usuario, idConversacion) {
+  if (!mongoose.isValidObjectId(idConversacion)) throw new AppError(404, NO_ENCONTRADA);
+  const { destinatarios } = await obtenerConAcceso(usuario, idConversacion);
+  return destinatarios;
+}
+
 export async function enviarMensaje(usuario, idConversacion, { texto } = {}) {
   if (typeof texto !== 'string' || !texto.trim()) {
     throw new AppError(400, 'Datos no válidos', { texto: 'El mensaje no puede estar vacío' });
