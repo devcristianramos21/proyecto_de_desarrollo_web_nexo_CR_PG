@@ -9,6 +9,9 @@ import MisSolicitudes from './pages/misSolicitudes';
 import MisMonitorias from './pages/misMonitorias';
 import Mensajes from './pages/mensajes';
 import Favoritos from './pages/favoritos';
+import MiPerfil from './pages/miPerfil';
+import Notificaciones from './pages/notificaciones';
+import CentroSoporte from './pages/centroSoporte';
 
 function App() {
   const [pantalla, setPantalla] = useState('Inicio');
@@ -23,6 +26,9 @@ function App() {
       'Mis monitorias',
       'Mensajes',
       'Favoritos',
+      'Mi perfil',
+      'Notificaciones',
+      'Soporte',
     ];
 
     if (pantallasDisponibles.includes(destino)) {
@@ -62,6 +68,18 @@ function App() {
 
       {pantalla === 'Favoritos' && (
         <Favoritos onNavegar={navegar} />
+      )}
+
+      {pantalla === 'Mi perfil' && (
+        <MiPerfil onNavegar={navegar} />
+      )}
+
+      {pantalla === 'Notificaciones' && (
+        <Notificaciones onNavegar={navegar} />
+      )}
+
+      {pantalla === 'Soporte' && (
+        <CentroSoporte onNavegar={navegar} />
       )}
     </>
   );

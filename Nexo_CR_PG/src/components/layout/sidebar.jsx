@@ -1,5 +1,7 @@
 
+import { useState } from 'react';
 import './sidebar.css';
+import ConfirmarCerrarSesion from '../modals/confirmarCerrarSesion';
 
 const opciones = [
   { nombre: 'Inicio', icono: '/assets/Frame.svg' },
@@ -19,7 +21,12 @@ const opcionesInferiores = [
   { nombre: 'Cerrar sesión', icono: '/assets/exit-svgrepo-com 1.svg' },
 ];
 
-export default function Sidebar({ paginaActiva = 'Inicio', onNavegar }) {
+export default function Sidebar({
+  paginaActiva = 'Inicio',
+  onNavegar,
+}) {
+  const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
+
   const renderOpcion = (opcion) => (
     <button
       type="button"
@@ -27,9 +34,19 @@ export default function Sidebar({ paginaActiva = 'Inicio', onNavegar }) {
       className={`sidebar__opcion ${
         paginaActiva === opcion.nombre ? 'sidebar__opcion--activa' : ''
       }`}
-      onClick={() => onNavegar?.(opcion.nombre)}
+      onClick={() => {
+        if (opcion.nombre === 'Cerrar sesión') {
+          setMostrarConfirmacion(true);
+        } else {
+          onNavegar?.(opcion.nombre);
+        }
+      }}
     >
-      <img src={opcion.icono} alt="" className="sidebar__icono" />
+      <img
+        src={opcion.icono}
+        alt=""
+        className="sidebar__icono"
+      />
 
       <span className="sidebar__nombre">{opcion.nombre}</span>
 
@@ -40,25 +57,39 @@ export default function Sidebar({ paginaActiva = 'Inicio', onNavegar }) {
   );
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar__marca">
-        <img src="/assets/logo-nexo.png" alt="NEXO" />
-        <div className="sidebar__marca-texto">
-          <strong>NEXO</strong>
-          <span>Plataforma monitorías</span>
+    <>
+      <aside className="sidebar">
+        <div className="sidebar__marca">
+          <img src="/assets/logo-nexo.png" alt="NEXO" />
+
+          <div className="sidebar__marca-texto">
+            <strong>NEXO</strong>
+            <span>Plataforma monitorías</span>
+          </div>
         </div>
-      </div>
 
-      <div className="sidebar__seccion">
-        <p className="sidebar__titulo">ESTUDIANTE</p>
-        <nav className="sidebar__navegacion">
-          {opciones.map(renderOpcion)}
-        </nav>
-      </div>
+        <div className="sidebar__seccion">
+          <p className="sidebar__titulo">ESTUDIANTE</p>
 
-      <div className="sidebar__inferior">
-        {opcionesInferiores.map(renderOpcion)}
-      </div>
-    </aside>
+          <nav className="sidebar__navegacion">
+            {opciones.map(renderOpcion)}
+          </nav>
+        </div>
+
+        <div className="sidebar__inferior">
+          {opcionesInferiores.map(renderOpcion)}
+        </div>
+      </aside>
+
+      {mostrarConfirmacion && (
+        <ConfirmarCerrarSesion
+          onCancelar={() => setMostrarConfirmacion(false)}
+          onConfirmar={() => {
+            setMostrarConfirmacion(false);
+            alert('Cierre de sesión simulado correctamente.');
+          }}
+        />
+      )}
+    </>
   );
 }

@@ -3,9 +3,9 @@ import { useState } from 'react';
 
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
-import StudentStats from '../components/StudentStats';
-import UpcomingExam from '../components/upComingExam';
-import TutorCard from '../components/tutorCard';
+import StudentStats from '../components/layout/studentStats';
+import UpcomingExam from '../components/layout/upComingExam';
+import TutorCard from '../components/layout/tutorCard';
 
 import './homeEstudiantes.css';
 
@@ -128,7 +128,7 @@ export default function HomeEstudiante({ onNavegar }) {
               <h2>MONITORÍAS DISPONIBLES</h2>
               <button
                 type="button"
-                onClick={() => setPaginaActiva('Monitorías')}
+                onClick={() => onNavegar?.('Monitorías')}
               >
                 Ver todas
               </button>
@@ -203,7 +203,7 @@ export default function HomeEstudiante({ onNavegar }) {
               <h2>TUTORES RECOMENDADOS</h2>
               <button
                 type="button"
-                onClick={() => setPaginaActiva('Buscar tutores')}
+                onClick={() => onNavegar?.('Buscar tutores')}
               >
                 Ver todos
               </button>

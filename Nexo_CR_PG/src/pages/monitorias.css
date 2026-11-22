@@ -1,4 +1,9 @@
 
+/* ==========================================
+   NEXO - PANTALLA DE MONITORÍAS
+   Estilos aislados de otras pantallas
+========================================== */
+
 /* CONTENEDOR GENERAL */
 
 .monitorias-layout {
@@ -9,26 +14,29 @@
   font-family: Inter, Arial, sans-serif;
 }
 
-.monitorias-contenido {
+.monitorias-layout .monitorias-contenido {
   flex: 1;
   min-width: 0;
   background: #fcf1f1;
 }
 
-/* CONTENIDO PRINCIPAL */
+/* ==========================================
+   CONTENIDO PRINCIPAL
+========================================== */
 
-.monitorias-main {
+.monitorias-layout .monitorias-main {
   width: 100%;
   max-width: 1201px;
   margin: 0 auto;
   padding: 36px 46px 40px;
+  box-sizing: border-box;
 }
 
-.monitorias-encabezado {
+.monitorias-layout .monitorias-encabezado {
   margin-bottom: 18px;
 }
 
-.monitorias-encabezado h1 {
+.monitorias-layout .monitorias-encabezado h1 {
   margin: 0 0 4px;
   color: #111827;
   font-size: 22px;
@@ -36,16 +44,18 @@
   letter-spacing: -0.22px;
 }
 
-.monitorias-encabezado p {
+.monitorias-layout .monitorias-encabezado p {
   margin: 0;
   color: #6b7280;
   font-size: 14px;
   font-weight: 400;
 }
 
-/* ALERTA DE PARCIALES */
+/* ==========================================
+   ALERTA DE PARCIALES
+========================================== */
 
-.monitorias-aviso {
+.monitorias-layout .monitorias-aviso {
   min-height: 95px;
   display: flex;
   align-items: flex-start;
@@ -55,21 +65,22 @@
   border: 1px solid #f6dfaf;
   border-radius: 12px;
   background: #fef3e2;
+  box-sizing: border-box;
 }
 
-.monitorias-aviso__icono {
+.monitorias-layout .monitorias-aviso__icono {
   width: 18px;
   height: 20px;
   flex-shrink: 0;
 }
 
-.monitorias-aviso__icono img {
+.monitorias-layout .monitorias-aviso__icono img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-.monitorias-aviso__contenido strong {
+.monitorias-layout .monitorias-aviso__contenido strong {
   display: block;
   margin-bottom: 5px;
   color: #92610a;
@@ -77,16 +88,18 @@
   font-weight: 700;
 }
 
-.monitorias-aviso__contenido p {
+.monitorias-layout .monitorias-aviso__contenido p {
   margin: 0;
   color: #92610a;
   font-size: 13px;
   line-height: 1.5;
 }
 
-/* FILTROS */
+/* ==========================================
+   FILTROS
+========================================== */
 
-.monitorias-filtros {
+.monitorias-layout .monitorias-filtros {
   min-height: 35px;
   display: flex;
   align-items: stretch;
@@ -95,7 +108,7 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
-.filtro {
+.monitorias-layout .filtro {
   min-width: 50px;
   padding: 0 14px 9px;
   border: none;
@@ -108,27 +121,31 @@
   cursor: pointer;
 }
 
-.filtro:hover {
+.monitorias-layout .filtro:hover {
   color: #98111e;
 }
 
-.filtro.activo {
+.monitorias-layout .filtro.activo {
   border-bottom-color: #98111e;
   color: #98111e;
   font-weight: 600;
 }
 
-/* LISTADO */
+/* ==========================================
+   LISTADO
+========================================== */
 
-.monitorias-lista {
+.monitorias-layout .monitorias-lista {
   display: flex;
   flex-direction: column;
   gap: 19px;
 }
 
-/* TARJETAS */
+/* ==========================================
+   TARJETAS
+========================================== */
 
-.monitoria-card {
+.monitorias-layout .monitoria-card {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -140,20 +157,20 @@
   border: 1px solid #E5E7EB;
   border-radius: 12px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
 }
 
-
-.monitoria-card--preparcial {
+.monitorias-layout .monitoria-card--preparcial {
   min-height: 133px;
 }
 
-.monitoria-informacion {
+.monitorias-layout .monitoria-informacion {
   flex: 1;
   min-width: 0;
   text-align: left;
 }
 
-.monitoria-titulo-fila {
+.monitorias-layout .monitoria-titulo-fila {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -161,17 +178,19 @@
   margin-bottom: 4px;
 }
 
-.monitoria-titulo-fila h2 {
+.monitorias-layout .monitoria-titulo-fila h2 {
   margin: 0;
   color: #111827;
   font-size: 15px;
   font-weight: 700;
 }
 
-/* BADGES */
+/* ==========================================
+   BADGES
+========================================== */
 
-.monitoria-tipo,
-.monitoria-estado {
+.monitorias-layout .monitoria-tipo,
+.monitorias-layout .monitoria-estado {
   min-height: 18px;
   display: inline-flex;
   align-items: center;
@@ -183,56 +202,58 @@
   white-space: nowrap;
 }
 
-.tipo-obligatoria {
+.monitorias-layout .tipo-obligatoria {
   background: #e7eef6;
   color: #0d2450;
 }
 
-.tipo-par {
+.monitorias-layout .tipo-par {
   background: #fceef0;
   color: #c0122c;
 }
 
-.tipo-preparcial {
+.monitorias-layout .tipo-preparcial {
   background: #fceef0;
   color: #c0122c;
 }
 
-.estado-disponible {
+.monitorias-layout .estado-disponible {
   background: #e9f8ef;
   color: #0f7a38;
 }
 
-.estado-por-confirmar {
+.monitorias-layout .estado-por-confirmar {
   background: #fdf6e4;
   color: #c0122c;
 }
 
-.estado-inscrito {
+.monitorias-layout .estado-inscrito {
   background: #e7eef6;
   color: #0d2450;
 }
 
-.estado-cupo-lleno {
+.monitorias-layout .estado-cupo-lleno {
   background: #fdf6e4;
   color: #92610a;
 }
 
-/* INFORMACIÓN */
+/* ==========================================
+   INFORMACIÓN
+========================================== */
 
-.monitoria-horario {
+.monitorias-layout .monitoria-horario {
   margin: 3px 0 0;
   color: #6b7280;
   font-size: 12px;
   line-height: 1.5;
 }
 
-.monitoria-horario strong {
+.monitorias-layout .monitoria-horario strong {
   color: #374151;
   font-weight: 600;
 }
 
-.monitoria-preparacion {
+.monitorias-layout .monitoria-preparacion {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -242,16 +263,18 @@
   font-weight: 600;
 }
 
-/* CUPOS Y PROGRESO */
+/* ==========================================
+   CUPOS Y PROGRESO
+========================================== */
 
-.monitoria-cupos {
+.monitorias-layout .monitoria-cupos {
   display: flex;
   align-items: center;
   gap: 9px;
   margin-top: 5px;
 }
 
-.monitoria-progreso {
+.monitorias-layout .monitoria-progreso {
   width: 100px;
   height: 8px;
   flex-shrink: 0;
@@ -260,7 +283,7 @@
   background: #e5e7eb;
 }
 
-.monitoria-progreso span {
+.monitorias-layout .monitoria-progreso span {
   display: block;
   height: 100%;
   border-radius: 999px;
@@ -268,21 +291,23 @@
   transition: width 0.3s ease;
 }
 
-.monitoria-cupos small {
+.monitorias-layout .monitoria-cupos small {
   color: #6b7280;
   font-size: 11px;
 }
 
-.monitoria-alerta {
+.monitorias-layout .monitoria-alerta {
   display: block;
   margin-top: 5px;
   color: #6b7280;
   font-size: 11px;
 }
 
-/* ACCIONES */
+/* ==========================================
+   ACCIONES
+========================================== */
 
-.monitoria-acciones {
+.monitorias-layout .monitoria-acciones {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -292,9 +317,9 @@
   margin-left: auto;
 }
 
-.boton-detalle,
-.boton-inscripcion,
-.boton-cancelar {
+.monitorias-layout .boton-detalle,
+.monitorias-layout .boton-inscripcion,
+.monitorias-layout .boton-cancelar {
   min-height: 32px;
   display: inline-flex;
   align-items: center;
@@ -309,44 +334,50 @@
   transition: filter 0.2s;
 }
 
-.boton-detalle {
+.monitorias-layout .boton-detalle {
   min-width: 94px;
   border: 1px solid #d1d5db;
   background: #ffffff;
   color: #111827;
 }
 
-.boton-inscripcion {
+.monitorias-layout .boton-inscripcion {
   min-width: 93px;
   border: 1px solid #98111e;
   background: #98111e;
   color: #ffffff;
 }
 
-.boton-cancelar {
+.monitorias-layout .boton-cancelar {
   min-width: 83px;
   border: 1px solid transparent;
   background: #ffffff;
   color: #dc2626;
 }
 
-.boton-detalle:hover,
-.boton-inscripcion:hover,
-.boton-cancelar:hover {
+.monitorias-layout .boton-detalle:hover,
+.monitorias-layout .boton-inscripcion:hover,
+.monitorias-layout .boton-cancelar:hover {
   filter: brightness(0.94);
 }
 
-.monitorias-vacio {
+/* ==========================================
+   ESTADO VACÍO
+========================================== */
+
+.monitorias-layout .monitorias-vacio {
   padding: 30px;
   color: #6b7280;
   text-align: center;
   font-size: 14px;
 }
 
-/* RESPONSIVE */
+/* ==========================================
+   RESPONSIVE
+========================================== */
 
 @media (max-width: 1000px) {
-  .monitorias-main {
+  .monitorias-layout .monitorias-main {
     padding: 30px 24px;
   }
 }
@@ -356,56 +387,56 @@
     flex-direction: column;
   }
 
-  .monitorias-main {
+  .monitorias-layout .monitorias-main {
     padding: 25px 16px;
   }
 
-  .monitoria-card,
-  .monitoria-card--preparcial {
+  .monitorias-layout .monitoria-card,
+  .monitorias-layout .monitoria-card--preparcial {
     align-items: flex-start;
     flex-direction: column;
     gap: 14px;
   }
 
-  .monitoria-acciones {
+  .monitorias-layout .monitoria-acciones {
     width: 100%;
-    justify-content: flex-start;
-  }
-}
-
-@media (max-width: 500px) {
-  .monitorias-encabezado h1 {
-    font-size: 20px;
-  }
-
-  .monitorias-aviso {
-    padding: 14px;
-  }
-
-  .monitorias-filtros {
-    overflow-x: auto;
-  }
-
-  .filtro {
-    padding-right: 10px;
-    padding-left: 10px;
-    white-space: nowrap;
-  }
-
-  .monitoria-titulo-fila h2 {
-    width: 100%;
-  }
-}
-
-@media (max-width: 700px) {
-  .monitoria-card {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .monitoria-acciones {
     justify-content: flex-start;
     margin-left: 0;
   }
 }
 
+@media (max-width: 700px) {
+  .monitorias-layout .monitoria-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .monitorias-layout .monitoria-acciones {
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 500px) {
+  .monitorias-layout .monitorias-encabezado h1 {
+    font-size: 20px;
+  }
+
+  .monitorias-layout .monitorias-aviso {
+    padding: 14px;
+  }
+
+  .monitorias-layout .monitorias-filtros {
+    overflow-x: auto;
+  }
+
+  .monitorias-layout .filtro {
+    padding-right: 10px;
+    padding-left: 10px;
+    white-space: nowrap;
+  }
+
+  .monitorias-layout .monitoria-titulo-fila h2 {
+    width: 100%;
+  }
+}

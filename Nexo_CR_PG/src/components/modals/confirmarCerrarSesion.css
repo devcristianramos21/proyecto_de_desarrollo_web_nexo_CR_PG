@@ -1,0 +1,144 @@
+
+/* ==========================================
+   MODAL - CONFIRMAR CIERRE DE SESIÓN
+   Frame Figma: 209:13699
+========================================== */
+
+.cerrar-sesion-overlay {
+  position: fixed;
+  top: 51px;
+  left: 239px;
+  z-index: 9999;
+
+  width: calc(100vw - 239px);
+  height: calc(100vh - 51px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(17, 24, 39, 0.45);
+  box-sizing: border-box;
+}
+
+/* MODAL */
+
+.cerrar-sesion-modal {
+  width: 380px;
+  max-width: calc(100% - 32px);
+  padding: 24px;
+
+  background: #FFFFFF;
+  border-radius: 16px;
+
+  box-shadow:
+    0 8px 12px rgba(17, 24, 39, 0.10),
+    0 2px 3px rgba(17, 24, 39, 0.05);
+
+  box-sizing: border-box;
+}
+
+/* TÍTULO */
+
+.cerrar-sesion-modal h2 {
+  margin: 0 0 6px;
+
+  color: #111827;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* MENSAJE */
+
+.cerrar-sesion-modal p {
+  margin: 0;
+
+  color: #111827;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 20.93px;
+}
+
+/* BOTONES */
+
+.cerrar-sesion-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  margin-top: 12.6px;
+}
+
+.cerrar-sesion-acciones button {
+  height: 37px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 9px 16px;
+  border-radius: 8px;
+
+  font-family: Inter, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* CANCELAR */
+
+.cerrar-sesion-cancelar {
+  width: 95px;
+  border: none;
+  background: #FFFFFF;
+  color: #111827;
+}
+
+.cerrar-sesion-cancelar:hover {
+  background: #F3F4F6;
+}
+
+/* CONFIRMAR */
+
+.cerrar-sesion-confirmar {
+  width: 143px;
+  border: 1px solid #DC2626;
+  background: #DC2626;
+  color: #FFFFFF;
+}
+
+.cerrar-sesion-confirmar:hover {
+  background: #B91C1C;
+  border-color: #B91C1C;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 750px) {
+  .cerrar-sesion-overlay {
+    top: 51px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 51px);
+  }
+}
+
+@media (max-width: 420px) {
+  .cerrar-sesion-modal {
+    padding: 20px;
+  }
+
+  .cerrar-sesion-acciones {
+    gap: 6px;
+  }
+
+  .cerrar-sesion-acciones button {
+    padding: 8px;
+    font-size: 12px;
+  }
+}

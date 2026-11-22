@@ -1,0 +1,440 @@
+
+/* ==========================================
+   NEXO - CENTRO DE SOPORTE
+   Frame Figma: 209:13162
+========================================== */
+
+/* ESTRUCTURA GENERAL */
+
+.centro-soporte {
+  display: flex;
+  min-height: 100vh;
+  background: #FCF1F1;
+  color: #111827;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.centro-soporte__principal {
+  flex: 1;
+  min-width: 0;
+  background: #FCF1F1;
+}
+
+.centro-soporte__contenido {
+  width: 100%;
+  max-width: 1201px;
+  margin: 0 auto;
+  padding: 37px 78px 43px 58px;
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   ENCABEZADO
+========================================== */
+
+.centro-soporte__encabezado {
+  margin-bottom: 24px;
+}
+
+.centro-soporte__encabezado h1 {
+  margin: 0 0 3px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.22px;
+}
+
+.centro-soporte__encabezado p {
+  margin: 0;
+  color: #0E0F11;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* ==========================================
+   PESTAÑAS
+========================================== */
+
+.centro-soporte__pestanas {
+  min-height: 36px;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 22px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.centro-soporte__pestana {
+  min-width: 80px;
+  padding: 0 9px 9px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #0E0F11;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.centro-soporte__pestana:hover {
+  color: #98111E;
+}
+
+.centro-soporte__pestana--activa {
+  border-bottom-color: #98111E;
+  color: #98111E;
+}
+
+/* ==========================================
+   TARJETA DEL FORMULARIO
+========================================== */
+
+.centro-soporte__formulario-card {
+  width: 100%;
+  min-height: 478px;
+  padding: 28px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.06);
+  box-sizing: border-box;
+}
+
+/* ENCABEZADO DEL FORMULARIO */
+
+.centro-soporte__formulario-encabezado {
+  margin-bottom: 20px;
+}
+
+.centro-soporte__formulario-encabezado h2 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.centro-soporte__formulario-encabezado p {
+  margin: 0;
+  color: #6B7280;
+  font-size: 13.5px;
+  font-weight: 400;
+}
+
+/* ==========================================
+   CAMPOS DEL FORMULARIO
+========================================== */
+
+.centro-soporte__formulario {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.centro-soporte__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.centro-soporte__campo label {
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.centro-soporte__campo input,
+.centro-soporte__campo select,
+.centro-soporte__campo textarea {
+  width: 100%;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #111827;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.centro-soporte__campo input,
+.centro-soporte__campo select {
+  height: 39px;
+  padding: 0 12px;
+}
+
+.centro-soporte__campo select {
+  height: 38px;
+  cursor: pointer;
+}
+
+.centro-soporte__campo textarea {
+  min-height: 110px;
+  padding: 10px 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.centro-soporte__campo input::placeholder,
+.centro-soporte__campo textarea::placeholder {
+  color: #9CA3AF;
+}
+
+.centro-soporte__campo input:focus,
+.centro-soporte__campo select:focus,
+.centro-soporte__campo textarea:focus {
+  border-color: #98111E;
+  box-shadow: 0 0 0 2px rgba(152, 17, 30, 0.08);
+}
+
+/* TEXTO DE AYUDA */
+
+.centro-soporte__ayuda {
+  margin: -3px 0 10px;
+  color: #0E0F11;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* BOTÓN ENVIAR */
+
+.centro-soporte__enviar {
+  width: 559px;
+  max-width: 100%;
+  min-height: 37px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: #98111E;
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.centro-soporte__enviar:hover {
+  background: #7D0D18;
+}
+
+/* ==========================================
+   MIS SOLICITUDES
+========================================== */
+
+.centro-soporte__mis-solicitudes {
+  min-height: 200px;
+  margin-bottom: 22px;
+  padding: 25px 28px;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  background: #FFFFFF;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.06);
+  box-sizing: border-box;
+}
+
+.centro-soporte__mis-solicitudes > h2 {
+  margin: 0 0 18px;
+  color: #111827;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.centro-soporte__sin-solicitudes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  color: #6B7280;
+  font-size: 13px;
+}
+
+.centro-soporte__sin-solicitudes p {
+  margin: 0;
+}
+
+.centro-soporte__sin-solicitudes button {
+  padding: 9px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #98111E;
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.centro-soporte__solicitudes-lista {
+  display: flex;
+  flex-direction: column;
+}
+
+.centro-soporte__solicitud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 14px 0;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.centro-soporte__solicitud:last-child {
+  border-bottom: none;
+}
+
+.centro-soporte__solicitud h3 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.centro-soporte__solicitud p,
+.centro-soporte__solicitud span {
+  margin: 0;
+  color: #6B7280;
+  font-size: 12px;
+}
+
+.centro-soporte__solicitud > .centro-soporte__estado {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ==========================================
+   PREGUNTAS FRECUENTES
+========================================== */
+
+.centro-soporte__faq {
+  margin-top: 17px;
+}
+
+.centro-soporte__faq > h2 {
+  margin: 0 0 11px 5px;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+
+.centro-soporte__faq-card {
+  overflow: hidden;
+  width: 100%;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  background: #FFFFFF;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.06);
+}
+
+/* FILAS FAQ */
+
+.centro-soporte__faq-item {
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.centro-soporte__faq-item:last-child {
+  border-bottom: none;
+}
+
+.centro-soporte__faq-pregunta {
+  width: 100%;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 10px 16px;
+  border: none;
+  background: #FFFFFF;
+  color: #111827;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.centro-soporte__faq-pregunta:hover {
+  background: #FAFAFA;
+}
+
+/* CHEVRON */
+
+.centro-soporte__chevron {
+  flex-shrink: 0;
+  color: #374151;
+  font-size: 20px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.centro-soporte__chevron--abierto {
+  transform: rotate(90deg);
+}
+
+/* RESPUESTA */
+
+.centro-soporte__faq-respuesta {
+  padding: 0 42px 14px 16px;
+  color: #6B7280;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1100px) {
+  .centro-soporte__contenido {
+    padding: 30px 28px 40px;
+  }
+}
+
+@media (max-width: 750px) {
+  .centro-soporte {
+    flex-direction: column;
+  }
+
+  .centro-soporte__contenido {
+    padding: 25px 16px 35px;
+  }
+
+  .centro-soporte__formulario-card {
+    min-height: auto;
+    padding: 22px 18px;
+  }
+
+  .centro-soporte__enviar {
+    width: 100%;
+  }
+}
+
+@media (max-width: 500px) {
+  .centro-soporte__encabezado h1 {
+    font-size: 20px;
+  }
+
+  .centro-soporte__campo textarea {
+    min-height: 120px;
+  }
+
+  .centro-soporte__mis-solicitudes {
+    padding: 20px 16px;
+  }
+
+  .centro-soporte__solicitud {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
