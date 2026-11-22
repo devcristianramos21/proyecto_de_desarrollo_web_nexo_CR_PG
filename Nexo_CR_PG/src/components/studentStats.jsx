@@ -1,6 +1,6 @@
-import './StudentStats.css';
+import './studentStats.css';
 
-export default function StudentStats({
+export default function studentStats({
   tutoriasActivas,
   sesionesCompletadas,
   solicitudesPendientes,

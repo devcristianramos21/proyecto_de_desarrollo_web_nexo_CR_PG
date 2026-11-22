@@ -1,0 +1,308 @@
+
+.mis-tutorias-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #FCF1F1;
+  font-family: 'Inter', sans-serif;
+}
+
+.mis-tutorias-contenido {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mis-tutorias-main {
+  flex: 1;
+  padding: 38px 38px 50px;
+  background: #FCF1F1;
+}
+
+/* Encabezado */
+
+.mis-tutorias__encabezado {
+  margin-bottom: 35px;
+}
+
+.mis-tutorias__encabezado h1 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.22px;
+}
+
+.mis-tutorias__encabezado p {
+  margin: 0;
+  color: #0E0F11;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* Pestañas */
+
+.mis-tutorias__tabs {
+  display: flex;
+  align-items: stretch;
+  height: 37px;
+  margin-bottom: 21px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.mis-tutorias__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  color: #6B7280;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mis-tutorias__tab--activa {
+  color: #98111E;
+  border-bottom-color: #98111E;
+}
+
+.mis-tutorias__contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 25px;
+  height: 18px;
+  padding: 0 6px;
+  color: #98111E;
+  background: #FCF1F1;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Lista */
+
+.mis-tutorias__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* Tarjetas */
+
+.mis-tutorias__tarjeta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 102px;
+  padding: 14px 14px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 1px rgba(17, 24, 39, 0.06),
+    0 1px 0.5px rgba(17, 24, 39, 0.04);
+}
+
+/* Avatar */
+
+.mis-tutorias__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  color: #5B6DEB;
+  background: #EEF0FD;
+  border-radius: 16px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Información */
+
+.mis-tutorias__informacion {
+  flex: 1;
+  min-width: 0;
+}
+
+.mis-tutorias__informacion h2 {
+  margin: 0 0 3px;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.mis-tutorias__informacion > p {
+  margin: 0 0 5px;
+  color: #0E0F11;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.mis-tutorias__datos {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.mis-tutorias__fecha {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #6B7280;
+  font-size: 13px;
+}
+
+.mis-tutorias__fecha > span {
+  color: #9CA3AF;
+  font-size: 17px;
+}
+
+.mis-tutorias__modalidad {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 55px;
+  height: 19px;
+  padding: 0 8px;
+  color: #0E0F11;
+  background: #EEF0FD;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Acciones */
+
+.mis-tutorias__acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 7px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.mis-tutorias__estado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 89px;
+  height: 20px;
+  padding: 0 9px;
+  color: #111827;
+  background: #EEF0FD;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.mis-tutorias__botones {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mis-tutorias__boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.mis-tutorias__boton--ver {
+  min-width: 48px;
+  color: #111827;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+}
+
+.mis-tutorias__boton--reprogramar {
+  min-width: 108px;
+  color: #111827;
+  background: #FFFFFF;
+  border: 1px solid transparent;
+}
+
+.mis-tutorias__boton--cancelar {
+  min-width: 83px;
+  color: #FFFFFF;
+  background: #98111E;
+  border: 1px solid #98111E;
+}
+
+.mis-tutorias__boton--ver:hover,
+.mis-tutorias__boton--reprogramar:hover {
+  background: #F9FAFB;
+}
+
+.mis-tutorias__boton--cancelar:hover {
+  background: #7F0E19;
+}
+
+/* Estado vacío */
+
+.mis-tutorias__vacio {
+  padding: 35px 20px;
+  color: #6B7280;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Responsive */
+
+@media (max-width: 1050px) {
+  .mis-tutorias__tarjeta {
+    flex-wrap: wrap;
+  }
+
+  .mis-tutorias__acciones {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 650px) {
+  .mis-tutorias-main {
+    padding: 24px 16px;
+  }
+
+  .mis-tutorias__tarjeta {
+    align-items: flex-start;
+  }
+
+  .mis-tutorias__informacion {
+    width: calc(100% - 60px);
+  }
+
+  .mis-tutorias__acciones {
+    justify-content: flex-start;
+  }
+
+  .mis-tutorias__botones {
+    flex-wrap: wrap;
+  }
+}

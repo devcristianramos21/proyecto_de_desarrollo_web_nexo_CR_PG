@@ -1,0 +1,119 @@
+
+.sidebar {
+  width: 239px;
+  min-width: 239px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 8px 16px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+}
+
+.sidebar__marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+  margin-bottom: 36px;
+}
+
+.sidebar__marca img {
+  width: 62px;
+  height: 41px;
+  object-fit: contain;
+}
+
+.sidebar__marca-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sidebar__marca-texto strong {
+  color: #98111e;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.sidebar__marca-texto span {
+  color: #6b7280;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.sidebar__titulo {
+  margin: 0 0 10px 10px;
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+}
+
+.sidebar__navegacion,
+.sidebar__inferior {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar__opcion {
+  width: 100%;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #374151;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar__opcion:hover {
+  background: #f9eeee;
+}
+
+.sidebar__opcion--activa {
+  background: #fcf1f1;
+  color: #98111e;
+  font-weight: 600;
+}
+
+.sidebar__icono {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.sidebar__nombre {
+  flex: 1;
+}
+
+.sidebar__badge {
+  min-width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  padding: 0 5px;
+  border-radius: 20px;
+  background: #98111e;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.sidebar__inferior {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}

@@ -1,0 +1,331 @@
+
+.solicitudes-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #FCF1F1;
+  font-family: 'Inter', sans-serif;
+}
+
+.solicitudes-contenido {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.solicitudes-main {
+  flex: 1;
+  padding: 38px 42px 50px;
+  background: #FCF1F1;
+}
+
+/* Encabezado */
+
+.solicitudes__encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.solicitudes__encabezado h1 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.22px;
+}
+
+.solicitudes__encabezado p {
+  margin: 0;
+  color: #0E0F11;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.solicitudes__nueva {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 163px;
+  height: 37px;
+  padding: 0 14px;
+  color: #FFFFFF;
+  background: #98111E;
+  border: 1px solid #98111E;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.solicitudes__nueva:hover {
+  background: #7F0E19;
+}
+
+.solicitudes__nueva span {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Pestañas */
+
+.solicitudes__tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  height: 37px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.solicitudes__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 14px;
+  color: #6B7280;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.solicitudes__tab--activa {
+  color: #98111E;
+  border-bottom-color: #98111E;
+}
+
+.solicitudes__contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  color: #98111E;
+  background: #FCF1F1;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Lista de solicitudes */
+
+.solicitudes__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.solicitudes__tarjeta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 98px;
+  padding: 16px 17px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 1px rgba(17, 24, 39, 0.06),
+    0 1px 0.5px rgba(17, 24, 39, 0.04);
+}
+
+/* Avatar */
+
+.solicitudes__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  color: #98111E;
+  background: #FCF1F1;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Información */
+
+.solicitudes__informacion {
+  flex: 1;
+  min-width: 0;
+}
+
+.solicitudes__informacion h2 {
+  margin: 0 0 2px;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.solicitudes__informacion p {
+  margin: 0 0 5px;
+  color: #6B7280;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.solicitudes__fecha {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #9CA3AF;
+  font-size: 11px;
+}
+
+.solicitudes__icono-calendario {
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* Estados y acciones */
+
+.solicitudes__acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.solicitudes__estado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 65px;
+  min-height: 20px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.solicitudes__estado--pendiente {
+  color: #FFB22A;
+  background: #FEF6E7;
+}
+
+.solicitudes__estado--aceptada {
+  color: #0F7A38;
+  background: #E9F8EF;
+}
+
+.solicitudes__estado--rechazada {
+  color: #DC2626;
+  background: #FEECEC;
+}
+
+.solicitudes__estado--cancelada {
+  color: #374151;
+  background: #F1F2FA;
+}
+
+.solicitudes__propuesta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 5px 10px;
+  color: #FFB22A;
+  background: #FEF6E7;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.solicitudes__propuesta span {
+  font-size: 14px;
+}
+
+.solicitudes__cancelar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 83px;
+  height: 32px;
+  color: #FFFFFF;
+  background: #DC2626;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.solicitudes__cancelar:hover {
+  background: #B91C1C;
+}
+
+/* Estado vacío */
+
+.solicitudes__vacio {
+  padding: 35px 20px;
+  color: #6B7280;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .solicitudes-main {
+    padding: 30px 24px;
+  }
+}
+
+@media (max-width: 650px) {
+  .solicitudes-main {
+    padding: 24px 16px;
+  }
+
+  .solicitudes__encabezado {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .solicitudes__tabs {
+    overflow-x: auto;
+  }
+
+  .solicitudes__tab {
+    padding: 0 10px;
+  }
+
+  .solicitudes__tarjeta {
+    flex-wrap: wrap;
+  }
+
+  .solicitudes__informacion {
+    width: calc(100% - 50px);
+  }
+
+  .solicitudes__acciones {
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+}

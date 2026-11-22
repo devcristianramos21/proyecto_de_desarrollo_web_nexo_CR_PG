@@ -1,0 +1,411 @@
+
+/* CONTENEDOR GENERAL */
+
+.monitorias-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #fcf1f1;
+  color: #111827;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.monitorias-contenido {
+  flex: 1;
+  min-width: 0;
+  background: #fcf1f1;
+}
+
+/* CONTENIDO PRINCIPAL */
+
+.monitorias-main {
+  width: 100%;
+  max-width: 1201px;
+  margin: 0 auto;
+  padding: 36px 46px 40px;
+}
+
+.monitorias-encabezado {
+  margin-bottom: 18px;
+}
+
+.monitorias-encabezado h1 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.22px;
+}
+
+.monitorias-encabezado p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* ALERTA DE PARCIALES */
+
+.monitorias-aviso {
+  min-height: 95px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 17px 20px;
+  border: 1px solid #f6dfaf;
+  border-radius: 12px;
+  background: #fef3e2;
+}
+
+.monitorias-aviso__icono {
+  width: 18px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.monitorias-aviso__icono img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.monitorias-aviso__contenido strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #92610a;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.monitorias-aviso__contenido p {
+  margin: 0;
+  color: #92610a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* FILTROS */
+
+.monitorias-filtros {
+  min-height: 35px;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.filtro {
+  min-width: 50px;
+  padding: 0 14px 9px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #6b7280;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.filtro:hover {
+  color: #98111e;
+}
+
+.filtro.activo {
+  border-bottom-color: #98111e;
+  color: #98111e;
+  font-weight: 600;
+}
+
+/* LISTADO */
+
+.monitorias-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+
+/* TARJETAS */
+
+.monitoria-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 20px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+
+.monitoria-card--preparcial {
+  min-height: 133px;
+}
+
+.monitoria-informacion {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.monitoria-titulo-fila {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 4px;
+}
+
+.monitoria-titulo-fila h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* BADGES */
+
+.monitoria-tipo,
+.monitoria-estado {
+  min-height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tipo-obligatoria {
+  background: #e7eef6;
+  color: #0d2450;
+}
+
+.tipo-par {
+  background: #fceef0;
+  color: #c0122c;
+}
+
+.tipo-preparcial {
+  background: #fceef0;
+  color: #c0122c;
+}
+
+.estado-disponible {
+  background: #e9f8ef;
+  color: #0f7a38;
+}
+
+.estado-por-confirmar {
+  background: #fdf6e4;
+  color: #c0122c;
+}
+
+.estado-inscrito {
+  background: #e7eef6;
+  color: #0d2450;
+}
+
+.estado-cupo-lleno {
+  background: #fdf6e4;
+  color: #92610a;
+}
+
+/* INFORMACIÓN */
+
+.monitoria-horario {
+  margin: 3px 0 0;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.monitoria-horario strong {
+  color: #374151;
+  font-weight: 600;
+}
+
+.monitoria-preparacion {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 3px 0;
+  color: #c0122c;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* CUPOS Y PROGRESO */
+
+.monitoria-cupos {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 5px;
+}
+
+.monitoria-progreso {
+  width: 100px;
+  height: 8px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e5e7eb;
+}
+
+.monitoria-progreso span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: #98111e;
+  transition: width 0.3s ease;
+}
+
+.monitoria-cupos small {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.monitoria-alerta {
+  display: block;
+  margin-top: 5px;
+  color: #6b7280;
+  font-size: 11px;
+}
+
+/* ACCIONES */
+
+.monitoria-acciones {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.boton-detalle,
+.boton-inscripcion,
+.boton-cancelar {
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.boton-detalle {
+  min-width: 94px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+}
+
+.boton-inscripcion {
+  min-width: 93px;
+  border: 1px solid #98111e;
+  background: #98111e;
+  color: #ffffff;
+}
+
+.boton-cancelar {
+  min-width: 83px;
+  border: 1px solid transparent;
+  background: #ffffff;
+  color: #dc2626;
+}
+
+.boton-detalle:hover,
+.boton-inscripcion:hover,
+.boton-cancelar:hover {
+  filter: brightness(0.94);
+}
+
+.monitorias-vacio {
+  padding: 30px;
+  color: #6b7280;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1000px) {
+  .monitorias-main {
+    padding: 30px 24px;
+  }
+}
+
+@media (max-width: 750px) {
+  .monitorias-layout {
+    flex-direction: column;
+  }
+
+  .monitorias-main {
+    padding: 25px 16px;
+  }
+
+  .monitoria-card,
+  .monitoria-card--preparcial {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .monitoria-acciones {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 500px) {
+  .monitorias-encabezado h1 {
+    font-size: 20px;
+  }
+
+  .monitorias-aviso {
+    padding: 14px;
+  }
+
+  .monitorias-filtros {
+    overflow-x: auto;
+  }
+
+  .filtro {
+    padding-right: 10px;
+    padding-left: 10px;
+    white-space: nowrap;
+  }
+
+  .monitoria-titulo-fila h2 {
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .monitoria-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .monitoria-acciones {
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+}
+

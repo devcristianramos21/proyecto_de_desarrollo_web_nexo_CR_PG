@@ -1,0 +1,291 @@
+
+.home-estudiante {
+  display: flex;
+  min-height: 100vh;
+  background: #fcf1f1;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.home-estudiante__principal {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-estudiante__contenido {
+  width: 100%;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 37px 53px 45px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Bienvenida */
+
+.bienvenida {
+  min-height: 132px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  padding: 22px 24px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+}
+
+.bienvenida__saludo {
+  margin: 0 0 7px;
+  color: #98111e;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bienvenida__texto h2 {
+  margin: 0 0 7px;
+  color: #111827;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.52px;
+}
+
+.bienvenida__texto > p:last-child {
+  margin: 0;
+  color: #000000;
+  font-size: 14px;
+}
+
+/* Secciones */
+
+.seccion-home {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.seccion-home__encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.seccion-home__encabezado h2 {
+  margin: 0;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+
+.seccion-home__encabezado button {
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  color: #98111e;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Monitorías */
+
+.monitorias-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 31px;
+}
+
+.monitoria-card {
+  min-width: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgb(17 24 39 / 6%);
+}
+
+.monitoria-card__etiquetas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+
+.monitoria-card__etiquetas span {
+  padding: 4px 9px;
+  border-radius: 20px;
+  background: #fcf1f1;
+  color: #98111e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.monitoria-card h3 {
+  margin: 0 0 7px;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.monitoria-card p {
+  margin: 0 0 14px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.monitoria-card > button {
+  width: 100%;
+  min-height: 34px;
+  margin-top: auto;
+  border: none;
+  border-radius: 7px;
+  background: #98111e;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Próxima tutoría */
+
+.tutoria-card {
+  min-height: 115px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(17 24 39 / 6%);
+}
+
+.tutoria-card__avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fcf1f1;
+  color: #98111e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tutoria-card__informacion {
+  flex: 1;
+  min-width: 0;
+}
+
+.tutoria-card__informacion h3 {
+  margin: 0 0 5px;
+  color: #111827;
+  font-size: 14px;
+}
+
+.tutoria-card__informacion p,
+.tutoria-card__informacion span {
+  display: block;
+  margin: 0 0 4px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.tutoria-card__estado {
+  padding: 6px 11px;
+  border-radius: 20px;
+  background: #ecfdf3;
+  color: #15803d;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tutoria-card__acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.tutoria-card__acciones button {
+  padding: 9px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tutoria-card__acciones button:first-child {
+  border-color: #98111e;
+  background: #98111e;
+  color: #ffffff;
+}
+
+/* Tutores */
+
+.tutores-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 31px;
+}
+
+/* Adaptación a pantallas pequeñas */
+
+@media (max-width: 1100px) {
+  .home-estudiante__contenido {
+    padding: 28px 24px;
+  }
+
+  .tutores-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 750px) {
+  .home-estudiante {
+    flex-direction: column;
+  }
+
+  .home-estudiante__contenido {
+    padding: 20px 16px;
+  }
+
+  .bienvenida {
+    grid-template-columns: 1fr;
+  }
+
+  .monitorias-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .tutoria-card {
+    flex-wrap: wrap;
+  }
+
+  .tutoria-card__acciones {
+    width: 100%;
+  }
+
+  .tutoria-card__acciones button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 500px) {
+  .tutores-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bienvenida__texto h2 {
+    font-size: 22px;
+  }
+}

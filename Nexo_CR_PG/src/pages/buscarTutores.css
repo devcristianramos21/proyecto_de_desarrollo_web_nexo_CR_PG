@@ -1,0 +1,303 @@
+
+.buscar-tutores {
+  display: flex;
+  min-height: 100vh;
+  background: #fcf1f1;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.buscar-tutores__principal {
+  flex: 1;
+  min-width: 0;
+  background: #fcf1f1;
+}
+
+.buscar-tutores__contenido {
+  width: 100%;
+  max-width: 1201px;
+  margin: 0 auto;
+  padding: 48px 46px 40px;
+}
+
+/* Encabezado */
+
+.buscar-tutores__encabezado {
+  margin-bottom: 39px;
+}
+
+.buscar-tutores__encabezado h2 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.22px;
+}
+
+.buscar-tutores__encabezado p {
+  margin: 0;
+  color: #0e0f11;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* Tarjeta de búsqueda */
+
+.busqueda-card {
+  width: 100%;
+  min-height: 480px;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 1px rgba(17, 24, 39, 0.06),
+    0 1px 0.5px rgba(17, 24, 39, 0.04);
+}
+
+.busqueda-card__titulo,
+.busqueda-card__subtitulo {
+  display: block;
+  margin: 0;
+  color: #0e0f11;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+
+.busqueda-card__titulo {
+  margin-bottom: 9px;
+}
+
+/* Buscador general */
+
+.busqueda-card__buscador {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  margin-bottom: 14px;
+}
+
+.busqueda-card__icono {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  color: #6b7280;
+  pointer-events: none;
+}
+
+.busqueda-card__icono svg,
+.busqueda-card__boton svg {
+  width: 100%;
+  height: 100%;
+}
+
+.busqueda-card__buscador input {
+  width: 100%;
+  height: 100%;
+  padding: 0 14px 0 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  outline: none;
+  background: #ffffff;
+  color: #111827;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.busqueda-card__buscador input::placeholder,
+.filtro input::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+.busqueda-card__buscador input:focus,
+.filtro input:focus,
+.filtro select:focus {
+  border-color: #98111e;
+  box-shadow: 0 0 0 2px rgba(152, 17, 30, 0.08);
+}
+
+/* Filtros */
+
+.busqueda-card__subtitulo {
+  margin-bottom: 8px;
+}
+
+.busqueda-card__filtros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 14px;
+  row-gap: 10px;
+}
+
+.filtro {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filtro label {
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.filtro select,
+.filtro input {
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  outline: none;
+  background-color: #ffffff;
+  color: #6b7280;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.filtro select {
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+.filtro select:focus {
+  color: #111827;
+}
+
+.filtro--tema {
+  margin-top: 12px;
+}
+
+.filtro--tema input {
+  height: 39px;
+}
+
+/* Botón de búsqueda */
+
+.busqueda-card__boton {
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #98111e;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.busqueda-card__boton:hover {
+  background: #7f0e19;
+}
+
+.busqueda-card__boton svg {
+  width: 16px;
+  height: 16px;
+}
+
+.busqueda-card__confirmacion {
+  margin: 10px 0 0;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Materias populares */
+
+.materias-populares {
+  margin: 39px 12px 0;
+}
+
+.materias-populares h3 {
+  margin: 0 0 12px;
+  color: #0e0f11;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+
+.materias-populares__lista {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.materias-populares__chip {
+  min-height: 32px;
+  padding: 7px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.materias-populares__chip:hover {
+  border-color: #98111e;
+  color: #98111e;
+}
+
+.materias-populares__chip--activo {
+  border-color: #98111e;
+  background: #fcf1f1;
+  color: #98111e;
+}
+
+/* Adaptación responsive */
+
+@media (max-width: 1000px) {
+  .buscar-tutores__contenido {
+    padding: 35px 28px;
+  }
+
+  .materias-populares {
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .buscar-tutores {
+    flex-direction: column;
+  }
+
+  .buscar-tutores__contenido {
+    padding: 28px 16px;
+  }
+
+  .busqueda-card {
+    padding: 20px;
+  }
+
+  .busqueda-card__filtros {
+    grid-template-columns: 1fr;
+    row-gap: 12px;
+  }
+
+  .materias-populares__lista {
+    gap: 7px;
+  }
+
+  .materias-populares__chip {
+    font-size: 12px;
+  }
+}
