@@ -8,7 +8,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "crear-admin": "node scripts/crearAdmin.js"
+    "crear-admin": "node scripts/crearAdmin.js",
+    "seed": "node scripts/seed.js",
+    "limpiar-pruebas": "node scripts/limpiarPruebas.js",
+    "probar-api": "node scripts/probarApi.js"
   },
   "engines": {
     "node": ">=20"

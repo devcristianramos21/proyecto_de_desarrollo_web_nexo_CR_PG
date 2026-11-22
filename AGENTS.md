@@ -4,7 +4,8 @@ Compact guidance for agents working in this repository. Verify against configs b
 
 ## Project
 
-- NEXO (`nexo-cr-pg`): React 19 + TypeScript + Vite single-page app for a mentor/tutoring platform. Currently a UI shell: `src/App.tsx` composes `src/components/Sidebar.tsx`; page content is placeholder. No backend, router, or state library yet — navigation uses hash anchors + local state.
+- NEXO (`nexo-cr-pg`): React 19 + TypeScript + Vite single-page app for a mentor/tutoring platform, in `nexo_CR_PG/`. Currently a UI shell; no router or state library yet — navigation uses hash anchors + local state. Not yet connected to the backend.
+- Backend in `nexo-backend/`: Express 5 + Mongoose (MongoDB Atlas) + Socket.IO, JWT auth. Full API docs in `nexo-backend/README.md` (see "Backend" below).
 
 Quiero que analices este proyecto antes de realizar cualquier modificación.
 
@@ -42,8 +43,16 @@ Verify frontend changes with `npm run lint` then `npm run build` (lint does not 
 - Plain CSS; design tokens as CSS variables in `src/index.css`; BEM-ish naming (`block__element--modifier`); component CSS colocated with component; responsive via `@media (max-width: 700px)`.
 - UI copy and code comments are in Spanish — keep new strings/comments consistent.
 
+## Backend (`nexo-backend/`)
+
+- Commands (run inside `nexo-backend/`): `npm run dev`, `npm run seed`, `npm run crear-admin`, `npm run probar-api`, `npm run limpiar-pruebas`. Needs `nexo-backend/.env` (`MONGODB_URI`, `JWT_SECRET`); never commit it.
+- Layers: routes → controllers (HTTP only) → services (business rules, throw `AppError(codigo, mensaje)`) → models. Roles enforced with `autenticar` + `permitir(...)`; a `tutor` also passes `permitir('estudiante')`.
+- Dates are `AAAA-MM-DD`, hours `HH:mm` in Colombia time (UTC-5); see `src/utils/fechas.js`.
+- Verify backend changes with `npm run probar-api` against a running server (runs `pruebas-api/NEXO.postman_collection.json`).
+- Test users use `prueba.*` emails; demo data uses `demo.*`. Business rules live in `nexo-backend/README.md`.
+
 ## Gotchas
 
-- `README.md` is Vite template boilerplate, not real project documentation.
+- `nexo_CR_PG/README.md` is Vite template boilerplate, not real project documentation.
 - No router: navigation is hash anchors (`href="#..."`) with `useState` in the Sidebar.
 - Build output goes to `dist/` (gitignored); no env vars or special env loading needed.
