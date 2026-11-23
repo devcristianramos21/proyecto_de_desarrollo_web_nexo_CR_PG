@@ -1,0 +1,393 @@
+
+/* ==============================
+   PÁGINA GENERAL
+============================== */
+
+.crear-cuenta-pagina {
+  min-height: 100vh;
+  padding: 32px 20px 55px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #F3F6FA;
+  color: #10233F;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+}
+
+.crear-cuenta-pagina * {
+  box-sizing: border-box;
+}
+
+/* ==============================
+   VOLVER AL INICIO
+============================== */
+
+.crear-cuenta-volver {
+  width: 100%;
+  max-width: 570px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 25px;
+  border: none;
+  background: transparent;
+  color: #10233F;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.crear-cuenta-volver span {
+  font-size: 25px;
+  line-height: 1;
+}
+
+.crear-cuenta-volver:hover {
+  color: #98111E;
+}
+
+/* ==============================
+   LOGO
+============================== */
+
+.crear-cuenta-marca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 30px;
+}
+
+.crear-cuenta-logo {
+  width: 53px;
+  height: 53px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: #A20F22;
+  color: #FFFFFF;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.crear-cuenta-marca h1 {
+  margin: 0;
+  color: #10233F;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+/* ==============================
+   TARJETA DEL FORMULARIO
+============================== */
+
+.crear-cuenta-card {
+  width: 100%;
+  max-width: 580px;
+  padding: 40px 38px;
+  background: #FFFFFF;
+  border: 1px solid #E0E5EC;
+  border-radius: 24px;
+  box-shadow: 0 2px 3px rgba(16, 35, 63, 0.05);
+}
+
+.crear-cuenta-encabezado {
+  margin-bottom: 33px;
+}
+
+.crear-cuenta-encabezado h2 {
+  margin: 0 0 12px;
+  color: #10233F;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.crear-cuenta-encabezado p {
+  margin: 0;
+  color: #60758F;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ==============================
+   CAMPOS
+============================== */
+
+.crear-cuenta-pagina form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.crear-cuenta-fila {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.crear-cuenta-campo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 9px;
+}
+
+.crear-cuenta-campo label {
+  color: #10233F;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.crear-cuenta-campo input,
+.crear-cuenta-campo select {
+  width: 100%;
+  height: 52px;
+  padding: 0 15px;
+  border: 1px solid #DDE3EA;
+  border-radius: 11px;
+  outline: none;
+  background: #FFFFFF;
+  color: #10233F;
+  font-family: inherit;
+  font-size: 15px;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.crear-cuenta-campo input::placeholder {
+  color: #91A0B3;
+}
+
+.crear-cuenta-campo select {
+  cursor: pointer;
+}
+
+.crear-cuenta-campo input:focus,
+.crear-cuenta-campo select:focus {
+  border-color: #98111E;
+  box-shadow: 0 0 0 3px rgba(152, 17, 30, 0.08);
+}
+
+.crear-cuenta-campo small {
+  color: #60758F;
+  font-size: 13px;
+}
+
+/* ==============================
+   SELECCIÓN DE ROL
+============================== */
+
+.crear-cuenta-roles {
+  min-width: 0;
+  margin: 2px 0 0;
+  padding: 0;
+  border: none;
+}
+
+.crear-cuenta-roles legend {
+  margin-bottom: 14px;
+  color: #10233F;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.crear-cuenta-roles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.crear-cuenta-rol {
+  min-height: 78px;
+  padding: 12px 15px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border: 1px solid #DDE3EA;
+  border-radius: 11px;
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.crear-cuenta-rol:hover {
+  border-color: #C8A0A6;
+}
+
+.crear-cuenta-rol input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.crear-cuenta-radio {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #9CA3AF;
+  border-radius: 50%;
+}
+
+.crear-cuenta-rol-activo {
+  border-color: #A20F22;
+  background: #FCEBEC;
+}
+
+.crear-cuenta-rol-activo .crear-cuenta-radio {
+  border-color: #A20F22;
+}
+
+.crear-cuenta-rol-activo .crear-cuenta-radio::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #A20F22;
+}
+
+.crear-cuenta-rol-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.crear-cuenta-rol-texto strong {
+  color: #10233F;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.crear-cuenta-rol-texto small {
+  color: #60758F;
+  font-size: 13px;
+}
+
+/* ==============================
+   TÉRMINOS Y CONDICIONES
+============================== */
+
+.crear-cuenta-terminos {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  color: #344B65;
+  font-size: 14px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.crear-cuenta-terminos input {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  margin: 2px 0 0;
+  accent-color: #A20F22;
+  cursor: pointer;
+}
+
+.crear-cuenta-terminos button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #A20F22;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.crear-cuenta-terminos button:hover {
+  text-decoration: underline;
+}
+
+/* ==============================
+   BOTÓN CREAR CUENTA
+============================== */
+
+.crear-cuenta-submit {
+  width: 100%;
+  height: 59px;
+  border: 1px solid #A20F22;
+  border-radius: 11px;
+  background: #A20F22;
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.crear-cuenta-submit:hover {
+  background: #820D1C;
+  border-color: #820D1C;
+}
+
+/* ==============================
+   INICIAR SESIÓN
+============================== */
+
+.crear-cuenta-login {
+  margin: 4px 0 0;
+  color: #60758F;
+  font-size: 15px;
+  text-align: center;
+}
+
+.crear-cuenta-login button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #A20F22;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.crear-cuenta-login button:hover {
+  text-decoration: underline;
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+
+@media (max-width: 600px) {
+  .crear-cuenta-pagina {
+    padding: 22px 15px 35px;
+  }
+
+  .crear-cuenta-volver {
+    padding-bottom: 22px;
+  }
+
+  .crear-cuenta-marca {
+    margin-bottom: 24px;
+  }
+
+  .crear-cuenta-card {
+    padding: 28px 21px;
+    border-radius: 18px;
+  }
+
+  .crear-cuenta-encabezado h2 {
+    font-size: 22px;
+  }
+
+  .crear-cuenta-fila {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .crear-cuenta-roles-grid {
+    grid-template-columns: 1fr;
+  }
+}

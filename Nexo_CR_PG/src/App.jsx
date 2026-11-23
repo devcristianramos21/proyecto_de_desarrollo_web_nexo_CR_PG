@@ -22,9 +22,12 @@ import Notificaciones from './pages/notificaciones';
 import CentroSoporte from './pages/centroSoporte';
 import PerfilTutor from './pages/perfilTutor';
 import SolicitarTutoria from './pages/solicitarTutoria';
+import LandingPage from './pages/landingPage';
+import CrearCuenta from './pages/crearCuenta';
+import IniciarSesion from './pages/iniciarSesion';
 
 function App() {
-  const [pantalla, setPantalla] = useState('Inicio');
+  const [pantalla, setPantalla] = useState('Landing');
 
   // Búsqueda de tutores
   const [filtrosBusqueda, setFiltrosBusqueda] = useState({});
@@ -71,6 +74,9 @@ function App() {
       'Soporte',
       'Perfil tutor',
       'Solicitar tutoría',
+      'Landing',
+      'Crear cuenta',
+      'Iniciar sesión',
     ];
 
     if (pantallasDisponibles.includes(destino)) {
@@ -198,12 +204,49 @@ function App() {
     setPantalla('Confirmacion evaluacion');
   };
 
+  const crearCuenta = (datos) => {
+    console.log('Datos del registro:', datos);
+
+    alert('Formulario completado. La creación de cuentas se conectará al backend posteriormente.');
+
+    setPantalla('Inicio');
+  };
+
   // ========================================
   // VISTAS
   // ========================================
 
   return (
     <>
+
+      {/* PÁGINA PÚBLICA DE BIENVENIDA */}
+      {pantalla === 'Landing' && (
+        <LandingPage
+          onCrearCuenta={() => setPantalla('Crear cuenta')}
+          onIniciarSesion={() => setPantalla('Iniciar sesión')}
+        />
+      )}
+
+      {/* CREAR CUENTA */}
+      {pantalla === 'Crear cuenta' && (
+        <CrearCuenta
+          onVolver={() => setPantalla('Landing')}
+          onIniciarSesion={() => setPantalla('Iniciar sesión')}
+          onCrearCuenta={crearCuenta}
+        />
+      )}
+
+      {/* INICIAR SESIÓN */}
+      {pantalla === 'Iniciar sesión' && (
+        <IniciarSesion
+          onCrearCuenta={() => setPantalla('Crear cuenta')}
+          onIngresar={(credenciales) => {
+            console.log('Credenciales:', credenciales);
+            alert('El inicio de sesión se conectará al backend posteriormente.');
+          }}
+        />
+      )}
+
       {/* INICIO */}
       {pantalla === 'Inicio' && (
         <HomeEstudiante

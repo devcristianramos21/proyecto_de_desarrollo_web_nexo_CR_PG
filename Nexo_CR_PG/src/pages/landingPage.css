@@ -1,0 +1,644 @@
+
+/* ==============================
+   CONFIGURACIÓN GENERAL
+============================== */
+
+.landing-page {
+  width: 100%;
+  min-height: 100vh;
+  color: #10233F;
+  background: #FFFFFF;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+}
+
+.landing-page * {
+  box-sizing: border-box;
+}
+
+/* ==============================
+   ENCABEZADO
+============================== */
+
+.landing-header {
+  height: 100px;
+  padding: 0 3.25%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #FFFFFF;
+  border-bottom: 1px solid #F0F1F4;
+}
+
+.landing-logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.landing-logo-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  background: #A20F22;
+  border-radius: 19px;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.landing-logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.landing-logo-text strong {
+  color: #10233F;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.landing-logo-text span {
+  color: #526987;
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: 600;
+}
+
+.landing-btn-login {
+  min-width: 155px;
+  height: 52px;
+  padding: 0 20px;
+  border: 1px solid #DCE3ED;
+  border-radius: 15px;
+  background: #FFFFFF;
+  color: #10233F;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.landing-btn-login:hover,
+.landing-btn-secondary:hover {
+  background: #F8FAFC;
+  border-color: #A20F22;
+}
+
+/* ==============================
+   PORTADA PRINCIPAL
+============================== */
+
+.landing-hero {
+  min-height: 730px;
+  padding: 75px 3.25% 65px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  align-items: center;
+  gap: 35px;
+  background: #FAF8F8;
+  overflow: hidden;
+}
+
+.landing-hero-text {
+  position: relative;
+  z-index: 2;
+  max-width: 710px;
+}
+
+.landing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 15px;
+  margin-bottom: 32px;
+  border: 1px solid #F0D8DA;
+  border-radius: 30px;
+  background: #FFFFFF;
+  color: #A20F22;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 2px 5px rgba(16, 35, 63, 0.08);
+}
+
+.landing-badge span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #A20F22;
+}
+
+.landing-hero-text h1 {
+  margin: 0;
+  color: #10233F;
+  font-size: clamp(48px, 5.5vw, 80px);
+  line-height: 1.08;
+  letter-spacing: -3.8px;
+  font-weight: 850;
+}
+
+.landing-hero-text h1 span {
+  color: #A20F22;
+}
+
+.landing-descripcion {
+  max-width: 690px;
+  margin: 32px 0 43px;
+  color: #526987;
+  font-size: 22px;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.landing-acciones {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.landing-acciones button {
+  min-height: 62px;
+  padding: 0 28px;
+  border-radius: 19px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.landing-btn-primary {
+  min-width: 237px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  color: #FFFFFF;
+  background: #A20F22;
+  border: 1px solid #A20F22;
+  box-shadow: 0 10px 22px rgba(162, 15, 34, 0.15);
+}
+
+.landing-btn-primary span {
+  font-size: 25px;
+  font-weight: 400;
+}
+
+.landing-btn-primary:hover {
+  background: #820D1C;
+  transform: translateY(-2px);
+}
+
+.landing-btn-secondary {
+  min-width: 236px;
+  color: #10233F;
+  background: #FFFFFF;
+  border: 1px solid #CBD6E5;
+}
+
+.landing-nota {
+  margin: 25px 0 0;
+  color: #6B7D91;
+  font-size: 13px;
+}
+
+/* ==============================
+   TARJETA VISUAL NEXO
+============================== */
+
+.landing-hero-visual {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 610px;
+  justify-self: center;
+  padding: 16px;
+}
+
+.landing-visual-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 42px;
+  background: rgba(162, 15, 34, 0.10);
+  transform: rotate(3deg);
+}
+
+.landing-visual-card {
+  position: relative;
+  padding: 42px 40px 30px;
+  border-radius: 38px;
+  background: #FFFFFF;
+  box-shadow: 0 25px 55px rgba(16, 35, 63, 0.10);
+}
+
+.landing-visual-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 42px;
+}
+
+.landing-visual-heading > div:first-child > span {
+  color: #A20F22;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.landing-visual-heading h2 {
+  margin: 8px 0 0;
+  color: #10233F;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.landing-visual-icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #FCE8EA;
+  color: #A20F22;
+  font-size: 32px;
+}
+
+.landing-materias {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.landing-materia {
+  min-height: 92px;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid #EDF0F5;
+  border-radius: 21px;
+  background: #F8FAFC;
+}
+
+.landing-materia-numero {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 19px;
+  background: #FFFFFF;
+  color: #A20F22;
+  font-size: 19px;
+  font-weight: 800;
+  box-shadow: 0 2px 5px rgba(16, 35, 63, 0.12);
+}
+
+.landing-materia-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.landing-materia-info strong {
+  color: #10233F;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.landing-materia-info span {
+  color: #526987;
+  font-size: 14px;
+}
+
+.landing-materia-punto {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #A20F22;
+}
+
+.landing-visual-footer {
+  min-height: 86px;
+  margin-top: 30px;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-radius: 21px;
+  background: #A20F22;
+  color: #FFFFFF;
+}
+
+.landing-check {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.17);
+  font-size: 23px;
+}
+
+.landing-visual-footer > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.landing-visual-footer strong {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.landing-visual-footer span {
+  color: #F8DADD;
+  font-size: 14px;
+}
+
+/* CÍRCULOS DECORATIVOS */
+
+.landing-circulo {
+  position: absolute;
+  border: 1px solid rgba(162, 15, 34, 0.10);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.landing-circulo-uno {
+  width: 430px;
+  height: 430px;
+  top: -150px;
+  right: -110px;
+  background: rgba(162, 15, 34, 0.035);
+}
+
+.landing-circulo-dos {
+  width: 190px;
+  height: 190px;
+  bottom: -115px;
+  left: 44%;
+}
+
+/* ==============================
+   BENEFICIOS
+============================== */
+
+.landing-beneficios {
+  padding: 100px 3.5%;
+  background: #FFFFFF;
+}
+
+.landing-beneficios-encabezado {
+  margin-bottom: 48px;
+}
+
+.landing-beneficios-encabezado > span {
+  color: #A20F22;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.landing-beneficios-encabezado h2 {
+  margin: 16px 0 0;
+  color: #10233F;
+  font-size: clamp(28px, 3.2vw, 44px);
+  font-weight: 850;
+  letter-spacing: -1.5px;
+}
+
+.landing-beneficios-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 25px;
+}
+
+.landing-beneficio-card {
+  min-height: 270px;
+  padding: 30px;
+  border: 1px solid #DCE3ED;
+  border-radius: 21px;
+  background: #FFFFFF;
+  transition: all 0.2s ease;
+}
+
+.landing-beneficio-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px rgba(16, 35, 63, 0.06);
+}
+
+.landing-beneficio-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 27px;
+  border-radius: 19px;
+  background: #FCE8EA;
+  color: #A20F22;
+}
+
+.landing-beneficio-icon svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.landing-beneficio-card h3 {
+  margin: 0 0 14px;
+  color: #10233F;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.landing-beneficio-card p {
+  margin: 0;
+  color: #526987;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* ==============================
+   FOOTER
+============================== */
+
+.landing-footer {
+  min-height: 78px;
+  padding: 20px 3.5%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  background: #F7F9FC;
+  border-top: 1px solid #E7ECF2;
+}
+
+.landing-footer strong {
+  color: #10233F;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.landing-footer span {
+  color: #526987;
+  font-size: 14px;
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+
+@media (max-width: 1050px) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    padding: 65px 5%;
+    gap: 60px;
+  }
+
+  .landing-hero-text {
+    max-width: 750px;
+  }
+
+  .landing-hero-visual {
+    max-width: 650px;
+  }
+
+  .landing-beneficios {
+    padding: 75px 5%;
+  }
+}
+
+@media (max-width: 750px) {
+  .landing-header {
+    height: 82px;
+    padding: 0 20px;
+  }
+
+  .landing-logo-icon {
+    width: 43px;
+    height: 43px;
+  }
+
+  .landing-logo-text strong {
+    font-size: 20px;
+  }
+
+  .landing-logo-text span {
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+
+  .landing-btn-login {
+    min-width: auto;
+    height: 43px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .landing-hero {
+    padding: 55px 22px;
+  }
+
+  .landing-hero-text h1 {
+    font-size: clamp(42px, 9vw, 62px);
+    letter-spacing: -2px;
+  }
+
+  .landing-descripcion {
+    font-size: 17px;
+  }
+
+  .landing-acciones {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .landing-acciones button {
+    width: 100%;
+  }
+
+  .landing-visual-card {
+    padding: 28px 20px;
+    border-radius: 25px;
+  }
+
+  .landing-visual-heading h2 {
+    font-size: 19px;
+  }
+
+  .landing-materia {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .landing-materia-info strong {
+    font-size: 14px;
+  }
+
+  .landing-materia-info span {
+    font-size: 11px;
+  }
+
+  .landing-beneficios {
+    padding: 65px 22px;
+  }
+
+  .landing-beneficios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .landing-beneficio-card {
+    min-height: auto;
+  }
+
+  .landing-footer {
+    padding: 22px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 420px) {
+  .landing-logo {
+    gap: 9px;
+  }
+
+  .landing-logo-text span {
+    font-size: 8px;
+  }
+
+  .landing-visual-heading {
+    align-items: flex-start;
+  }
+
+  .landing-visual-icon {
+    width: 43px;
+    height: 43px;
+  }
+
+  .landing-materia-numero {
+    width: 42px;
+    height: 42px;
+  }
+}
