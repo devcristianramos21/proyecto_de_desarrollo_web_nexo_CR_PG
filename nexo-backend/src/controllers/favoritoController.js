@@ -13,3 +13,4 @@ export async function agregarFavorito(req, res) {
 export async function quitarFavorito(req, res) {
   res.json(await favoritoService.quitar(req.usuario.id, req.params.tutorId));
 }
+
