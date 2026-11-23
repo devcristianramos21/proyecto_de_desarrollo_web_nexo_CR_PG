@@ -25,6 +25,11 @@ import SolicitarTutoria from './pages/solicitarTutoria';
 import LandingPage from './pages/landingPage';
 import CrearCuenta from './pages/crearCuenta';
 import IniciarSesion from './pages/iniciarSesion';
+import RecuperarContrasena from './pages/recuperarContrasena';
+import ConfirmacionRecuperacion from './pages/confirmacionRecuperacion';
+import NuevaContrasena from './pages/nuevaContrasena';
+import ContrasenaActualizada from './pages/contrasenaActualizada';
+
 
 function App() {
   const [pantalla, setPantalla] = useState('Landing');
@@ -46,6 +51,10 @@ function App() {
   // Tutorías
   const [tutorias, setTutorias] = useState(tutoriasIniciales);
   const [tutoriaSeleccionada, setTutoriaSeleccionada] = useState(null);
+
+
+  const [correoRecuperacion, setCorreoRecuperacion] = useState('');
+
 
   // ========================================
   // NAVEGACIÓN GENERAL
@@ -77,6 +86,11 @@ function App() {
       'Landing',
       'Crear cuenta',
       'Iniciar sesión',
+      'Recuperar contraseña',
+      'Confirmación recuperación',
+      'Nueva contraseña',
+      'Contraseña actualizada',
+
     ];
 
     if (pantallasDisponibles.includes(destino)) {
@@ -212,6 +226,29 @@ function App() {
     setPantalla('Inicio');
   };
 
+
+  const abrirRecuperacion = () => {
+    setPantalla('Recuperar contraseña');
+  };
+
+  const continuarRecuperacion = (correo) => {
+    setCorreoRecuperacion(correo);
+    setPantalla('Confirmación recuperación');
+  };
+
+  const abrirNuevaContrasena = () => {
+    setPantalla('Nueva contraseña');
+  };
+
+  const actualizarContrasena = () => {
+    setPantalla('Contraseña actualizada');
+  };
+
+  const volverInicioSesion = () => {
+    setPantalla('Iniciar sesión');
+  };
+
+
   // ========================================
   // VISTAS
   // ========================================
@@ -222,7 +259,7 @@ function App() {
       {/* PÁGINA PÚBLICA DE BIENVENIDA */}
       {pantalla === 'Landing' && (
         <LandingPage
-          onCrearCuenta={() => setPantalla('Crear cuenta')}
+          onCrearCuenta={() => setPantalla('Inicio')}
           onIniciarSesion={() => setPantalla('Iniciar sesión')}
         />
       )}
@@ -244,14 +281,49 @@ function App() {
             console.log('Credenciales:', credenciales);
             alert('El inicio de sesión se conectará al backend posteriormente.');
           }}
+          onOlvideContrasena={abrirRecuperacion}
         />
       )}
+
+
+      {/* RECUPERAR CONTRASEÑA */}
+      {pantalla === 'Recuperar contraseña' && (
+        <RecuperarContrasena
+          onVolver={volverInicioSesion}
+          onContinuar={continuarRecuperacion}
+        />
+      )}
+
+      {/* CONFIRMACIÓN DE ENVÍO */}
+      {pantalla === 'Confirmación recuperación' && (
+        <ConfirmacionRecuperacion
+          correo={correoRecuperacion}
+          onVolver={volverInicioSesion}
+        />
+      )}
+
+      {/* NUEVA CONTRASEÑA */}
+      {pantalla === 'Nueva contraseña' && (
+        <NuevaContrasena
+          onActualizar={actualizarContrasena}
+        />
+      )}
+
+      {/* CONTRASEÑA ACTUALIZADA */}
+      {pantalla === 'Contraseña actualizada' && (
+        <ContrasenaActualizada
+          onIniciarSesion={volverInicioSesion}
+        />
+      )}
+
 
       {/* INICIO */}
       {pantalla === 'Inicio' && (
         <HomeEstudiante
           onNavegar={navegar}
           onVerPerfilTutor={abrirPerfilTutor}
+          onVerDetalleMonitoria={abrirDetalleMonitoria}
+          onSolicitarTutoria={abrirSolicitudTutor}
         />
       )}
 
@@ -286,6 +358,7 @@ function App() {
         <DetalleMonitoria
           onNavegar={navegar}
           monitoria={monitoriaSeleccionada}
+          onVerPerfilTutor={abrirPerfilTutor}
         />
       )}
 
@@ -401,6 +474,7 @@ function App() {
         <PerfilTutor
           onNavegar={navegar}
           tutor={tutorSeleccionado}
+          onSolicitar={abrirSolicitudTutor}
         />
       )}
 

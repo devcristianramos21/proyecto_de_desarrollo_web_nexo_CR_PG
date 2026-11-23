@@ -1,147 +1,275 @@
+
+/* ==========================================
+   TARJETA DE TUTOR
+========================================== */
+
 .tutor-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  width: 100%;
   min-width: 0;
-  padding: 16px;
-  background-color: #ffffff;
-  border: 1px solid #e8e5e8;
-  border-radius: 12px;
+  min-height: 216px;
+  padding: 18px;
+
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
   box-shadow: 0 2px 5px rgb(35 20 30 / 3%);
+
+  box-sizing: border-box;
+  overflow: hidden;
 }
+
+/* ==========================================
+   ENCABEZADO
+========================================== */
 
 .tutor-card__encabezado {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
+  min-width: 0;
 }
 
+/* AVATAR */
+
 .tutor-card__avatar {
-  width: 38px;
-  height: 38px;
-  flex-shrink: 0;
   display: grid;
   place-items: center;
+
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+
   border-radius: 50%;
-  background-color: #fbecef;
-  color: #a20f28;
-  font-size: 0.75rem;
+  background: #FCF1F1;
+  color: #98111E;
+
+  font-size: 14px;
   font-weight: 700;
 }
+
+/* IDENTIDAD */
 
 .tutor-card__identidad {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .tutor-card__nombre {
   margin: 0 0 4px;
-  color: #20202a;
-  font-size: 0.85rem;
+
+  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+
+  overflow-wrap: anywhere;
 }
 
 .tutor-card__especialidad {
   margin: 0;
-  color: #656575;
-  font-size: 0.7rem;
-  line-height: 1.5;
+
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.4;
+
+  overflow-wrap: break-word;
 }
 
+.tutor-card__semestre {
+  display: block;
+  margin-top: 2px;
+
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* ==========================================
+   FAVORITOS
+========================================== */
+
 .tutor-card__favorito {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  background-color: #ffffff;
-  border: 1px solid #dedbe0;
-  border-radius: 7px;
-  color: #38343b;
-  font-size: 1.2rem;
+  display: grid;
+  place-items: center;
+
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+
+  padding: 0;
+  border: 1px solid #DEDDE3;
+  border-radius: 8px;
+
+  background: #FFFFFF;
+  color: #38343B;
+
+  font-size: 21px;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tutor-card__favorito:hover {
+  border-color: #98111E;
+  color: #98111E;
 }
 
 .tutor-card__favorito--activo {
-  color: #a20f28;
-  border-color: #a20f28;
+  border-color: #98111E;
+  color: #98111E;
+  background: #FCEEF0;
 }
+
+/* ==========================================
+   CALIFICACIÓN
+========================================== */
 
 .tutor-card__calificacion {
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
   gap: 5px;
-  margin: 12px 0;
-  font-size: 0.75rem;
+
+  width: 100%;
+  min-width: 0;
+  margin: 13px 0 11px;
 }
 
-.tutor-card__calificacion > span:first-child {
-  color: #f4a62a;
-  letter-spacing: 1px;
+.tutor-card__estrellas {
+  flex-shrink: 0;
+  color: #F4A62A;
+  font-size: 14px;
+  letter-spacing: 0;
+  white-space: nowrap;
 }
 
 .tutor-card__calificacion strong {
-  color: #33303a;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .tutor-card__resenas {
-  color: #777481;
+  color: #64748B;
+  font-size: 12px;
+  white-space: nowrap;
 }
+
+/* ==========================================
+   MATERIAS
+========================================== */
 
 .tutor-card__materias {
   display: flex;
+  align-items: flex-start;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 6px;
+
+  width: 100%;
+  min-width: 0;
 }
 
 .tutor-card__etiqueta {
-  padding: 4px 7px;
-  background-color: #f1eff4;
-  border-radius: 5px;
-  color: #37313e;
-  font-size: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+
+  max-width: 100%;
+  min-width: 0;
+  padding: 5px 8px;
+
+  border-radius: 6px;
+  background: #F1EFF4;
+  color: #37313E;
+
+  font-size: 11px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
 }
+
+/* ==========================================
+   DISPONIBILIDAD
+========================================== */
 
 .tutor-card__disponibilidad {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+
   margin: 12px 0;
-  color: #45424b;
-  font-size: 0.7rem;
+
+  color: #64748B;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .tutor-card__indicador {
-  width: 7px;
-  height: 7px;
-  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+
   border-radius: 50%;
-  background-color: #a5a5a5;
+  background: #A5A5A5;
 }
 
 .tutor-card__indicador--disponible {
-  background-color: #18ad61;
+  background: #18AD61;
 }
+
+/* ==========================================
+   ACCIONES
+========================================== */
 
 .tutor-card__acciones {
   display: flex;
+  align-items: center;
   gap: 8px;
+
+  width: 100%;
+  margin-top: auto;
 }
 
 .tutor-card__boton {
   flex: 1;
   min-width: 0;
-  padding: 9px 6px;
+  min-height: 36px;
+  padding: 8px 6px;
+
   border-radius: 7px;
-  font-size: 0.72rem;
+
+  font-family: inherit;
+  font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
+
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .tutor-card__boton--secundario {
-  color: #28232c;
-  background-color: #ffffff;
-  border: 1px solid #dedbe0;
+  border: 1px solid #DEDDE3;
+  background: #FFFFFF;
+  color: #28232C;
+}
+
+.tutor-card__boton--secundario:hover {
+  background: #F9FAFB;
 }
 
 .tutor-card__boton--principal {
-  color: #ffffff;
-  background-color: #a20f28;
-  border: 1px solid #a20f28;
+  border: 1px solid #98111E;
+  background: #98111E;
+  color: #FFFFFF;
+}
+
+.tutor-card__boton--principal:hover:not(:disabled) {
+  background: #7D0D18;
 }
 
 .tutor-card__boton:disabled {
@@ -149,6 +277,24 @@
   cursor: not-allowed;
 }
 
-.tutor-card__boton:not(:disabled):hover {
-  filter: brightness(0.94);
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 1100px) {
+  .tutor-card {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 500px) {
+  .tutor-card {
+    min-height: auto;
+  }
+
+  .tutor-card__avatar {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+  }
 }

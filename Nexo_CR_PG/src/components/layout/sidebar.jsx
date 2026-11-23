@@ -4,20 +4,20 @@ import './sidebar.css';
 import ConfirmarCerrarSesion from '../modals/confirmarCerrarSesion';
 
 const opciones = [
-  { nombre: 'Inicio', icono: '/assets/Frame.svg' },
-  { nombre: 'Buscar tutores', icono: '/assets/Frame-1.svg' },
-  { nombre: 'Monitorías', icono: '/assets/Frame-2.svg' },
-  { nombre: 'Calendario', icono: '/assets/Frame-3.svg' },
-  { nombre: 'Mis solicitudes', icono: '/assets/Frame-4.svg', badge: '1' },
-  { nombre: 'Mis monitorias', icono: '/assets/Frame-5.svg' },
-  { nombre: 'Mensajes', icono: '/assets/Frame-6.svg' },
-  { nombre: 'Favoritos', icono: '/assets/Frame-7.svg' },
-  { nombre: 'Mi perfil', icono: '/assets/Frame-8.svg' },
+  { nombre: 'Inicio', icono: '/assets/home.svg' },
+  { nombre: 'Buscar tutores', icono: '/assets/Frame-9.svg' },
+  { nombre: 'Monitorías', icono: '/assets/Vector-2.svg' },
+  { nombre: 'Calendario', icono: '/assets/Frame-11.svg' },
+  { nombre: 'Mis solicitudes', icono: '/assets/Frame-7.svg', badge: '1' },
+  { nombre: 'Mis monitorias', icono: '/assets/Frame-6.svg' },
+  { nombre: 'Mensajes', icono: '/assets/Frame-5.svg' },
+  { nombre: 'Favoritos', icono: '/assets/Frame-4.svg' },
+  { nombre: 'Mi perfil', icono: '/assets/Frame-3.svg' },
 ];
 
 const opcionesInferiores = [
-  { nombre: 'Notificaciones', icono: '/assets/Frame-9.svg', badge: '3' },
-  { nombre: 'Soporte', icono: '/assets/Frame-10.svg' },
+  { nombre: 'Notificaciones', icono: '/assets/Frame-2.svg', badge: '3' },
+  { nombre: 'Soporte', icono: '/assets/Frame-1.svg' },
   { nombre: 'Cerrar sesión', icono: '/assets/exit-svgrepo-com 1.svg' },
 ];
 
@@ -32,7 +32,9 @@ export default function Sidebar({
       type="button"
       key={opcion.nombre}
       className={`sidebar__opcion ${
-        paginaActiva === opcion.nombre ? 'sidebar__opcion--activa' : ''
+        paginaActiva === opcion.nombre
+          ? 'sidebar__opcion--activa'
+          : ''
       }`}
       onClick={() => {
         if (opcion.nombre === 'Cerrar sesión') {
@@ -48,10 +50,14 @@ export default function Sidebar({
         className="sidebar__icono"
       />
 
-      <span className="sidebar__nombre">{opcion.nombre}</span>
+      <span className="sidebar__nombre">
+        {opcion.nombre}
+      </span>
 
       {opcion.badge && (
-        <span className="sidebar__badge">{opcion.badge}</span>
+        <span className="sidebar__badge">
+          {opcion.badge}
+        </span>
       )}
     </button>
   );
@@ -60,7 +66,7 @@ export default function Sidebar({
     <>
       <aside className="sidebar">
         <div className="sidebar__marca">
-          <img src="/assets/logo-nexo.png" alt="NEXO" />
+          <img src="/assets/logo.png" alt="NEXO" />
 
           <div className="sidebar__marca-texto">
             <strong>NEXO</strong>
@@ -86,7 +92,7 @@ export default function Sidebar({
           onCancelar={() => setMostrarConfirmacion(false)}
           onConfirmar={() => {
             setMostrarConfirmacion(false);
-            alert('Cierre de sesión simulado correctamente.');
+            onNavegar?.('Landing');
           }}
         />
       )}

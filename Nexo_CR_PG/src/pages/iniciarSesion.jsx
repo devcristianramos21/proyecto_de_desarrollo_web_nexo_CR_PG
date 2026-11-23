@@ -21,8 +21,15 @@ function IniciarSesion({
       return;
     }
 
-    if (!/^[^\s@]+@urosario\.edu\.co$/i.test(correo.trim())) {
-      setError('Ingresa un correo institucional válido de la Universidad del Rosario.');
+    // Validar correo institucional
+    const correoValido = /^[^\s@]+@urosario\.edu\.co$/i.test(
+      correo.trim()
+    );
+
+    if (!correoValido) {
+      setError(
+        'Ingresa un correo institucional válido de la Universidad del Rosario.'
+      );
       return;
     }
 
@@ -37,10 +44,14 @@ function IniciarSesion({
   };
 
   const manejarOlvido = () => {
+    setError('');
+
     if (onOlvideContrasena) {
       onOlvideContrasena();
     } else {
-      setError('La recuperación de contraseña estará disponible próximamente.');
+      setError(
+        'La recuperación de contraseña estará disponible próximamente.'
+      );
     }
   };
 
@@ -103,7 +114,9 @@ function IniciarSesion({
               <button
                 type="button"
                 className="login-ver-contrasena"
-                onClick={() => setMostrarContrasena(!mostrarContrasena)}
+                onClick={() =>
+                  setMostrarContrasena((actual) => !actual)
+                }
                 aria-label={
                   mostrarContrasena
                     ? 'Ocultar contraseña'
@@ -127,7 +140,10 @@ function IniciarSesion({
 
           {/* RECUPERAR CONTRASEÑA */}
           <div className="login-olvido">
-            <button type="button" onClick={manejarOlvido}>
+            <button
+              type="button"
+              onClick={manejarOlvido}
+            >
               ¿Olvidaste tu contraseña?
             </button>
           </div>
@@ -140,14 +156,20 @@ function IniciarSesion({
           )}
 
           {/* INGRESAR */}
-          <button type="submit" className="login-boton">
+          <button
+            type="submit"
+            className="login-boton"
+          >
             Ingresar
           </button>
 
           {/* CREAR CUENTA */}
           <p className="login-registro">
             ¿Aún no tienes una cuenta?{' '}
-            <button type="button" onClick={onCrearCuenta}>
+            <button
+              type="button"
+              onClick={onCrearCuenta}
+            >
               Crear cuenta
             </button>
           </p>
@@ -155,6 +177,7 @@ function IniciarSesion({
         </form>
       </section>
 
+      {/* PIE */}
       <p className="login-pie">
         Acceso exclusivo para la comunidad Rosarista.
       </p>

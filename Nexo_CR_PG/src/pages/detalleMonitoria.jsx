@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react';
+
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 
@@ -34,7 +35,12 @@ const monitoriaPredeterminada = {
   iniciales: 'FC',
 };
 
-function DetalleMonitoria({ onNavegar, monitoria, onInscribirse }) {
+function DetalleMonitoria({
+  onNavegar,
+  monitoria,
+  onInscribirse,
+  onVerPerfilTutor,
+}) {
   const datos = monitoria || monitoriaPredeterminada;
 
   // Estados
@@ -132,6 +138,21 @@ function DetalleMonitoria({ onNavegar, monitoria, onInscribirse }) {
     });
   };
 
+  // Abrir perfil del monitor
+  const abrirPerfilMonitor = () => {
+    onVerPerfilTutor?.({
+      ...datos,
+      nombre: nombreMonitor,
+      iniciales: datos.iniciales || 'FC',
+      especialidad:
+        datos.especialidad ||
+        datos.semestreMonitor ||
+        'Monitor académico',
+      semestre: datos.semestre || '',
+      calificacion: datos.calificacion || 4.8,
+    });
+  };
+
   return (
     <div className="detalle-layout">
 
@@ -145,7 +166,10 @@ function DetalleMonitoria({ onNavegar, monitoria, onInscribirse }) {
       <div className="detalle-contenido">
 
         {/* NAVBAR */}
-        <Navbar titulo="Detalle monitoría" />
+        <Navbar
+          titulo="Detalle monitoría"
+          onNavegar={onNavegar}
+        />
 
         <main className="detalle-main">
 
@@ -176,7 +200,9 @@ function DetalleMonitoria({ onNavegar, monitoria, onInscribirse }) {
                 </span>
 
                 <span className="detalle-estado">
-                  {estadoActual === 'Inscrito' ? 'Disponible' : estadoActual}
+                  {estadoActual === 'Inscrito'
+                    ? 'Disponible'
+                    : estadoActual}
                 </span>
               </div>
 
@@ -320,9 +346,7 @@ function DetalleMonitoria({ onNavegar, monitoria, onInscribirse }) {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      alert('El perfil del monitor se conectará próximamente.')
-                    }
+                    onClick={abrirPerfilMonitor}
                   >
                     Ver perfil
                   </button>

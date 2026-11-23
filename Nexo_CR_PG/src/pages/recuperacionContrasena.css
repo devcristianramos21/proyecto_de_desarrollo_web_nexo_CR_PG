@@ -1,0 +1,241 @@
+
+.recuperacion-pagina {
+  min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px 50px;
+  background: #F3F6F9;
+  font-family: 'Inter', sans-serif;
+  color: #10243E;
+}
+
+.recuperacion-volver {
+  align-self: center;
+  width: 580px;
+  max-width: 100%;
+  margin-bottom: 30px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #10243E;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.recuperacion-volver span {
+  margin-right: 10px;
+  font-size: 24px;
+  vertical-align: -2px;
+}
+
+.recuperacion-marca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.recuperacion-logo {
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #98111E;
+  color: #FFFFFF;
+  border-radius: 16px;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.recuperacion-marca h1 {
+  margin: 0;
+  color: #10243E;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.recuperacion-card {
+  box-sizing: border-box;
+  width: 580px;
+  max-width: 100%;
+  padding: 40px;
+  background: #FFFFFF;
+  border: 1px solid #E1E6EC;
+  border-radius: 24px;
+  box-shadow: 0 2px 3px rgba(16, 36, 62, 0.05);
+}
+
+.recuperacion-icono {
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  background: #FCE8EA;
+  border-radius: 16px;
+  color: #98111E;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.recuperacion-icono-exito {
+  background: #E8F7EE;
+  color: #16A34A;
+  border-radius: 50%;
+}
+
+.recuperacion-encabezado {
+  margin-bottom: 28px;
+}
+
+.recuperacion-encabezado h2,
+.recuperacion-confirmacion h2 {
+  margin: 0 0 10px;
+  color: #10243E;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.recuperacion-encabezado p,
+.recuperacion-confirmacion > p {
+  margin: 0;
+  color: #64748B;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.recuperacion-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 23px;
+}
+
+.recuperacion-campo label {
+  color: #10243E;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.recuperacion-campo input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 53px;
+  padding: 0 15px;
+  border: 1px solid #DCE2E9;
+  border-radius: 10px;
+  outline: none;
+  color: #10243E;
+  background: #FFFFFF;
+  font-family: inherit;
+  font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.recuperacion-campo input::placeholder {
+  color: #94A3B8;
+}
+
+.recuperacion-campo input:focus {
+  border-color: #98111E;
+  box-shadow: 0 0 0 3px rgba(152, 17, 30, 0.09);
+}
+
+.recuperacion-campo small {
+  color: #64748B;
+  font-size: 13px;
+}
+
+.recuperacion-boton-principal {
+  width: 100%;
+  min-height: 54px;
+  margin-top: 8px;
+  border: 1px solid #98111E;
+  border-radius: 10px;
+  background: #98111E;
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.recuperacion-boton-principal:hover {
+  background: #7F0E19;
+}
+
+.recuperacion-boton-principal:active {
+  transform: scale(0.99);
+}
+
+.recuperacion-pie {
+  margin: 26px 0 0;
+  color: #64748B;
+  font-size: 14px;
+  text-align: center;
+}
+
+.recuperacion-pie button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #98111E;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.recuperacion-confirmacion {
+  text-align: center;
+}
+
+.recuperacion-confirmacion .recuperacion-icono {
+  margin: 0 auto 24px;
+}
+
+.recuperacion-correo-enviado {
+  margin: 22px 0 12px;
+  padding: 14px;
+  overflow-wrap: anywhere;
+  border: 1px solid #E1E6EC;
+  border-radius: 10px;
+  background: #F8FAFC;
+  color: #10243E;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.recuperacion-ayuda {
+  margin: 0 0 24px !important;
+  font-size: 13px !important;
+}
+
+@media (max-width: 600px) {
+  .recuperacion-pagina {
+    padding: 24px 16px 35px;
+  }
+
+  .recuperacion-volver {
+    margin-bottom: 25px;
+  }
+
+  .recuperacion-card {
+    padding: 28px 22px;
+    border-radius: 18px;
+  }
+
+  .recuperacion-encabezado h2,
+  .recuperacion-confirmacion h2 {
+    font-size: 21px;
+  }
+}

@@ -50,20 +50,27 @@ export default function PerfilTutor({
 
   const [favorito, setFavorito] = useState(false);
 
+  // Solicitar tutoría
   const solicitarTutoria = () => {
     if (onSolicitar) {
       onSolicitar(datosTutor);
     } else {
-      alert('Solicitud de tutoría simulada.');
+      onNavegar?.('Solicitar tutoría');
     }
   };
 
+  // Enviar mensaje
   const enviarMensaje = () => {
     if (onEnviarMensaje) {
       onEnviarMensaje(datosTutor);
     } else {
-      alert('La mensajería estará disponible próximamente.');
+      onNavegar?.('Mensajes');
     }
+  };
+
+  // Guardar o quitar de favoritos
+  const cambiarFavorito = () => {
+    setFavorito((actual) => !actual);
   };
 
   return (
@@ -74,12 +81,14 @@ export default function PerfilTutor({
       />
 
       <main className="perfil-tutor__principal">
-        <Navbar titulo="Perfil del tutor" />
+        <Navbar
+          titulo="Perfil del tutor"
+          onNavegar={onNavegar}
+        />
 
         <div className="perfil-tutor__contenido">
 
           {/* BREADCRUMB */}
-
           <div className="perfil-tutor__breadcrumb">
             <button
               type="button"
@@ -94,15 +103,12 @@ export default function PerfilTutor({
           </div>
 
           {/* CONTENIDO PRINCIPAL */}
-
           <div className="perfil-tutor__columnas">
 
             {/* COLUMNA IZQUIERDA */}
-
             <section className="perfil-tutor__izquierda">
 
               {/* INFORMACIÓN PRINCIPAL */}
-
               <article className="perfil-tutor__tarjeta perfil-tutor__presentacion">
                 <div className="perfil-tutor__avatar">
                   {datosTutor.iniciales}
@@ -139,7 +145,7 @@ export default function PerfilTutor({
                     className={`perfil-tutor__guardar ${
                       favorito ? 'perfil-tutor__guardar--activo' : ''
                     }`}
-                    onClick={() => setFavorito(!favorito)}
+                    onClick={cambiarFavorito}
                   >
                     <span>{favorito ? '♥' : '♡'}</span>
                     {favorito ? 'Guardado' : 'Guardar'}
@@ -156,7 +162,6 @@ export default function PerfilTutor({
               </article>
 
               {/* SOBRE MÍ */}
-
               <article className="perfil-tutor__tarjeta perfil-tutor__sobre-mi">
                 <h2>Sobre mí</h2>
 
@@ -164,12 +169,11 @@ export default function PerfilTutor({
               </article>
 
               {/* MATERIAS Y TEMAS */}
-
               <article className="perfil-tutor__tarjeta perfil-tutor__materias">
                 <h2>Materias y temas</h2>
 
                 <div className="perfil-tutor__grupos-materias">
-                  {materias.map((materia, indice) => (
+                  {materias.map((materia) => (
                     <div
                       className="perfil-tutor__grupo-materia"
                       key={materia.nombre}
@@ -188,11 +192,9 @@ export default function PerfilTutor({
             </section>
 
             {/* COLUMNA DERECHA */}
-
             <aside className="perfil-tutor__derecha">
 
               {/* DISPONIBILIDAD */}
-
               <article className="perfil-tutor__tarjeta perfil-tutor__disponibilidad">
                 <h2>DISPONIBILIDAD</h2>
 
@@ -219,8 +221,8 @@ export default function PerfilTutor({
               </article>
 
               {/* ESTADÍSTICAS Y ACCIONES */}
-
               <div className="perfil-tutor__estadisticas-contenedor">
+
                 <article className="perfil-tutor__tarjeta perfil-tutor__estadisticas">
                   <h2>ESTADÍSTICAS</h2>
 
@@ -257,21 +259,23 @@ export default function PerfilTutor({
                 >
                   Enviar mensaje
                 </button>
+
               </div>
             </aside>
           </div>
 
           {/* RESEÑAS */}
-
           <section className="perfil-tutor__tarjeta perfil-tutor__resenas">
             <div className="perfil-tutor__resenas-encabezado">
               <h2>Reseñas</h2>
 
               <div className="perfil-tutor__resumen-resenas">
                 <span>★★★★★</span>
+
                 <strong>
                   {Number(datosTutor.calificacion).toFixed(1)}
                 </strong>
+
                 <small>· {datosTutor.resenas} reseñas</small>
               </div>
             </div>

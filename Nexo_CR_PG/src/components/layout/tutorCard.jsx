@@ -1,3 +1,4 @@
+
 import './TutorCard.css';
 
 export default function TutorCard({
@@ -7,7 +8,7 @@ export default function TutorCard({
   semestre,
   calificacion,
   resenas,
-  materias,
+  materias = [],
   disponible,
   favorito,
   onToggleFavorito,
@@ -16,17 +17,27 @@ export default function TutorCard({
 }) {
   return (
     <article className="tutor-card">
+
+      {/* ENCABEZADO */}
+
       <div className="tutor-card__encabezado">
+
         <div className="tutor-card__avatar" aria-hidden="true">
           {iniciales}
         </div>
 
         <div className="tutor-card__identidad">
-          <h3 className="tutor-card__nombre">{nombre}</h3>
+          <h3 className="tutor-card__nombre">
+            {nombre}
+          </h3>
 
           <p className="tutor-card__especialidad">
-            {especialidad} · {semestre} semestre
+            {especialidad}
           </p>
+
+          <span className="tutor-card__semestre">
+            {semestre} semestre
+          </span>
         </div>
 
         <button
@@ -42,26 +53,47 @@ export default function TutorCard({
         >
           {favorito ? '♥' : '♡'}
         </button>
+
       </div>
 
+      {/* CALIFICACIÓN */}
+
       <div className="tutor-card__calificacion">
-        <span aria-hidden="true">★★★★★</span>
-        <strong>{calificacion.toFixed(1)}</strong>
-        <span className="tutor-card__resenas">({resenas})</span>
+
+        <span className="tutor-card__estrellas" aria-label="Cinco estrellas">
+          ★★★★★
+        </span>
+
+        <strong>{Number(calificacion).toFixed(1)}</strong>
+
+        <span className="tutor-card__resenas">
+          ({resenas})
+        </span>
+
       </div>
+
+      {/* MATERIAS */}
 
       <div className="tutor-card__materias">
         {materias.map((materia) => (
-          <span className="tutor-card__etiqueta" key={materia}>
+          <span
+            className="tutor-card__etiqueta"
+            key={materia}
+            title={materia}
+          >
             {materia}
           </span>
         ))}
       </div>
 
+      {/* DISPONIBILIDAD */}
+
       <p className="tutor-card__disponibilidad">
         <span
           className={`tutor-card__indicador ${
-            disponible ? 'tutor-card__indicador--disponible' : ''
+            disponible
+              ? 'tutor-card__indicador--disponible'
+              : ''
           }`}
           aria-hidden="true"
         />
@@ -69,7 +101,10 @@ export default function TutorCard({
         {disponible ? 'Disponible hoy' : 'No disponible hoy'}
       </p>
 
+      {/* ACCIONES */}
+
       <div className="tutor-card__acciones">
+
         <button
           type="button"
           className="tutor-card__boton tutor-card__boton--secundario"
@@ -86,7 +121,9 @@ export default function TutorCard({
         >
           Solicitar
         </button>
+
       </div>
+
     </article>
   );
 }

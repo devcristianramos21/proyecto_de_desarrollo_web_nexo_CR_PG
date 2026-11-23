@@ -68,6 +68,8 @@ const monitorias = [
 export default function HomeEstudiante({
   onNavegar,
   onVerPerfilTutor,
+  onVerDetalleMonitoria,
+  onSolicitarTutoria,
 }) {
   const [tutores, setTutores] = useState(tutoresIniciales);
 
@@ -81,10 +83,6 @@ export default function HomeEstudiante({
     );
   };
 
-  const mostrarMensaje = (mensaje) => {
-    alert(mensaje);
-  };
-
   return (
     <div className="home-estudiante">
       <Sidebar
@@ -93,7 +91,10 @@ export default function HomeEstudiante({
       />
 
       <main className="home-estudiante__principal">
-        <Navbar titulo="Inicio" />
+        <Navbar
+          titulo="Inicio"
+          onNavegar={onNavegar}
+        />
 
         <div className="home-estudiante__contenido">
           <section className="bienvenida">
@@ -118,17 +119,15 @@ export default function HomeEstudiante({
             titulo="Parcial de Cálculo Diferencial en 7 días"
             fecha="Lunes 23 Sep - Aula 301"
             descripcion="Hay una monitoría pre-parcial disponible el Sáb 20 Sep."
-            onVerCalendario={() =>
-              mostrarMensaje('Próximamente podrás consultar tu calendario.')
-            }
-            onInscribirse={() =>
-              mostrarMensaje('Próximamente podrás inscribirte a esta monitoría.')
-            }
+            onVerCalendario={() => onNavegar?.('Calendario')}
+            onInscribirse={() => onNavegar?.('Monitorías')}
           />
 
+          {/* MONITORÍAS DISPONIBLES */}
           <section className="seccion-home">
             <div className="seccion-home__encabezado">
               <h2>MONITORÍAS DISPONIBLES</h2>
+
               <button
                 type="button"
                 onClick={() => onNavegar?.('Monitorías')}
@@ -139,10 +138,15 @@ export default function HomeEstudiante({
 
             <div className="monitorias-grid">
               {monitorias.map((monitoria) => (
-                <article className="monitoria-card" key={monitoria.id}>
+                <article
+                  className="monitoria-card"
+                  key={monitoria.id}
+                >
                   <div className="monitoria-card__etiquetas">
                     {monitoria.etiquetas.map((etiqueta) => (
-                      <span key={etiqueta}>{etiqueta}</span>
+                      <span key={etiqueta}>
+                        {etiqueta}
+                      </span>
                     ))}
                   </div>
 
@@ -155,7 +159,7 @@ export default function HomeEstudiante({
                   <button
                     type="button"
                     onClick={() =>
-                      mostrarMensaje(`Seleccionaste ${monitoria.titulo}`)
+                      onVerDetalleMonitoria?.(monitoria)
                     }
                   >
                     Inscribirse
@@ -165,18 +169,25 @@ export default function HomeEstudiante({
             </div>
           </section>
 
+          {/* PRÓXIMA TUTORÍA */}
           <section className="seccion-home">
             <div className="seccion-home__encabezado">
               <h2>PRÓXIMA TUTORÍA</h2>
             </div>
 
             <article className="tutoria-card">
-              <div className="tutoria-card__avatar">NT</div>
+              <div className="tutoria-card__avatar">
+                NT
+              </div>
 
               <div className="tutoria-card__informacion">
                 <h3>Nombre del tutor</h3>
+
                 <p>Cálculo diferencial · Integrales</p>
-                <span>Jueves, 3:00 PM — 4:00 PM · Virtual</span>
+
+                <span>
+                  Jueves, 3:00 PM — 4:00 PM · Virtual
+                </span>
               </div>
 
               <span className="tutoria-card__estado">
@@ -186,14 +197,14 @@ export default function HomeEstudiante({
               <div className="tutoria-card__acciones">
                 <button
                   type="button"
-                  onClick={() => mostrarMensaje('Detalles de la tutoría')}
+                  onClick={() => onNavegar?.('Mis monitorias')}
                 >
                   Ver detalles
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => mostrarMensaje('Próximamente podrás enviar mensajes.')}
+                  onClick={() => onNavegar?.('Mensajes')}
                 >
                   Mensaje
                 </button>
@@ -201,9 +212,11 @@ export default function HomeEstudiante({
             </article>
           </section>
 
+          {/* TUTORES RECOMENDADOS */}
           <section className="seccion-home seccion-home--tutores">
             <div className="seccion-home__encabezado">
               <h2>TUTORES RECOMENDADOS</h2>
+
               <button
                 type="button"
                 onClick={() => onNavegar?.('Buscar tutores')}
@@ -217,10 +230,14 @@ export default function HomeEstudiante({
                 <TutorCard
                   key={tutor.id}
                   {...tutor}
-                  onToggleFavorito={() => cambiarFavorito(tutor.id)}
-                  onVerPerfil={() => onVerPerfilTutor?.(tutor)}
+                  onToggleFavorito={() =>
+                    cambiarFavorito(tutor.id)
+                  }
+                  onVerPerfil={() =>
+                    onVerPerfilTutor?.(tutor)
+                  }
                   onSolicitar={() =>
-                    mostrarMensaje(`Solicitud para ${tutor.nombre}`)
+                    onSolicitarTutoria?.(tutor)
                   }
                 />
               ))}
