@@ -56,6 +56,7 @@ const filtros = ['Todas', 'Pendientes', 'Aceptadas', 'Rechazadas'];
 function SolicitudesRecibidasTutor({
   onNavegar,
   solicitudes = solicitudesTutorIniciales,
+  cargando = false,
   onVerDetalle,
   onActualizarSolicitud,
 }) {
@@ -111,7 +112,7 @@ function SolicitudesRecibidasTutor({
           </nav>
 
           <section className="solicitudes-tutor__lista" aria-live="polite">
-            {filtradas.map((solicitud) => (
+            {cargando ? <p role="status">Cargando solicitudes…</p> : filtradas.map((solicitud) => (
               <article className="solicitudes-tutor__tarjeta" key={solicitud.id}>
                 <div className="solicitudes-tutor__tarjeta-cabecera">
                   <div className="solicitudes-tutor__persona">
@@ -169,8 +170,7 @@ function SolicitudesRecibidasTutor({
                     <button
                       type="button"
                       className="solicitudes-tutor__boton solicitudes-tutor__boton--secundario"
-                      disabled
-                      title="Falta el frame de Figma para proponer un horario."
+                      onClick={() => onVerDetalle?.(solicitud)}
                     >
                       Proponer horario
                     </button>
@@ -178,6 +178,7 @@ function SolicitudesRecibidasTutor({
                 </div>
               </article>
             ))}
+            {!cargando && filtradas.length === 0 && <p>No tienes solicitudes en este estado.</p>}
           </section>
         </main>
       </div>

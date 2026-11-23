@@ -5,6 +5,7 @@ import { Mensaje } from '../models/Mensaje.js';
 import { Monitoria, TIPOS_GRUPALES } from '../models/Monitoria.js';
 import { Usuario } from '../models/Usuario.js';
 import { AppError } from '../utils/AppError.js';
+import * as notificacionService from './notificacionService.js';
 
 // Una relación tutor-estudiante "cuenta" si la monitoría está programada o ya se realizó
 const ESTADOS_CON_RELACION = ['programada', 'finalizada'];
@@ -280,5 +281,15 @@ export async function enviarMensaje(usuario, idConversacion, { texto } = {}) {
   await marcarLeida(conversacion._id, usuario.id, mensaje.createdAt);
 
   eventosChat.emit('mensaje', { conversacion: id(conversacion), destinatarios, mensaje: mensaje.toObject() });
+  await notificacionService.crear(
+    destinatarios.filter((destinatario) => destinatario !== usuario.id),
+    {
+      tipo: 'mensaje',
+      titulo: 'Nuevo mensaje',
+      descripcion: 'Tienes un nuevo mensaje en una de tus conversaciones.',
+      accion: 'Abrir chat',
+      destino: 'Mensajes',
+    },
+  );
   return mensaje;
 }

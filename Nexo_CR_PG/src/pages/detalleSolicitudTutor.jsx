@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import './detalleSolicitudTutor.css';
@@ -6,7 +7,13 @@ function DetalleSolicitudTutor({
   onNavegar,
   solicitud,
   onEnviarMensaje,
+  onProponerHorario,
 }) {
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [enviandoPropuesta, setEnviandoPropuesta] = useState(false);
+  const [errorPropuesta, setErrorPropuesta] = useState('');
+  const [propuestaEnviada, setPropuestaEnviada] = useState(false);
+
   if (!solicitud) {
     return (
       <div className="detalle-solicitud-tutor-layout">
@@ -28,6 +35,33 @@ function DetalleSolicitudTutor({
   }
 
   const estadoClase = solicitud.estado.toLowerCase();
+  const puedeProponerHorario = solicitud.estado === 'Aceptada'
+    && solicitud.estadoPropuesta !== 'Aceptado'
+    && !solicitud.propuestaPendiente;
+
+  const enviarPropuestaHorario = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    setErrorPropuesta('');
+    setEnviandoPropuesta(true);
+    try {
+      await onProponerHorario(solicitud.id, {
+        fechaPrincipal: formData.get('fechaPrincipal'),
+        horaInicioPrincipal: formData.get('horaInicioPrincipal'),
+        horaFinPrincipal: formData.get('horaFinPrincipal'),
+        fechaAlternativa: formData.get('fechaAlternativa'),
+        horaInicioAlternativa: formData.get('horaInicioAlternativa'),
+        horaFinAlternativa: formData.get('horaFinAlternativa'),
+        nota: formData.get('nota'),
+      });
+      setMostrarFormulario(false);
+      setPropuestaEnviada(true);
+    } catch (errorApi) {
+      setErrorPropuesta(errorApi.message || 'No se pudo enviar la propuesta.');
+    } finally {
+      setEnviandoPropuesta(false);
+    }
+  };
 
   return (
     <div className="detalle-solicitud-tutor-layout">
@@ -56,13 +90,12 @@ function DetalleSolicitudTutor({
           </header>
 
           <section className="detalle-solicitud-tutor__card detalle-solicitud-tutor__perfil">
-            <h2>TUTOR</h2>
+            <h2>ESTUDIANTE</h2>
             <div className="detalle-solicitud-tutor__perfil-contenido">
-              <span className="detalle-solicitud-tutor__avatar">NT</span>
+              <span className="detalle-solicitud-tutor__avatar">{solicitud.iniciales || 'NE'}</span>
               <div>
-                <strong>Nombre del tutor</strong>
-                <p>Ingeniería de Sistemas · 7° semestre</p>
-                <span className="detalle-solicitud-tutor__calificacion">★★★★★ <b>4.9</b></span>
+                <strong>{solicitud.estudiante}</strong>
+                <p>{solicitud.programaEstudiante} · {solicitud.semestreEstudiante}</p>
               </div>
             </div>
           </section>
@@ -92,6 +125,77 @@ function DetalleSolicitudTutor({
               </div>
             </section>
           )}
+
+          {puedeProponerHorario && (
+            <section className="detalle-solicitud-tutor__card">
+              <h2>PROPONER HORARIO</h2>
+              {!mostrarFormulario ? (
+                <button
+                  type="button"
+                  className="detalle-solicitud-tutor__boton detalle-solicitud-tutor__boton--principal"
+                  onClick={() => setMostrarFormulario(true)}
+                >
+                  Proponer horario
+                </button>
+              ) : (
+                <form className="detalle-solicitud-tutor__formulario" onSubmit={enviarPropuestaHorario}>
+                  <fieldset>
+                    <legend>Horario principal</legend>
+                    <label>
+                      Fecha
+                      <input name="fechaPrincipal" type="date" required />
+                    </label>
+                    <label>
+                      Hora de inicio
+                      <input name="horaInicioPrincipal" type="time" required />
+                    </label>
+                    <label>
+                      Hora de fin
+                      <input name="horaFinPrincipal" type="time" required />
+                    </label>
+                  </fieldset>
+                  <fieldset>
+                    <legend>Horario alternativo</legend>
+                    <label>
+                      Fecha
+                      <input name="fechaAlternativa" type="date" required />
+                    </label>
+                    <label>
+                      Hora de inicio
+                      <input name="horaInicioAlternativa" type="time" required />
+                    </label>
+                    <label>
+                      Hora de fin
+                      <input name="horaFinAlternativa" type="time" required />
+                    </label>
+                  </fieldset>
+                  <label className="detalle-solicitud-tutor__nota">
+                    Nota para el estudiante (opcional)
+                    <textarea name="nota" maxLength={500} rows={3} />
+                  </label>
+                  {errorPropuesta && <p role="alert">{errorPropuesta}</p>}
+                  <div className="detalle-solicitud-tutor__formulario-acciones">
+                    <button
+                      type="button"
+                      className="detalle-solicitud-tutor__boton detalle-solicitud-tutor__boton--secundario"
+                      onClick={() => setMostrarFormulario(false)}
+                      disabled={enviandoPropuesta}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="detalle-solicitud-tutor__boton detalle-solicitud-tutor__boton--principal"
+                      disabled={enviandoPropuesta}
+                    >
+                      {enviandoPropuesta ? 'Enviando…' : 'Enviar propuesta'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </section>
+          )}
+          {propuestaEnviada && <p role="status">La propuesta de horario fue enviada.</p>}
 
           <div className="detalle-solicitud-tutor__acciones">
             <button

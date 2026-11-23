@@ -3,14 +3,6 @@ import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import './miDisponibilidadTutor.css';
 
-export const disponibilidadTutorInicial = [
-  { id: 'lunes', dia: 'Lunes', inicio: '14:00', fin: '16:00' },
-  { id: 'martes', dia: 'Martes', inicio: '10:00', fin: '12:00' },
-  { id: 'miercoles', dia: 'Miércoles', inicio: '16:00', fin: '18:00' },
-  { id: 'viernes', dia: 'Viernes', inicio: '15:00', fin: '17:00' },
-  { id: 'sabado', dia: 'Sábado', inicio: '09:00', fin: '11:00' },
-];
-
 const dias = [
   'Lunes',
   'Martes',
@@ -32,10 +24,11 @@ function formatearHora(hora) {
 
 function MiDisponibilidadTutor({
   onNavegar,
-  disponibilidad = disponibilidadTutorInicial,
+  disponibilidad = [],
+  cargando = false,
+  errorApi = '',
   onGuardarHorario,
   onEliminarHorario,
-  onGuardarDisponibilidad,
 }) {
   const [formularioVisible, setFormularioVisible] = useState(false);
   const [idEditando, setIdEditando] = useState(null);
@@ -45,6 +38,8 @@ function MiDisponibilidadTutor({
     fin: '10:00',
   });
   const [error, setError] = useState('');
+  const [guardando, setGuardando] = useState(false);
+  const [idEliminando, setIdEliminando] = useState(null);
 
   const abrirNuevo = () => {
     setIdEditando(null);
@@ -64,7 +59,7 @@ function MiDisponibilidadTutor({
     setFormularioVisible(true);
   };
 
-  const guardarHorario = (evento) => {
+  const guardarHorario = async (evento) => {
     evento.preventDefault();
     const inicioMinutos = Number(formulario.inicio.slice(0, 2)) * 60
       + Number(formulario.inicio.slice(3, 5));
@@ -76,22 +71,42 @@ function MiDisponibilidadTutor({
       return;
     }
 
-    onGuardarHorario?.({
-      id: idEditando || `disponibilidad-${Date.now()}`,
-      dia: formulario.dia,
-      inicio: formulario.inicio,
-      fin: formulario.fin,
-    });
-    setFormularioVisible(false);
-    setIdEditando(null);
     setError('');
+    setGuardando(true);
+    try {
+      if (!onGuardarHorario) throw new Error('No se pudo guardar la disponibilidad.');
+      await onGuardarHorario({
+        id: idEditando,
+        dia: formulario.dia,
+        inicio: formulario.inicio,
+        fin: formulario.fin,
+      });
+      setFormularioVisible(false);
+      setIdEditando(null);
+    } catch (errorGuardado) {
+      setError(errorGuardado.message || 'No se pudo guardar la disponibilidad.');
+    } finally {
+      setGuardando(false);
+    }
   };
 
   const volverAConfiguracion = () => onNavegar?.('Mi perfil');
 
   const guardarDisponibilidad = () => {
-    onGuardarDisponibilidad?.(disponibilidad);
     onNavegar?.('Mi perfil');
+  };
+
+  const eliminarHorario = async (id) => {
+    setError('');
+    setIdEliminando(id);
+    try {
+      if (!onEliminarHorario) throw new Error('No se pudo eliminar la disponibilidad.');
+      await onEliminarHorario(id);
+    } catch (errorEliminacion) {
+      setError(errorEliminacion.message || 'No se pudo eliminar la disponibilidad.');
+    } finally {
+      setIdEliminando(null);
+    }
   };
 
   return (
@@ -108,6 +123,8 @@ function MiDisponibilidadTutor({
           </header>
 
           <section className="disponibilidad-tutor__tarjeta">
+            {errorApi && <p className="disponibilidad-tutor__error" role="alert">{errorApi}</p>}
+            {error && <p className="disponibilidad-tutor__error" role="alert">{error}</p>}
             <div className="disponibilidad-tutor__tarjeta-cabecera">
               <h2>Horarios registrados</h2>
               {!formularioVisible && (
@@ -123,7 +140,9 @@ function MiDisponibilidadTutor({
             </div>
 
             <div className="disponibilidad-tutor__lista">
-              {disponibilidad.map((horario) => (
+              {cargando ? (
+                <p role="status">Cargando disponibilidad…</p>
+              ) : disponibilidad.map((horario) => (
                 <div className="disponibilidad-tutor__fila" key={horario.id}>
                   <div className="disponibilidad-tutor__detalle">
                     <span className="disponibilidad-tutor__punto" />
@@ -143,13 +162,17 @@ function MiDisponibilidadTutor({
                     <button
                       type="button"
                       className="disponibilidad-tutor__accion disponibilidad-tutor__accion--eliminar"
-                      onClick={() => onEliminarHorario?.(horario.id)}
+                      onClick={() => eliminarHorario(horario.id)}
+                      disabled={idEliminando === horario.id}
                     >
-                      Eliminar
+                      {idEliminando === horario.id ? 'Eliminando…' : 'Eliminar'}
                     </button>
                   </div>
                 </div>
               ))}
+              {!cargando && disponibilidad.length === 0 && (
+                <p>No tienes horarios de disponibilidad registrados.</p>
+              )}
             </div>
 
             {formularioVisible && (
@@ -206,8 +229,6 @@ function MiDisponibilidadTutor({
                   </label>
                 </div>
 
-                {error && <p className="disponibilidad-tutor__error" role="alert">{error}</p>}
-
                 <div className="disponibilidad-tutor__acciones-formulario">
                   <button
                     type="button"
@@ -217,14 +238,16 @@ function MiDisponibilidadTutor({
                       setIdEditando(null);
                       setError('');
                     }}
+                    disabled={guardando}
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     className="disponibilidad-tutor__boton disponibilidad-tutor__boton--guardar"
+                    disabled={guardando}
                   >
-                    Guardar
+                    {guardando ? 'Guardando…' : 'Guardar'}
                   </button>
                 </div>
               </form>

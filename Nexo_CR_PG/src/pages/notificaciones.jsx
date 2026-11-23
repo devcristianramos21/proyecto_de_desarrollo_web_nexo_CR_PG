@@ -1,81 +1,13 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
+import {
+  listarNotificaciones,
+  marcarNotificacionLeida,
+  marcarTodasLasNotificacionesLeidas,
+} from '../services/modulosIntegrados';
 import './notificaciones.css';
-
-const notificacionesIniciales = [
-  {
-    id: 1,
-    tipo: 'recordatorio',
-    titulo: 'Recordatorio de tutoría',
-    descripcion: 'Tu tutoría de Cálculo diferencial empieza en 30 minutos.',
-    tiempo: 'Hace 5 min',
-    accion: 'Ver tutoría',
-    destino: 'Mis monitorias',
-    leida: false,
-  },
-  {
-    id: 2,
-    tipo: 'aceptada',
-    titulo: 'Solicitud aceptada',
-    descripcion: 'Tu solicitud de tutoría de Programación I fue aceptada por el tutor.',
-    tiempo: 'Hace 2 h',
-    accion: 'Ver solicitud',
-    destino: 'Mis solicitudes',
-    leida: false,
-  },
-  {
-    id: 3,
-    tipo: 'propuesta',
-    titulo: 'Propuesta por confirmar',
-    descripcion: 'Tienes un horario propuesto que vence en 2 horas. Responde pronto.',
-    tiempo: 'Hace 3 h',
-    accion: 'Ver propuesta',
-    destino: 'Mis solicitudes',
-    leida: false,
-  },
-  {
-    id: 4,
-    tipo: 'mensaje',
-    titulo: 'Nuevo mensaje',
-    descripcion: 'Nombre del tutor te envió un mensaje sobre la tutoría del jueves.',
-    tiempo: 'Hace 5 h',
-    accion: 'Abrir chat',
-    destino: 'Mensajes',
-    leida: true,
-  },
-  {
-    id: 5,
-    tipo: 'completada',
-    titulo: 'Tutoría completada',
-    descripcion: 'Tu sesión de Álgebra lineal fue completada. ¿Cómo estuvo la experiencia?',
-    tiempo: 'Ayer',
-    accion: 'Dejar reseña',
-    destino: 'Mis monitorias',
-    leida: true,
-  },
-  {
-    id: 6,
-    tipo: 'rechazada',
-    titulo: 'Solicitud rechazada',
-    descripcion: 'Tu solicitud de tutoría de Estadística fue rechazada por el tutor.',
-    tiempo: 'Hace 2 días',
-    accion: 'Buscar otro tutor',
-    destino: 'Buscar tutores',
-    leida: true,
-  },
-  {
-    id: 7,
-    tipo: 'coincidencia',
-    titulo: 'Nueva coincidencia',
-    descripcion: 'Encontramos 3 tutores disponibles para Física I que coinciden con tu horario.',
-    tiempo: 'Hace 3 días',
-    accion: 'Ver tutores',
-    destino: 'Buscar tutores',
-    leida: true,
-  },
-];
 
 const iconos = {
   recordatorio: '◷',
@@ -85,12 +17,48 @@ const iconos = {
   completada: '✓',
   rechazada: '×',
   coincidencia: '☆',
+  alerta: '⚠',
+  confirmacion: '✓',
 };
 
+function tiempoRelativo(fecha) {
+  const minutos = Math.max(0, Math.floor((Date.now() - new Date(fecha).getTime()) / 60000));
+  if (minutos < 1) return 'Ahora';
+  if (minutos < 60) return `Hace ${minutos} min`;
+  const horas = Math.floor(minutos / 60);
+  if (horas < 24) return `Hace ${horas} h`;
+  const dias = Math.floor(horas / 24);
+  return dias === 1 ? 'Ayer' : `Hace ${dias} días`;
+}
+
 export default function Notificaciones({ onNavegar }) {
-  const [notificaciones, setNotificaciones] = useState(
-    notificacionesIniciales
-  );
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let vigente = true;
+    listarNotificaciones()
+      .then((resultado) => {
+        if (vigente) {
+          setNotificaciones(resultado.map((notificacion) => ({
+            ...notificacion,
+            id: notificacion._id,
+            tiempo: tiempoRelativo(notificacion.createdAt),
+          })));
+        }
+      })
+      .catch((errorApi) => {
+        if (vigente) setError(errorApi.message);
+      })
+      .finally(() => {
+        if (vigente) setCargando(false);
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, []);
 
   const noLeidas = notificaciones.filter(
     (notificacion) => !notificacion.leida
@@ -100,23 +68,32 @@ export default function Notificaciones({ onNavegar }) {
     (notificacion) => notificacion.leida
   );
 
-  const marcarTodasComoLeidas = () => {
-    setNotificaciones((actuales) =>
-      actuales.map((notificacion) => ({
+  const marcarTodasComoLeidas = async () => {
+    setError('');
+    try {
+      await marcarTodasLasNotificacionesLeidas();
+      setNotificaciones((actuales) => actuales.map((notificacion) => ({
         ...notificacion,
         leida: true,
-      }))
-    );
+      })));
+    } catch (errorApi) {
+      setError(errorApi.message);
+    }
   };
 
-  const abrirNotificacion = (notificacion) => {
-    setNotificaciones((actuales) =>
-      actuales.map((actual) =>
-        actual.id === notificacion.id
-          ? { ...actual, leida: true }
-          : actual
-      )
-    );
+  const abrirNotificacion = async (notificacion) => {
+    if (!notificacion.leida) {
+      setError('');
+      try {
+        await marcarNotificacionLeida(notificacion.id);
+        setNotificaciones((actuales) => actuales.map((actual) =>
+          actual.id === notificacion.id ? { ...actual, leida: true } : actual
+        ));
+      } catch (errorApi) {
+        setError(errorApi.message);
+        return;
+      }
+    }
 
     if (notificacion.destino) {
       onNavegar?.(notificacion.destino);
@@ -174,6 +151,7 @@ export default function Notificaciones({ onNavegar }) {
         <Navbar titulo="Notificaciones" onNavegar={onNavegar} />
 
         <div className="notificaciones-contenido">
+          {error && <p role="alert">{error}</p>}
 
           {/* ENCABEZADO */}
 
@@ -195,7 +173,9 @@ export default function Notificaciones({ onNavegar }) {
 
           {/* SIN LEER */}
 
-          {noLeidas.length > 0 && (
+          {cargando ? (
+            <p role="status">Cargando notificaciones…</p>
+          ) : noLeidas.length > 0 && (
             <section className="notificaciones-seccion">
               <h2>SIN LEER</h2>
 

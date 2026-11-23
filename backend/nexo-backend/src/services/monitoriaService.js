@@ -13,6 +13,7 @@ import { Usuario } from '../models/Usuario.js';
 import { AppError } from '../utils/AppError.js';
 import { elegirCampos } from '../utils/elegirCampos.js';
 import { regexBusqueda } from '../utils/escaparRegex.js';
+import * as notificacionService from './notificacionService.js';
 import {
   aTextoFecha,
   diaSemanaDe,
@@ -24,7 +25,7 @@ import { esHoraValida } from '../utils/horas.js';
 import * as parcialService from './parcialService.js';
 
 const POBLAR = [
-  { path: 'tutor', select: 'nombre foto materias' },
+  { path: 'tutor', select: 'nombre foto materias carrera semestre' },
   { path: 'estudiantes', select: 'nombre correo carrera semestre' },
   { path: 'parcial', select: 'materia nombre fecha hora' },
 ];
@@ -221,6 +222,14 @@ export async function solicitarPar(estudiante, datos) {
     creadaPor: estudiante.id,
   });
 
+  await notificacionService.crear([tutor._id], {
+    tipo: 'alerta',
+    titulo: 'Nueva solicitud de tutoría',
+    descripcion: `Tienes una nueva solicitud para ${monitoria.materia}.`,
+    accion: 'Ver solicitud',
+    destino: 'Solicitudes recibidas',
+  });
+
   return presentar(await obtenerPoblada(monitoria.id), estudiante);
 }
 
@@ -243,7 +252,159 @@ export async function responderSolicitud(tutor, id, { aceptar, motivo }) {
   }
 
   await monitoria.save();
+  await notificacionService.crear(monitoria.estudiantes, {
+      tipo: aceptar ? 'confirmacion' : 'alerta',
+      titulo: aceptar ? 'Solicitud de tutoría aceptada' : 'Solicitud de tutoría rechazada',
+      descripcion: aceptar
+        ? `El tutor aceptó tu solicitud de ${monitoria.materia}.`
+        : `El tutor rechazó tu solicitud de ${monitoria.materia}.`,
+      accion: 'Ver solicitud',
+      destino: 'Mis solicitudes',
+  });
   return presentar(await obtenerPoblada(id), tutor);
+}
+
+/** El tutor propone dos horarios para una monitoría individual ya aceptada. */
+export async function proponerHorario(tutor, id, datos) {
+  if (!mongoose.isValidObjectId(id)) throw new AppError(404, NO_ENCONTRADA);
+  const monitoria = await obtenerParaEditar(id);
+  if (monitoria.tipo !== 'par' || !esTutorDe(monitoria, tutor)) {
+    throw new AppError(404, NO_ENCONTRADA);
+  }
+  if (monitoria.estado !== 'programada') {
+    throw new AppError(409, 'Solo se puede proponer un horario para una monitoría aceptada');
+  }
+  if (monitoria.propuestaHorario?.estado === 'pendiente') {
+    throw new AppError(409, 'Ya existe una propuesta de horario pendiente');
+  }
+  if (monitoria.propuestaHorario?.estado === 'aceptada') {
+    throw new AppError(409, 'Esta monitoría ya tiene un horario confirmado');
+  }
+
+  const principal = leerHorario({
+    fecha: datos.fechaPrincipal,
+    horaInicio: datos.horaInicioPrincipal,
+    horaFin: datos.horaFinPrincipal,
+  });
+  const alternativa = leerHorario({
+    fecha: datos.fechaAlternativa,
+    horaInicio: datos.horaInicioAlternativa,
+    horaFin: datos.horaFinAlternativa,
+  });
+  const duracionEnMinutos = (horaInicio, horaFin) => {
+    const minutos = (hora) => hora.split(':').reduce((total, parte) => total * 60 + Number(parte), 0);
+    return minutos(horaFin) - minutos(horaInicio);
+  };
+  const duracionOriginal = duracionEnMinutos(monitoria.horaInicio, monitoria.horaFin);
+  if (
+    duracionEnMinutos(principal.horaInicio, principal.horaFin) !== duracionOriginal
+    || duracionEnMinutos(alternativa.horaInicio, alternativa.horaFin) !== duracionOriginal
+  ) {
+    throw new AppError(400, 'Las franjas propuestas deben conservar la duración de la monitoría');
+  }
+  if (
+    principal.fecha.getTime() === alternativa.fecha.getTime()
+    && principal.horaInicio === alternativa.horaInicio
+    && principal.horaFin === alternativa.horaFin
+  ) {
+    throw new AppError(400, 'Los horarios principal y alternativo deben ser diferentes');
+  }
+
+  for (const horario of [principal, alternativa]) {
+    const disponible = await Disponibilidad.exists({
+      tutor: monitoria.tutor,
+      diaSemana: diaSemanaDe(horario.fecha),
+      horaInicio: { $lte: horario.horaInicio },
+      horaFin: { $gte: horario.horaFin },
+    });
+    if (!disponible) {
+      throw new AppError(409, 'Uno de los horarios propuestos no está dentro de tu disponibilidad');
+    }
+    await verificarCruce(tutor.id, horario, 'Uno de los horarios propuestos se cruza con otra monitoría', [monitoria._id]);
+    for (const estudiante of monitoria.estudiantes) {
+      await verificarCruce(idDe(estudiante), horario, 'Uno de los horarios propuestos se cruza con otra monitoría', [monitoria._id]);
+    }
+  }
+
+  if (datos.nota !== undefined && (typeof datos.nota !== 'string' || datos.nota.trim().length > 500)) {
+    throw new AppError(400, 'La nota no puede superar los 500 caracteres');
+  }
+
+  monitoria.propuestaHorario = {
+    fechaPrincipal: principal.fecha,
+    horaInicioPrincipal: principal.horaInicio,
+    horaFinPrincipal: principal.horaFin,
+    fechaAlternativa: alternativa.fecha,
+    horaInicioAlternativa: alternativa.horaInicio,
+    horaFinAlternativa: alternativa.horaFin,
+    nota: datos.nota?.trim() ?? '',
+    estado: 'pendiente',
+  };
+  await monitoria.save();
+  await notificacionService.crear(monitoria.estudiantes, {
+    tipo: 'propuesta',
+    titulo: 'Propuesta de horario por confirmar',
+    descripcion: `El tutor propuso horarios para ${monitoria.materia}.`,
+    accion: 'Ver propuesta',
+    destino: 'Mis solicitudes',
+  });
+  return presentar(await obtenerPoblada(id), tutor);
+}
+
+/** El estudiante elige una de las opciones del tutor o rechaza la propuesta. */
+export async function responderPropuestaHorario(estudiante, id, datos) {
+  if (!mongoose.isValidObjectId(id)) throw new AppError(404, NO_ENCONTRADA);
+  const monitoria = await obtenerParaEditar(id);
+  if (!estaInscrito(monitoria, estudiante)) throw new AppError(404, NO_ENCONTRADA);
+  if (monitoria.estado !== 'programada' || !monitoria.propuestaHorario) {
+    throw new AppError(404, 'Propuesta de horario no encontrada');
+  }
+  if (monitoria.propuestaHorario.estado !== 'pendiente') {
+    throw new AppError(409, 'La propuesta de horario ya fue respondida');
+  }
+  if (!['aceptar', 'rechazar'].includes(datos.decision)) {
+    throw new AppError(400, 'La decisión debe ser aceptar o rechazar');
+  }
+
+  if (datos.decision === 'aceptar') {
+    if (!['principal', 'alternativo'].includes(datos.horario)) {
+      throw new AppError(400, 'Selecciona el horario principal o el alternativo');
+    }
+    const sufijo = datos.horario === 'principal' ? 'Principal' : 'Alternativa';
+    const horario = {
+      fecha: monitoria.propuestaHorario[`fecha${sufijo}`],
+      horaInicio: monitoria.propuestaHorario[`horaInicio${sufijo}`],
+      horaFin: monitoria.propuestaHorario[`horaFin${sufijo}`],
+    };
+    if (momentoEnColombia(horario.fecha, horario.horaInicio) <= new Date()) {
+      throw new AppError(409, 'El horario seleccionado ya pasó');
+    }
+    await verificarCruce(monitoria.tutor, horario, 'El tutor ya tiene otra monitoría en ese horario', [monitoria._id]);
+    await verificarCruce(estudiante.id, horario, 'Ya tienes otra monitoría en ese horario', [monitoria._id]);
+    monitoria.set({
+      ...horario,
+      'propuestaHorario.estado': 'aceptada',
+      'propuestaHorario.horarioSeleccionado': datos.horario,
+      'propuestaHorario.respondidaEn': new Date(),
+    });
+  } else {
+    monitoria.set({
+      'propuestaHorario.estado': 'rechazada',
+      'propuestaHorario.respondidaEn': new Date(),
+    });
+  }
+
+  await monitoria.save();
+  await notificacionService.crear([monitoria.tutor], {
+    tipo: datos.decision === 'aceptar' ? 'confirmacion' : 'alerta',
+    titulo: datos.decision === 'aceptar' ? 'Horario confirmado' : 'Propuesta de horario rechazada',
+    descripcion: datos.decision === 'aceptar'
+      ? `El estudiante confirmó un horario para ${monitoria.materia}.`
+      : `El estudiante rechazó la propuesta de horario para ${monitoria.materia}.`,
+    accion: 'Ver monitoría',
+    destino: 'Monitorías asignadas',
+  });
+  return presentar(await obtenerPoblada(id), estudiante);
 }
 
 // ───────────────────────── Monitorías grupales (admin) ─────────────────────────
@@ -470,6 +631,16 @@ export async function cancelar(usuario, id, { motivo } = {}) {
 
   monitoria.set({ estado: 'cancelada', motivo });
   await monitoria.save();
+  const participantes = [monitoria.tutor, ...monitoria.estudiantes]
+    .map(idDe)
+    .filter((idParticipante) => idParticipante !== usuario.id);
+  await notificacionService.crear(participantes, {
+    tipo: 'alerta',
+    titulo: 'Monitoría cancelada',
+    descripcion: `La monitoría de ${monitoria.materia} fue cancelada.`,
+    accion: 'Ver monitoría',
+    destino: 'Mis monitorias',
+  });
 
   return presentar(await obtenerPoblada(id), usuario);
 }
@@ -492,6 +663,13 @@ export async function finalizar(usuario, id) {
 
   monitoria.estado = 'finalizada';
   await monitoria.save();
+  await notificacionService.crear(monitoria.estudiantes, {
+    tipo: 'completada',
+    titulo: 'Tutoría completada',
+    descripcion: `Tu tutoría de ${monitoria.materia} fue finalizada. Puedes evaluar al tutor.`,
+    accion: 'Evaluar tutor',
+    destino: 'Mis monitorias',
+  });
 
   return presentar(await obtenerPoblada(id), usuario);
 }

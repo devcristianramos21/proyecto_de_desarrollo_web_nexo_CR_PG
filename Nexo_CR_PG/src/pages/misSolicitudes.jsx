@@ -64,6 +64,7 @@ function MisSolicitudes({
   onNavegar,
   onVerDetalleSolicitud,
   solicitudes = solicitudesIniciales,
+  cargando = false,
   onCancelarSolicitud,
   onNuevaSolicitud,
 }) {
@@ -160,7 +161,9 @@ function MisSolicitudes({
           {/* LISTADO */}
           <section className="solicitudes__lista">
 
-            {solicitudesFiltradas.length > 0 ? (
+            {cargando ? (
+              <p role="status">Cargando tus solicitudes…</p>
+            ) : solicitudesFiltradas.length > 0 ? (
               solicitudesFiltradas.map((solicitud) => (
                 <article
                   className="solicitudes__tarjeta"

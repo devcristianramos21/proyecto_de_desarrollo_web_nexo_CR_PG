@@ -10,7 +10,7 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
     contrasena: '',
     programa: '',
     semestre: '',
-    rol: 'Estudiante',
+    rol: 'estudiante',
     aceptaTerminos: false,
   });
 
@@ -43,7 +43,6 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
 
   return (
     <main className="crear-cuenta-pagina">
-
       <button
         type="button"
         className="crear-cuenta-volver"
@@ -59,14 +58,12 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
       </div>
 
       <section className="crear-cuenta-card">
-
         <header className="crear-cuenta-encabezado">
           <h2>Crear cuenta</h2>
           <p>Completa tu información para comenzar</p>
         </header>
 
         <form onSubmit={enviarFormulario}>
-
           <div className="crear-cuenta-fila">
             <div className="crear-cuenta-campo">
               <label htmlFor="nombre">Nombre</label>
@@ -166,15 +163,15 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
             <div className="crear-cuenta-roles-grid">
               <label
                 className={`crear-cuenta-rol ${
-                  formulario.rol === 'Estudiante' ? 'crear-cuenta-rol-activo' : ''
+                  formulario.rol === 'estudiante' ? 'crear-cuenta-rol-activo' : ''
                 }`}
               >
                 <input
                   type="radio"
                   name="rol"
-                  value="Estudiante"
-                  checked={formulario.rol === 'Estudiante'}
-                  onChange={() => actualizarCampo('rol', 'Estudiante')}
+                  value="estudiante"
+                  checked={formulario.rol === 'estudiante'}
+                  onChange={() => actualizarCampo('rol', 'estudiante')}
                 />
                 <span className="crear-cuenta-radio"></span>
                 <span className="crear-cuenta-rol-texto">
@@ -185,15 +182,15 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
 
               <label
                 className={`crear-cuenta-rol ${
-                  formulario.rol === 'Administrador' ? 'crear-cuenta-rol-activo' : ''
+                  formulario.rol === 'admin' ? 'crear-cuenta-rol-activo' : ''
                 }`}
               >
                 <input
                   type="radio"
                   name="rol"
-                  value="Administrador"
-                  checked={formulario.rol === 'Administrador'}
-                  onChange={() => actualizarCampo('rol', 'Administrador')}
+                  value="admin"
+                  checked={formulario.rol === 'admin'}
+                  onChange={() => actualizarCampo('rol', 'admin')}
                 />
                 <span className="crear-cuenta-radio"></span>
                 <span className="crear-cuenta-rol-texto">
@@ -203,6 +200,7 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
               </label>
             </div>
           </fieldset>
+
           <button type="submit" className="crear-cuenta-submit">
             Crear cuenta
           </button>
@@ -213,7 +211,6 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
               Iniciar sesión
             </button>
           </p>
-
         </form>
       </section>
     </main>

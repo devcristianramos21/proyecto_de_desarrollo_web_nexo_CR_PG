@@ -8,7 +8,7 @@ export default function Navbar({
   titulo = 'Inicio',
   onNavegar,
   variant = 'default',
-  showBack = false,
+  showBack = true,
   onBack,
 }) {
   const { usuario } = useUsuario();
@@ -21,8 +21,8 @@ export default function Navbar({
           <button
             type="button"
             className="navbar__regresar"
-            aria-label="Volver al inicio administrativo"
-            onClick={onBack}
+            aria-label="Volver a la pantalla anterior"
+            onClick={onBack || (() => onNavegar?.('__back__'))}
           >
             <img src={esAdmin ? adminBackIcon : '/assets/Frame.svg'} alt="" />
           </button>

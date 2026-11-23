@@ -1,0 +1,301 @@
+.postulacion-tutor {
+  min-height: 100vh;
+  display: flex;
+  background: #fcf1f1;
+  color: #111827;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.postulacion-tutor__principal {
+  min-width: 0;
+  flex: 1;
+}
+
+.postulacion-tutor__contenido {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 36px 4.85% 60px;
+  box-sizing: border-box;
+}
+
+.postulacion-tutor__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 27px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.postulacion-tutor__breadcrumb button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.postulacion-tutor__breadcrumb button:hover {
+  color: #98111e;
+}
+
+.postulacion-tutor__breadcrumb strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.postulacion-tutor__encabezado {
+  margin-bottom: 25px;
+}
+
+.postulacion-tutor__encabezado h1 {
+  margin: 0 0 5px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.22px;
+}
+
+.postulacion-tutor__encabezado p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.postulacion-tutor__formulario,
+.postulacion-tutor__mensaje,
+.postulacion-tutor__estado {
+  max-width: 820px;
+  margin: 0 auto 20px;
+  padding: 26px 28px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 5px rgb(17 24 39 / 4%);
+}
+
+.postulacion-tutor__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+}
+
+.postulacion-tutor__perfil {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.postulacion-tutor__perfil > div {
+  min-height: 67px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.postulacion-tutor__perfil span,
+.postulacion-tutor__estado > div > span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.postulacion-tutor__perfil strong {
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.postulacion-tutor__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.postulacion-tutor__campo > span {
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.postulacion-tutor__campo textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #374151;
+  font: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.postulacion-tutor__campo textarea:focus {
+  border-color: #98111e;
+  outline: 2px solid rgb(152 17 30 / 12%);
+}
+
+.postulacion-tutor__campo textarea::placeholder {
+  color: #9ca3af;
+}
+
+.postulacion-tutor__campo small {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.postulacion-tutor__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+.postulacion-tutor__boton-principal,
+.postulacion-tutor__boton-secundario {
+  min-height: 36px;
+  padding: 8px 14px;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.postulacion-tutor__boton-principal {
+  border: 1px solid #98111e;
+  background: #98111e;
+  color: #fff;
+}
+
+.postulacion-tutor__boton-principal:hover:not(:disabled) {
+  border-color: #7e0e19;
+  background: #7e0e19;
+}
+
+.postulacion-tutor__boton-principal:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.postulacion-tutor__boton-secundario {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #111827;
+}
+
+.postulacion-tutor__boton-secundario:hover {
+  background: #f9fafb;
+}
+
+.postulacion-tutor__estado {
+  border-left: 4px solid #d29100;
+  color: #111827;
+}
+
+.postulacion-tutor__estado--aprobada {
+  border-left-color: #16a34a;
+}
+
+.postulacion-tutor__estado--rechazada {
+  border-left-color: #be123c;
+}
+
+.postulacion-tutor__estado > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.postulacion-tutor__estado > div > strong {
+  color: #1d3b6c;
+  font-size: 14px;
+}
+
+.postulacion-tutor__estado--aprobada > div > strong {
+  color: #15803d;
+}
+
+.postulacion-tutor__estado--rechazada > div > strong {
+  color: #be123c;
+}
+
+.postulacion-tutor__estado p,
+.postulacion-tutor__mensaje p {
+  margin: 10px 0 0;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.postulacion-tutor__aviso {
+  margin: 0;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.postulacion-tutor__error {
+  margin: 0;
+  color: #b42332;
+  font-size: 13px;
+}
+
+.postulacion-tutor__mensaje {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 13px;
+}
+
+.postulacion-tutor__mensaje--error {
+  display: block;
+  border-color: #f1c1c6;
+}
+
+.postulacion-tutor__mensaje--error .postulacion-tutor__boton-secundario {
+  margin-top: 12px;
+}
+
+@media (max-width: 700px) {
+  .postulacion-tutor__contenido {
+    padding: 25px 20px 40px;
+  }
+
+  .postulacion-tutor__formulario,
+  .postulacion-tutor__mensaje,
+  .postulacion-tutor__estado {
+    padding: 21px 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .postulacion-tutor__perfil {
+    grid-template-columns: 1fr;
+  }
+
+  .postulacion-tutor__acciones {
+    flex-direction: column-reverse;
+  }
+
+  .postulacion-tutor__acciones button,
+  .postulacion-tutor__mensaje button {
+    width: 100%;
+  }
+
+  .postulacion-tutor__estado > div,
+  .postulacion-tutor__mensaje {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

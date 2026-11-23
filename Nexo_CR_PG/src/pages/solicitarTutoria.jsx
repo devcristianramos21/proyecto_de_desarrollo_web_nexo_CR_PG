@@ -1,18 +1,84 @@
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
+import { obtenerDisponibilidadTutor } from '../services/modulosIntegrados';
 
 import './solicitarTutoria.css';
 
-const horariosDisponibles = [
-  { id: 1, dia: 'Lunes 16 Jun', hora: '2:00 PM — 3:00 PM' },
-  { id: 2, dia: 'Lunes 16 Jun', hora: '3:00 PM — 4:00 PM' },
-  { id: 3, dia: 'Martes 17 Jun', hora: '10:00 AM — 11:00 AM' },
-  { id: 4, dia: 'Viernes 20 Jun', hora: '3:00 PM — 4:00 PM' },
-  { id: 5, dia: 'Sábado 21 Jun', hora: '9:00 AM — 10:00 AM' },
-];
+const DIAS_SEMANA = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+
+function fechaLocalIso(fecha) {
+  const anio = fecha.getUTCFullYear();
+  const mes = String(fecha.getUTCMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getUTCDate()).padStart(2, '0');
+  return `${anio}-${mes}-${dia}`;
+}
+
+function formatoHora(minutos) {
+  const hora = Math.floor(minutos / 60);
+  const minuto = minutos % 60;
+  const fecha = new Date(Date.UTC(2000, 0, 1, hora, minuto));
+  return new Intl.DateTimeFormat('es-CO', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'UTC',
+  }).format(fecha);
+}
+
+function crearOpcionesHorario(franjas, fechaBase, fechaHoraActual) {
+  const opciones = [];
+
+  for (let desplazamiento = 0; desplazamiento < 14; desplazamiento += 1) {
+    const fecha = new Date(fechaBase);
+    fecha.setUTCDate(fecha.getUTCDate() + desplazamiento);
+    const diaSemana = DIAS_SEMANA[fecha.getUTCDay()];
+    const dia = new Intl.DateTimeFormat('es-CO', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'short',
+      timeZone: 'UTC',
+    }).format(fecha);
+
+    franjas
+      .filter((franja) => franja.diaSemana === diaSemana)
+      .forEach((franja) => {
+        const [horaInicio, minutoInicio] = franja.horaInicio.split(':').map(Number);
+        const [horaFin, minutoFin] = franja.horaFin.split(':').map(Number);
+        const inicio = horaInicio * 60 + minutoInicio;
+        const fin = horaFin * 60 + minutoFin;
+
+        for (let inicioOpcion = inicio; inicioOpcion + 60 <= fin; inicioOpcion += 60) {
+          const fechaHora = new Date(
+            Date.UTC(
+              fecha.getUTCFullYear(),
+              fecha.getUTCMonth(),
+              fecha.getUTCDate(),
+              Math.floor(inicioOpcion / 60) + 5,
+              inicioOpcion % 60,
+            ),
+          );
+          if (fechaHora <= fechaHoraActual) continue;
+
+          const finOpcion = inicioOpcion + 60;
+          const horaInicioTexto = `${String(Math.floor(inicioOpcion / 60)).padStart(2, '0')}:${String(inicioOpcion % 60).padStart(2, '0')}`;
+          const horaFinTexto = `${String(Math.floor(finOpcion / 60)).padStart(2, '0')}:${String(finOpcion % 60).padStart(2, '0')}`;
+          opciones.push({
+            id: `${fechaLocalIso(fecha)}-${horaInicioTexto}`,
+            fecha: fechaLocalIso(fecha),
+            dia,
+            horaInicio: horaInicioTexto,
+            horaFin: horaFinTexto,
+            hora: `${formatoHora(inicioOpcion)} — ${formatoHora(finOpcion)}`,
+          });
+        }
+      });
+  }
+
+  return opciones;
+}
 
 export default function SolicitarTutoria({
   onNavegar,
@@ -24,16 +90,35 @@ export default function SolicitarTutoria({
   const materiasTutor = tutor?.materias || [];
 
   const [paso, setPaso] = useState(1);
-  const [materia, setMateria] = useState(
-    materiasTutor[0] || 'Cálculo diferencial'
-  );
+  const [materia, setMateria] = useState(materiasTutor[0] || '');
   const [tema, setTema] = useState('');
   const [necesidad, setNecesidad] = useState('');
   const [modalidad, setModalidad] = useState('Virtual');
-  const [horarioSeleccionado, setHorarioSeleccionado] = useState(1);
-  const [error, setError] = useState('');
+  const [disponibilidad, setDisponibilidad] = useState([]);
+  const [cargandoDisponibilidad, setCargandoDisponibilidad] = useState(Boolean(tutor?.id));
+  const [enviandoSolicitud, setEnviandoSolicitud] = useState(false);
+  const [horarioSeleccionado, setHorarioSeleccionado] = useState('');
+  const [error, setError] = useState(tutor?.id ? '' : 'No se encontró el tutor seleccionado.');
   const [mostrarModal, setMostrarModal] = useState(false);
   const [solicitudEnviada, setSolicitudEnviada] = useState(false);
+  const [fechaBase] = useState(() => {
+    const partes = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Bogota',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(new Date());
+    const valor = Object.fromEntries(partes.map(({ type, value }) => [type, value]));
+    return new Date(Date.UTC(Number(valor.year), Number(valor.month) - 1, Number(valor.day)));
+  });
+  const [fechaHoraActual] = useState(() => new Date());
+  const horariosDisponibles = useMemo(
+    () => crearOpcionesHorario(disponibilidad, fechaBase, fechaHoraActual),
+    [disponibilidad, fechaBase, fechaHoraActual],
+  );
+  const horarioActual = horariosDisponibles.find(
+    (horario) => horario.id === horarioSeleccionado
+  ) || horariosDisponibles[0];
 
   const nombreTutor = tutor?.nombre || 'Nombre del tutor';
   const programaTutor =
@@ -44,9 +129,29 @@ export default function SolicitarTutoria({
     'Mis solicitudes': 'Mis solicitudes',
   };
 
-  const horarioActual = horariosDisponibles.find(
-    (horario) => horario.id === horarioSeleccionado
-  );
+  useEffect(() => {
+    if (!tutor?.id) return undefined;
+
+    let vigente = true;
+    obtenerDisponibilidadTutor(tutor.id)
+      .then((franjas) => {
+        if (vigente) {
+          setDisponibilidad(franjas);
+          setHorarioSeleccionado('');
+          setError('');
+        }
+      })
+      .catch((errorApi) => {
+        if (vigente) setError(errorApi.message);
+      })
+      .finally(() => {
+        if (vigente) setCargandoDisponibilidad(false);
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, [tutor?.id]);
 
   // ========================================
   // PASO 1: INFORMACIÓN
@@ -74,7 +179,7 @@ export default function SolicitarTutoria({
   // ========================================
 
   const revisarSolicitud = () => {
-    if (!horarioSeleccionado) {
+    if (!horarioActual) {
       setError('Selecciona un horario para continuar.');
       return;
     }
@@ -96,9 +201,13 @@ export default function SolicitarTutoria({
     setMostrarModal(true);
   };
 
-  const confirmarEnvio = () => {
+  const confirmarEnvio = async () => {
+    if (!tutor?.id || !horarioActual) {
+      setError('Selecciona un horario disponible antes de enviar.');
+      return;
+    }
+
     const solicitud = {
-      id: Date.now(),
       tutor: nombreTutor,
       tutorId: tutor?.id,
       tutorData: tutor || null,
@@ -106,24 +215,28 @@ export default function SolicitarTutoria({
       semestreTutor:
         tutor?.semestreTutor ||
         (tutor?.semestre ? `${tutor.semestre}° semestre` : 'Programa académico'),
-      calificacion: tutor?.calificacion || '4.9',
+      calificacion: tutor?.calificacion ?? '—',
       materia,
       tema: tema.trim(),
       modalidad,
-      fecha: new Intl.DateTimeFormat('es-CO', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      }).format(new Date()),
-      estado: 'Pendiente',
+      fecha: horarioActual.fecha,
+      horaInicio: horarioActual.horaInicio,
+      horaFin: horarioActual.horaFin,
       descripcion: necesidad.trim(),
-      propuesta: false,
-      horario: `${horarioActual?.dia || ''} · ${horarioActual?.hora || ''}`.trim(),
     };
 
-    onCrearSolicitud?.(solicitud);
-    setMostrarModal(false);
-    setSolicitudEnviada(true);
+    setEnviandoSolicitud(true);
+    setError('');
+    try {
+      if (!onCrearSolicitud) throw new Error('No se pudo conectar el envío de solicitudes.');
+      await onCrearSolicitud?.(solicitud);
+      setMostrarModal(false);
+      setSolicitudEnviada(true);
+    } catch (errorApi) {
+      setError(errorApi.message || 'No se pudo enviar la solicitud.');
+    } finally {
+      setEnviandoSolicitud(false);
+    }
   };
 
   return (
@@ -349,19 +462,9 @@ export default function SolicitarTutoria({
                           </option>
                         ))
                       ) : (
-                        <>
-                          <option value="Cálculo diferencial">
-                            Cálculo diferencial
-                          </option>
-
-                          <option value="Álgebra lineal">
-                            Álgebra lineal
-                          </option>
-
-                          <option value="Programación I">
-                            Programación I
-                          </option>
-                        </>
+                        <option value="" disabled>
+                          No hay materias registradas
+                        </option>
                       )}
                     </select>
                   </div>
@@ -458,16 +561,20 @@ export default function SolicitarTutoria({
 
                   <div className="solicitar-tutoria__titulo-horario">
                     <h2>Selecciona un horario</h2>
-                    <p>Disponibilidad del tutor esta semana</p>
+                    <p>Horarios registrados para las próximas dos semanas</p>
                   </div>
 
                   <div className="solicitar-tutoria__lista-horarios">
-                    {horariosDisponibles.map((horario) => (
+                    {cargandoDisponibilidad ? (
+                      <p role="status">Consultando disponibilidad…</p>
+                    ) : horariosDisponibles.length === 0 ? (
+                      <p>No hay horarios disponibles registrados para las próximas dos semanas.</p>
+                    ) : horariosDisponibles.map((horario) => (
                       <button
                         type="button"
                         key={horario.id}
                         className={`solicitar-tutoria__horario ${
-                          horarioSeleccionado === horario.id
+                          horarioActual?.id === horario.id
                             ? 'solicitar-tutoria__horario--seleccionado'
                             : ''
                         }`}
@@ -476,7 +583,7 @@ export default function SolicitarTutoria({
                           setError('');
                         }}
                         aria-pressed={
-                          horarioSeleccionado === horario.id
+                          horarioActual?.id === horario.id
                         }
                       >
                         <span
@@ -511,7 +618,7 @@ export default function SolicitarTutoria({
                           {horario.dia} · {horario.hora}
                         </span>
 
-                        {horarioSeleccionado === horario.id && (
+                        {horarioActual?.id === horario.id && (
                           <span className="solicitar-tutoria__horario-etiqueta">
                             Seleccionado
                           </span>
@@ -632,7 +739,7 @@ export default function SolicitarTutoria({
               {mostrarModal && (
                 <div
                   className="solicitar-tutoria__overlay"
-                  onClick={() => setMostrarModal(false)}
+                  onClick={() => !enviandoSolicitud && setMostrarModal(false)}
                 >
                   <section
                     className="solicitar-tutoria__modal"
@@ -650,11 +757,14 @@ export default function SolicitarTutoria({
                       a <strong>{nombreTutor}</strong>?
                     </p>
 
+                    {error && <p className="solicitar-tutoria__error" role="alert">{error}</p>}
+
                     <div className="solicitar-tutoria__modal-acciones">
                       <button
                         type="button"
                         className="solicitar-tutoria__modal-cancelar"
                         onClick={() => setMostrarModal(false)}
+                        disabled={enviandoSolicitud}
                       >
                         Cancelar
                       </button>
@@ -663,8 +773,9 @@ export default function SolicitarTutoria({
                         type="button"
                         className="solicitar-tutoria__modal-confirmar"
                         onClick={confirmarEnvio}
+                        disabled={enviandoSolicitud}
                       >
-                        Confirmar y enviar
+                        {enviandoSolicitud ? 'Enviando…' : 'Confirmar y enviar'}
                       </button>
                     </div>
                   </section>

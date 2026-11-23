@@ -23,6 +23,8 @@ router.put('/:id', permitir('admin'), c.actualizarGrupal);
 // Respuesta del tutor a una solicitud par
 router.patch('/:id/aceptar', permitir('tutor'), c.aceptarSolicitud);
 router.patch('/:id/rechazar', permitir('tutor'), c.rechazarSolicitud);
+router.put('/:id/propuesta-horario', permitir('tutor'), c.proponerHorario);
+router.patch('/:id/propuesta-horario/responder', permitir('estudiante'), c.responderPropuestaHorario);
 
 // Cancelar (participantes o admin; el service decide) y finalizar (tutor o admin)
 router.patch('/:id/cancelar', c.cancelarMonitoria);

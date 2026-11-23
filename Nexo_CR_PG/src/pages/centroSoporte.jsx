@@ -1,8 +1,12 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
-import './CentroSoporte.css';
+import {
+  crearTicketSoporte,
+  listarMisTicketsSoporte,
+} from '../services/modulosIntegrados';
+import './centroSoporte.css';
 
 const preguntasFrecuentes = [
   {
@@ -31,6 +35,32 @@ const preguntasFrecuentes = [
   },
 ];
 
+function adaptarTicket(ticket) {
+  const estados = {
+    pendiente: 'Pendiente',
+    en_revision: 'En revisión',
+    resuelto: 'Resuelto',
+  };
+  const fechaActualizacion = new Date(ticket.updatedAt);
+  return {
+    id: ticket._id,
+    numeroCaso: ticket.numeroCaso,
+    tipo: ticket.categoria,
+    asunto: ticket.asunto,
+    descripcion: ticket.descripcion,
+    fecha: new Date(ticket.createdAt).toLocaleDateString('es-CO'),
+    ultimaActualizacion: fechaActualizacion.toLocaleString('es-CO', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }),
+    estado: estados[ticket.estado] || ticket.estado,
+    respuesta: ticket.respuesta || '',
+  };
+}
+
 export default function CentroSoporte({ onNavegar }) {
   const [pestanaActiva, setPestanaActiva] = useState('nueva');
   const [tipoSituacion, setTipoSituacion] = useState('Problema técnico');
@@ -40,41 +70,51 @@ export default function CentroSoporte({ onNavegar }) {
   const [solicitudes, setSolicitudes] = useState([]);
   const [solicitudExpandida, setSolicitudExpandida] = useState(null);
   const [confirmacionEnviada, setConfirmacionEnviada] = useState(false);
+  const [cargando, setCargando] = useState(true);
+  const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let vigente = true;
+    listarMisTicketsSoporte()
+      .then((tickets) => {
+        if (vigente) setSolicitudes(tickets.map(adaptarTicket));
+      })
+      .catch((errorApi) => {
+        if (vigente) setError(errorApi.message);
+      })
+      .finally(() => {
+        if (vigente) setCargando(false);
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, []);
 
   // ENVIAR SOLICITUD
 
-  const enviarSolicitud = (event) => {
+  const enviarSolicitud = async (event) => {
     event.preventDefault();
-
-    const fechaActual = new Date();
-
-    const nuevaSolicitud = {
-      id: Date.now(),
-      numeroCaso: `NEXO-${String(Date.now()).slice(-4)}`,
-      tipo: tipoSituacion,
-      asunto: asunto.trim(),
-      descripcion: descripcion.trim(),
-      fecha: fechaActual.toLocaleDateString('es-CO'),
-      ultimaActualizacion: fechaActual.toLocaleString('es-CO', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      }),
-      estado: 'Pendiente',
-      respuesta: '',
-    };
-
-    setSolicitudes((actuales) => [nuevaSolicitud, ...actuales]);
-
-    setAsunto('');
-    setDescripcion('');
-    setTipoSituacion('Problema técnico');
-    setSolicitudExpandida(null);
-
-    // Mostrar la pantalla de confirmación
-    setConfirmacionEnviada(true);
+    setError('');
+    setEnviando(true);
+    try {
+      const ticket = await crearTicketSoporte({
+        categoria: tipoSituacion,
+        asunto: asunto.trim(),
+        descripcion: descripcion.trim(),
+      });
+      setSolicitudes((actuales) => [adaptarTicket(ticket), ...actuales]);
+      setAsunto('');
+      setDescripcion('');
+      setTipoSituacion('Problema técnico');
+      setSolicitudExpandida(null);
+      setConfirmacionEnviada(true);
+    } catch (errorApi) {
+      setError(errorApi.message);
+    } finally {
+      setEnviando(false);
+    }
   };
 
   // VER MIS SOLICITUDES
@@ -120,6 +160,7 @@ export default function CentroSoporte({ onNavegar }) {
       <main className="centro-soporte__principal">
 
         <Navbar titulo="Centro de soporte" onNavegar={onNavegar} />
+        {error && <p className="centro-soporte__error" role="alert">{error}</p>}
 
         {confirmacionEnviada ? (
 
@@ -262,6 +303,7 @@ export default function CentroSoporte({ onNavegar }) {
                     <input
                       id="asunto"
                       type="text"
+                      maxLength={120}
                       value={asunto}
                       onChange={(event) =>
                         setAsunto(event.target.value)
@@ -279,6 +321,7 @@ export default function CentroSoporte({ onNavegar }) {
                     <textarea
                       id="descripcion"
                       value={descripcion}
+                      maxLength={3000}
                       onChange={(event) =>
                         setDescripcion(event.target.value)
                       }
@@ -294,8 +337,9 @@ export default function CentroSoporte({ onNavegar }) {
                   <button
                     type="submit"
                     className="centro-soporte__enviar"
+                    disabled={enviando}
                   >
-                    Enviar solicitud
+                    {enviando ? 'Enviando…' : 'Enviar solicitud'}
                   </button>
 
                 </form>
@@ -309,7 +353,9 @@ export default function CentroSoporte({ onNavegar }) {
 
                 <h2>Mis solicitudes</h2>
 
-                {solicitudes.length > 0 ? (
+                {cargando ? (
+                  <p role="status">Cargando tus solicitudes…</p>
+                ) : solicitudes.length > 0 ? (
 
                   <div className="centro-soporte__solicitudes-lista">
 

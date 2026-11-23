@@ -16,6 +16,8 @@ function EvaluarTutoria({ onNavegar, tutoria, onEnviarEvaluacion }) {
   const [criterios, setCriterios] = useState(criteriosIniciales);
   const [comentario, setComentario] = useState('');
   const [recomendacion, setRecomendacion] = useState(null);
+  const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState('');
 
   const datos = {
     tutor: 'Andrés Moreno',
@@ -50,7 +52,7 @@ function EvaluarTutoria({ onNavegar, tutoria, onEnviarEvaluacion }) {
   };
 
   // ENVIAR EVALUACIÓN
-  const enviarEvaluacion = () => {
+  const enviarEvaluacion = async () => {
     if (!datos.id) {
       alert('No se encontró el identificador de la tutoría.');
       return;
@@ -81,15 +83,22 @@ function EvaluarTutoria({ onNavegar, tutoria, onEnviarEvaluacion }) {
     }
 
     const evaluacion = {
-      tutor: datos.tutor,
       calificacionGeneral,
-      criterios: criterios.map((criterio) => ({ ...criterio })),
-      comentario,
+      criterios: criterios.map(({ nombre, valor }) => ({ nombre, valor })),
+      comentario: comentario.trim(),
       recomendacion,
     };
 
-    // App.jsx registra la evaluación y abre la pantalla de confirmación.
-    onEnviarEvaluacion(datos.id, evaluacion);
+    setError('');
+    setEnviando(true);
+    try {
+      await onEnviarEvaluacion(datos.id, evaluacion);
+      onNavegar('Confirmacion evaluacion');
+    } catch (errorApi) {
+      setError(errorApi.message || 'No se pudo enviar la evaluación.');
+    } finally {
+      setEnviando(false);
+    }
   };
 
   // COMPONENTE DE ESTRELLAS
@@ -225,12 +234,13 @@ function EvaluarTutoria({ onNavegar, tutoria, onEnviarEvaluacion }) {
                 <textarea
                   id="comentario-tutor"
                   value={comentario}
+                  maxLength={1000}
                   onChange={(e) => setComentario(e.target.value)}
                   placeholder="Comparte tu experiencia con este tutor..."
                 />
 
                 <p>
-                  Tu comentario será visible en el perfil público del tutor.
+                  Tu comentario se guardará junto con la evaluación de esta tutoría.
                 </p>
               </section>
 
@@ -267,6 +277,7 @@ function EvaluarTutoria({ onNavegar, tutoria, onEnviarEvaluacion }) {
 
           {/* ACCIONES */}
           <div className="evaluar-acciones">
+            {error && <p role="alert">{error}</p>}
             <button
               type="button"
               className="evaluar-cancelar"
@@ -279,8 +290,9 @@ function EvaluarTutoria({ onNavegar, tutoria, onEnviarEvaluacion }) {
               type="button"
               className="evaluar-enviar"
               onClick={enviarEvaluacion}
+              disabled={enviando}
             >
-              Enviar evaluación
+              {enviando ? 'Enviando…' : 'Enviar evaluación'}
             </button>
           </div>
 

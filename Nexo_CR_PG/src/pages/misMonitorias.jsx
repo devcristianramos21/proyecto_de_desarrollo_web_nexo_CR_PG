@@ -82,6 +82,8 @@ function MisMonitorias({
   onNavegar,
   onVerDetalleTutoria,
   onEvaluarTutoria,
+  onCancelarTutoria,
+  cargando = false,
   tutorias,
   setTutorias,
 }) {
@@ -98,18 +100,16 @@ function MisMonitorias({
   ).length;
 
   // Cancelar tutoría
-  const cancelarTutoria = (id) => {
-    setTutorias((actuales) =>
-      actuales.map((tutoria) =>
-        tutoria.id === id
-          ? {
-              ...tutoria,
-              categoria: 'Canceladas',
-              estado: 'Cancelada',
-            }
-          : tutoria
-      )
-    );
+  const cancelarTutoria = async (id) => {
+    if (onCancelarTutoria) {
+      await onCancelarTutoria(id);
+      return;
+    }
+    setTutorias((actuales) => actuales.map((tutoria) =>
+      tutoria.id === id
+        ? { ...tutoria, categoria: 'Canceladas', estado: 'Cancelada' }
+        : tutoria
+    ));
   };
 
   // Abrir detalle
@@ -177,7 +177,9 @@ function MisMonitorias({
 
           {/* LISTADO DE TUTORÍAS */}
           <section className="mis-tutorias__lista">
-            {tutoriasFiltradas.length > 0 ? (
+            {cargando ? (
+              <p role="status">Cargando tus tutorías…</p>
+            ) : tutoriasFiltradas.length > 0 ? (
               tutoriasFiltradas.map((tutoria) => (
                 <article
                   className="mis-tutorias__tarjeta"

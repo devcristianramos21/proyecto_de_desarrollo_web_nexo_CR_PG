@@ -4,36 +4,15 @@ import Navbar from '../components/layout/navbar';
 
 import './PerfilTutor.css';
 
-const tutorPredeterminado = {
-  nombre: 'Nombre del tutor',
-  iniciales: 'NT',
-  programa: 'Ingeniería de Sistemas',
-  semestre: 7,
-  calificacion: 4.9,
-  resenas: 32,
-  disponibilidad: 'Disponible hoy',
-  sobreMi:
-    'Soy estudiante de Ingeniería de Sistemas en 7° semestre, con experiencia como monitor en las materias de Cálculo diferencial y Álgebra lineal. Me apasiona enseñar con ejemplos prácticos y acompañar a otros estudiantes en su proceso de aprendizaje.',
+const NOMBRES_DIAS = {
+  lunes: 'Lunes',
+  martes: 'Martes',
+  miercoles: 'Miércoles',
+  jueves: 'Jueves',
+  viernes: 'Viernes',
+  sabado: 'Sábado',
+  domingo: 'Domingo',
 };
-
-const horarios = [
-  { dia: 'Lunes', horario: '2:00 PM — 4:00 PM' },
-  { dia: 'Martes', horario: '10:00 AM — 12:00 PM' },
-  { dia: 'Jueves', horario: 'No disponible', noDisponible: true },
-  { dia: 'Viernes', horario: '3:00 PM — 5:00 PM' },
-  { dia: 'Sábado', horario: '9:00 AM — 11:00 AM' },
-];
-
-const materias = [
-  {
-    nombre: 'Cálculo diferencial',
-    temas: ['Límites', 'Derivadas', 'Integrales', 'Regla de L’Hôpital'],
-  },
-  {
-    nombre: 'Álgebra lineal',
-    temas: ['Vectores', 'Matrices', 'Determinantes'],
-  },
-];
 
 export default function PerfilTutor({
   onNavegar,
@@ -46,46 +25,42 @@ export default function PerfilTutor({
   onToggleFavorito,
 }) {
   const datosTutor = {
-    ...tutorPredeterminado,
     ...(tutor || {}),
+    nombre: tutor?.nombre || 'Tutor no disponible',
+    iniciales: tutor?.nombre
+      ?.split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((parte) => parte[0])
+      .join('')
+      .toUpperCase() || 'TU',
     programa:
       tutor?.programa ||
       tutor?.especialidad ||
       tutor?.programaTutor ||
-      (tutor ? 'Programa académico no disponible' : tutorPredeterminado.programa),
+      'Programa académico no disponible',
     disponibilidad: tutor
       ? tutor.disponibilidad ||
         (tutor.disponible ? 'Disponible hoy' : 'Disponibilidad por confirmar')
-      : tutorPredeterminado.disponibilidad,
-    calificacion: tutor
-      ? tutor.calificacion ?? null
-      : tutorPredeterminado.calificacion,
-    resenas: tutor
-      ? tutor.resenas ?? tutor.opiniones ?? null
-      : tutorPredeterminado.resenas,
+      : 'Disponibilidad por confirmar',
+    calificacion: tutor?.calificacion ?? null,
+    resenas: tutor?.resenas ?? 0,
   };
 
   const calificacion = datosTutor.calificacion == null
     ? '—'
     : Number(datosTutor.calificacion).toFixed(1);
-  const resenas = datosTutor.resenas ?? '—';
-  const materiasTutor = tutor
-    ? (tutor.materias || []).map((nombre) => ({ nombre, temas: [] }))
-    : materias;
+  const resenas = datosTutor.resenas;
+  const materiasTutor = (tutor?.materias || []).map((nombre) => ({ nombre, temas: [] }));
   const semestreTexto = datosTutor.semestreTutor ||
     (tutor?.semestre != null
       ? `${tutor.semestre}° semestre`
-      : tutor
-        ? 'Semestre no disponible'
-        : `${datosTutor.semestre}° semestre`);
-  const horariosTutor = tutor
-    ? tutor.horarios || []
-    : horarios;
-  const sobreMi = tutor?.sobreMi || (
-    tutor
-      ? `Tutor de ${datosTutor.programa}${tutor.materias?.length ? `, con experiencia en ${tutor.materias.join(', ')}` : ''}.`
-      : tutorPredeterminado.sobreMi
-  );
+      : 'Semestre no disponible');
+  const horariosTutor = (tutor?.horarios || []).map((horario) => ({
+    dia: NOMBRES_DIAS[horario.diaSemana] || horario.diaSemana,
+    horario: `${horario.horaInicio} — ${horario.horaFin}`,
+  }));
+  const sobreMi = tutor?.biografia || 'El tutor no ha agregado una biografía.';
   const etiquetasPagina = {
     'Resultados búsqueda': 'Resultados',
     'Detalle monitoría': 'Monitorías',
@@ -171,7 +146,7 @@ export default function PerfilTutor({
 
                   <div className="perfil-tutor__calificacion">
                     <span className="perfil-tutor__estrellas">
-                      ★★★★★
+                      {datosTutor.calificacion == null ? '☆☆☆☆☆' : '★★★★★'}
                     </span>
 
                     <strong>
@@ -232,6 +207,9 @@ export default function PerfilTutor({
                         {materia.temas.map((tema) => (
                           <span key={tema}>{tema}</span>
                         ))}
+                        {materiasTutor.length === 0 && (
+                          <p>El tutor no tiene materias registradas.</p>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -265,6 +243,9 @@ export default function PerfilTutor({
                       </span>
                     </div>
                   ))}
+                  {horariosTutor.length === 0 && (
+                    <p>No hay disponibilidad registrada.</p>
+                  )}
                 </div>
               </article>
 

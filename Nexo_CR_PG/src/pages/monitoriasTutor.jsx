@@ -3,59 +3,10 @@ import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import './monitoriasTutor.css';
 
-export const monitoriasTutorIniciales = [
-  {
-    id: 'monitoria-tutor-1',
-    titulo: 'Pre-parcial Álgebra Lineal',
-    tipo: 'Pre-parcial',
-    estado: 'Programada',
-    programa: 'Ing. / Matemáticas',
-    horario: 'Dom 21 Sep · 10 AM-12 PM',
-    fecha: 'Dom 21 Sep 2026',
-    hora: '10:00 AM – 12:00 PM',
-    modalidad: 'Presencial',
-    lugar: 'Edificio G, Sala 2',
-    inscritos: 14,
-    cupo: 20,
-    proximaSesion: 'Dom 21 Sep - 10:00 AM',
-    monitor: 'Felipe Castro',
-    semestreMonitor: 'Matemáticas · 10° semestre',
-    calificacion: 4.8,
-    iniciales: 'FC',
-    descripcion:
-      'Sesión de repaso intensivo. Se cubrirán: espacios vectoriales, transformaciones lineales, valores y vectores propios, sistemas de ecuaciones.',
-    preparacion:
-      'Parcial de Álgebra Lineal — Martes 24 Sep a las 10:00 AM',
-    temas: [
-      'Espacios vectoriales',
-      'Transformaciones lineales',
-      'Valores propios',
-      'Sistemas de ecuaciones',
-    ],
-  },
-  {
-    id: 'monitoria-tutor-2',
-    titulo: 'Monitoría Cálculo Diferencial',
-    tipo: 'Obligatoria',
-    estado: 'Activa',
-    programa: 'Ingeniería',
-    horario: 'Lunes y miércoles 2-4 PM',
-    fecha: 'Lunes y miércoles',
-    hora: '2:00 PM – 4:00 PM',
-    modalidad: 'Presencial',
-    inscritos: 14,
-    cupo: 20,
-    proximaSesion: 'Lunes y miércoles 2-4 PM',
-    monitor: 'Felipe Castro',
-    semestreMonitor: 'Matemáticas · 10° semestre',
-    calificacion: 4.8,
-    iniciales: 'FC',
-  },
-];
-
 function MonitoriasTutor({
   onNavegar,
-  monitorias = monitoriasTutorIniciales,
+  monitorias = [],
+  cargando = false,
   onVerDetalle,
   onMensajeEstudiantes,
 }) {
@@ -63,7 +14,7 @@ function MonitoriasTutor({
   const monitoriasFiltradas = monitorias.filter((monitoria) =>
     pestanaActiva === 'Activas'
       ? monitoria.estado === 'Activa' || monitoria.estado === 'Programada'
-      : monitoria.estado === 'Finalizada'
+      : ['Finalizada', 'Cancelada', 'Rechazada'].includes(monitoria.estado)
   );
 
   return (
@@ -95,7 +46,9 @@ function MonitoriasTutor({
           </nav>
 
           <section className="monitorias-tutor__lista" aria-live="polite">
-            {monitoriasFiltradas.map((monitoria) => {
+            {cargando ? (
+              <p role="status">Cargando monitorías…</p>
+            ) : monitoriasFiltradas.length > 0 ? monitoriasFiltradas.map((monitoria) => {
               const porcentaje = monitoria.cupo
                 ? Math.min((monitoria.inscritos / monitoria.cupo) * 100, 100)
                 : 0;
@@ -150,7 +103,9 @@ function MonitoriasTutor({
                   </div>
                 </article>
               );
-            })}
+            }) : (
+              <p>No hay monitorías en esta sección.</p>
+            )}
           </section>
         </main>
       </div>

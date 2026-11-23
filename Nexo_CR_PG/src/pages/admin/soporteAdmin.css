@@ -100,6 +100,12 @@
   text-align: center;
 }
 
+.soporte-admin__error {
+  margin: 0 0 14px;
+  color: #b42318;
+  font-size: 13px;
+}
+
 .soporte-admin__overlay {
   position: fixed;
   inset: 51px 0 0 239px;
@@ -143,6 +149,34 @@
   margin: 0;
   color: #111827;
   font-weight: 600;
+}
+
+.soporte-admin__respuesta {
+  display: grid;
+  gap: 10px;
+}
+
+.soporte-admin__respuesta label {
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.soporte-admin__respuesta textarea {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  color: #111827;
+  font: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.soporte-admin__respuesta > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .soporte-admin__cerrar {

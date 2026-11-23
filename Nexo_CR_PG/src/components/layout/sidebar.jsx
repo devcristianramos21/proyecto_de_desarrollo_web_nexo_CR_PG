@@ -26,6 +26,7 @@ const opciones = [
   { nombre: 'Mensajes', icono: '/assets/Frame-5.svg' },
   { nombre: 'Favoritos', icono: '/assets/Frame-4.svg' },
   { nombre: 'Mi perfil', icono: '/assets/Frame-3.svg' },
+  { nombre: 'Quiero ser tutor', destino: 'Postulación tutor', icono: adminTutorsIcon },
 ];
 
 const opcionesInferiores = [
@@ -71,6 +72,7 @@ const seccionesAdministrador = [
     titulo: 'PERSONAS',
     opciones: [
       { nombre: 'Tutores y monitores', destino: 'Tutores admin', icono: adminTutorsIcon, iconoActivo: adminTutorsActiveIcon, badge: '3' },
+      { nombre: 'Solicitudes de tutores', destino: 'Solicitudes de tutores admin', icono: adminTutorsIcon },
       { nombre: 'Estudiantes', destino: 'Estudiantes admin', icono: adminStudentsIcon },
     ],
   },
@@ -95,8 +97,8 @@ export default function Sidebar({
 }) {
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
   const { usuario, solicitudesTutor = [] } = useUsuario();
-  const esTutor = usuario?.rol === 'Estudiante-Tutor';
-  const esAdmin = usuario?.rol === 'Administrador';
+  const esTutor = usuario?.rol === 'Estudiante-Tutor' || usuario?.rol === 'tutor';
+  const esAdmin = usuario?.rol === 'Administrador' || usuario?.rol === 'admin';
   const solicitudesPendientes = solicitudesTutor.filter(
     (solicitud) => solicitud.estado === 'Pendiente'
   ).length;

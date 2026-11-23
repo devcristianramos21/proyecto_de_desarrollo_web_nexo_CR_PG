@@ -17,16 +17,17 @@ function PropuestaHorario({
       : 'Por confirmar'
   );
   const [horarioSeleccionado, setHorarioSeleccionado] = useState('principal');
+  const [procesando, setProcesando] = useState(false);
+  const [error, setError] = useState('');
 
   const datos = {
-    materia: 'Cálculo diferencial',
-    tema: 'Integrales',
-    tutor: 'Nombre del tutor',
-    horarioPrincipal: 'Jueves 19 Jun · 3:00 PM — 4:00 PM',
-    horarioAlternativo: 'Viernes 20 Jun · 5:00 PM — 6:00 PM',
-    modalidad: 'Virtual',
-    notaTutor:
-      'Hola, propongo el jueves a las 3 PM para nuestra sesión. Si no te queda bien, el viernes a las 5 PM también estoy disponible.',
+    materia: '',
+    tema: '',
+    tutor: '',
+    horarioPrincipal: '',
+    horarioAlternativo: '',
+    modalidad: '',
+    notaTutor: '',
     ...(solicitud || {}),
   };
 
@@ -34,30 +35,41 @@ function PropuestaHorario({
     onNavegar?.('Detalle solicitud');
   };
 
-  // HORARIO ELEGIDO
-  const horarioElegido =
-    horarioSeleccionado === 'principal'
-      ? datos.horarioPrincipal
-      : datos.horarioAlternativo;
-
   // ACEPTAR HORARIO
-  const aceptarHorario = () => {
+  const aceptarHorario = async () => {
     if (estado !== 'Por confirmar') return;
 
-    setEstado('Aceptado');
-
-    onConfirmar?.({
-      solicitud: datos,
-      horario: horarioElegido,
-    });
+    setProcesando(true);
+    setError('');
+    try {
+      if (!onConfirmar) throw new Error('No se pudo enviar la respuesta al servidor.');
+      await onConfirmar({
+        solicitud: datos,
+        horario: horarioSeleccionado,
+      });
+      setEstado('Aceptado');
+    } catch (errorApi) {
+      setError(errorApi.message || 'No se pudo confirmar el horario.');
+    } finally {
+      setProcesando(false);
+    }
   };
 
   // RECHAZAR HORARIO
-  const rechazarHorario = () => {
+  const rechazarHorario = async () => {
     if (estado !== 'Por confirmar') return;
 
-    setEstado('Rechazado');
-    onRechazar?.(datos);
+    setProcesando(true);
+    setError('');
+    try {
+      if (!onRechazar) throw new Error('No se pudo enviar la respuesta al servidor.');
+      await onRechazar(datos);
+      setEstado('Rechazado');
+    } catch (errorApi) {
+      setError(errorApi.message || 'No se pudo rechazar la propuesta.');
+    } finally {
+      setProcesando(false);
+    }
   };
 
   // SELECCIONAR HORARIO
@@ -98,9 +110,9 @@ function PropuestaHorario({
           <section className="propuesta-horario__aviso">
             <span className="propuesta-horario__aviso-icono">⚠</span>
             <div>
-              <h2>Responde antes del 14 de junio</h2>
+              <h2>Propuesta pendiente</h2>
               <p>
-                La propuesta vence en 2 horas. Acepta, rechaza o propón otro horario.
+                Revisa las opciones disponibles y confirma o rechaza la propuesta.
               </p>
             </div>
           </section>
@@ -136,7 +148,7 @@ function PropuestaHorario({
                   : ''
               }`}
               onClick={() => seleccionarHorario('principal')}
-              disabled={estado !== 'Por confirmar'}
+              disabled={estado !== 'Por confirmar' || procesando}
               aria-pressed={horarioSeleccionado === 'principal'}
             >
               <span className="propuesta-horario__opcion-info">
@@ -158,7 +170,7 @@ function PropuestaHorario({
                   : ''
               }`}
               onClick={() => seleccionarHorario('alternativo')}
-              disabled={estado !== 'Por confirmar'}
+              disabled={estado !== 'Por confirmar' || procesando}
               aria-pressed={horarioSeleccionado === 'alternativo'}
             >
               <span className="propuesta-horario__opcion-info">
@@ -186,17 +198,17 @@ function PropuestaHorario({
               type="button"
               className="propuesta-horario__boton propuesta-horario__boton--aceptar"
               onClick={aceptarHorario}
-              disabled={estado !== 'Por confirmar'}
+              disabled={estado !== 'Por confirmar' || procesando}
             >
               <span>✓</span>
-              Aceptar horario
+              {procesando ? 'Guardando…' : 'Aceptar horario'}
             </button>
 
             <button
               type="button"
               className="propuesta-horario__boton propuesta-horario__boton--rechazar"
               onClick={rechazarHorario}
-              disabled={estado !== 'Por confirmar'}
+              disabled={estado !== 'Por confirmar' || procesando}
             >
               Rechazar
             </button>
@@ -211,6 +223,7 @@ function PropuestaHorario({
             </button>
 
           </div>
+          {error && <p role="alert">{error}</p>}
         </main>
       </div>
     </div>

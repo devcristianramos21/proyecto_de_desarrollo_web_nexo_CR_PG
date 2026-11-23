@@ -25,7 +25,7 @@ export default function AdminShell({
           titulo={titulo}
           variant="admin"
           showBack={mostrarRegreso}
-          onBack={() => onNavegar?.('Home Admin')}
+          onBack={() => onNavegar?.('__back__')}
           onNavegar={onNavegar}
         />
         <main className="admin-shell__main">{children}</main>

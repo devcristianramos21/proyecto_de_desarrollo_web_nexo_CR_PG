@@ -29,8 +29,25 @@ export const REGLAS_CUPO = {
  * - cancelada / finalizada
  */
 export const ESTADOS = ['solicitada', 'rechazada', 'programada', 'cancelada', 'finalizada'];
+export const ESTADOS_PROPUESTA_HORARIO = ['pendiente', 'aceptada', 'rechazada'];
 // Estados que ocupan el horario de sus participantes
 export const ESTADOS_ACTIVOS = ['solicitada', 'programada'];
+
+const propuestaHorarioSchema = new mongoose.Schema(
+  {
+    fechaPrincipal: { type: Date, required: true },
+    horaInicioPrincipal: { type: String, required: true, match: FORMATO_HORA },
+    horaFinPrincipal: { type: String, required: true, match: FORMATO_HORA },
+    fechaAlternativa: { type: Date, required: true },
+    horaInicioAlternativa: { type: String, required: true, match: FORMATO_HORA },
+    horaFinAlternativa: { type: String, required: true, match: FORMATO_HORA },
+    nota: { type: String, trim: true, maxlength: 500, default: '' },
+    estado: { type: String, enum: ESTADOS_PROPUESTA_HORARIO, default: 'pendiente' },
+    horarioSeleccionado: { type: String, enum: ['principal', 'alternativo'] },
+    respondidaEn: { type: Date },
+  },
+  { _id: false },
+);
 
 const monitoriaSchema = new mongoose.Schema(
   {
@@ -118,6 +135,9 @@ const monitoriaSchema = new mongoose.Schema(
       type: String,
       trim: true,
       maxlength: [500, 'El motivo no puede superar los 500 caracteres'],
+    },
+    propuestaHorario: {
+      type: propuestaHorarioSchema,
     },
   },
   { timestamps: true },

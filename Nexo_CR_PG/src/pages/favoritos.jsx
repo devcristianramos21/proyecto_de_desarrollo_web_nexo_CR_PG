@@ -3,57 +3,6 @@ import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import './Favoritos.css';
 
-export const tutoresIniciales = [
-  {
-    id: 1,
-    nombre: 'Nombre del tutor',
-    programa: 'Ing. de Sistemas',
-    programaLabel: 'Ing. de Sistemas · 7° sem',
-    semestreTutor: '7° semestre',
-    calificacion: '5.0',
-    opiniones: 32,
-    materias: ['Cálculo diferencial', 'Álgebra lineal'],
-    disponibilidad: 'Disponible hoy',
-    estado: 'disponible',
-  },
-  {
-    id: 2,
-    nombre: 'Nombre del tutor',
-    programa: 'Matemáticas',
-    programaLabel: 'Matemáticas · 9° sem',
-    semestreTutor: '9° semestre',
-    calificacion: '4.0',
-    opiniones: 18,
-    materias: ['Estadística', 'Ecuaciones diferenciales'],
-    disponibilidad: 'Ocupado hasta las 4 PM',
-    estado: 'ocupado',
-  },
-  {
-    id: 3,
-    nombre: 'Nombre del tutor',
-    programa: 'Física',
-    programaLabel: 'Física · 7° sem',
-    semestreTutor: '7° semestre',
-    calificacion: '4.0',
-    opiniones: 8,
-    materias: ['Física I', 'Física II'],
-    disponibilidad: 'Disponible mañana',
-    estado: 'ocupado',
-  },
-  {
-    id: 4,
-    nombre: 'Nombre del tutor',
-    programa: 'Matemáticas',
-    programaLabel: 'Matemáticas · 10° sem',
-    semestreTutor: '10° semestre',
-    calificacion: '5.0',
-    opiniones: 45,
-    materias: ['Álgebra lineal', 'Cálculo integral'],
-    disponibilidad: 'Disponible hoy',
-    estado: 'disponible',
-  },
-];
-
 function Favoritos({
   onNavegar,
   tutores = [],
@@ -109,7 +58,7 @@ function Favoritos({
 
                       <div className="favorito-calificacion">
                         <span className="favorito-estrellas">
-                          ★★★★★
+                          {tutor.calificacion == null ? '☆☆☆☆☆' : '★★★★★'}
                         </span>
                         <strong>
                           {tutor.calificacion == null

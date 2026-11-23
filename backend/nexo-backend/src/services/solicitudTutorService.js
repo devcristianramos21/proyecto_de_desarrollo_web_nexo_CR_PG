@@ -3,6 +3,7 @@ import { ESTADOS_SOLICITUD, SolicitudTutor } from '../models/SolicitudTutor.js';
 import { Usuario } from '../models/Usuario.js';
 import { AppError } from '../utils/AppError.js';
 import { elegirCampos } from '../utils/elegirCampos.js';
+import * as notificacionService from './notificacionService.js';
 
 const CAMPOS_SOLICITUD = ['materias', 'motivacion'];
 const DATOS_ESTUDIANTE = 'nombre correo carrera semestre';
@@ -12,14 +13,27 @@ export async function crear(usuario, datos) {
     throw new AppError(409, 'Ya eres tutor');
   }
 
-  const pendiente = await SolicitudTutor.exists({ estudiante: usuario.id, estado: 'pendiente' });
-  if (pendiente) {
-    throw new AppError(409, 'Ya tienes una solicitud pendiente de revisión');
-  }
+  return mongoose.connection.transaction(async (session) => {
+    const pendiente = await SolicitudTutor.exists({
+      estudiante: usuario.id,
+      estado: 'pendiente',
+    }).session(session);
+    if (pendiente) {
+      throw new AppError(409, 'Ya tienes una solicitud pendiente de revisión');
+    }
 
-  return SolicitudTutor.create({
-    ...elegirCampos(datos, CAMPOS_SOLICITUD),
-    estudiante: usuario.id,
+    const [solicitud] = await SolicitudTutor.create([{
+      ...elegirCampos(datos, CAMPOS_SOLICITUD),
+      estudiante: usuario.id,
+    }], { session });
+    await notificacionService.crearParaAdministradores({
+      tipo: 'alerta',
+      titulo: 'Nueva solicitud para ser tutor',
+      descripcion: 'Un estudiante envió una postulación para ser tutor.',
+      accion: 'Revisar solicitud',
+      destino: 'Solicitudes de tutores admin',
+    }, { session });
+    return solicitud;
   });
 }
 
@@ -73,21 +87,36 @@ export async function aprobar(id, admin) {
 
     solicitud.set({ estado: 'aprobada', revisadaPor: admin.id, fechaRevision: new Date() });
     await solicitud.save({ session });
+    await notificacionService.crear([estudiante._id], {
+      tipo: 'confirmacion',
+      titulo: 'Postulación aprobada',
+      descripcion: 'Tu postulación fue aprobada. Ahora tienes acceso al perfil de tutor.',
+      accion: 'Ver inicio de tutor',
+      destino: 'Inicio',
+    }, { session });
   });
 
-  return SolicitudTutor.findById(id).populate('estudiante', DATOS_ESTUDIANTE);
+  const solicitudActualizada = await SolicitudTutor.findById(id).populate('estudiante', DATOS_ESTUDIANTE);
+  return solicitudActualizada;
 }
 
 export async function rechazar(id, admin, { comentario } = {}) {
-  const solicitud = await obtenerPendiente(id);
-
-  solicitud.set({
-    estado: 'rechazada',
-    revisadaPor: admin.id,
-    fechaRevision: new Date(),
-    comentarioRevision: comentario,
+  await mongoose.connection.transaction(async (session) => {
+    const solicitud = await obtenerPendiente(id, session);
+    solicitud.set({
+      estado: 'rechazada',
+      revisadaPor: admin.id,
+      fechaRevision: new Date(),
+      comentarioRevision: comentario,
+    });
+    await solicitud.save({ session });
+    await notificacionService.crear([solicitud.estudiante], {
+      tipo: 'alerta',
+      titulo: 'Postulación rechazada',
+      descripcion: comentario || 'Tu postulación para ser tutor fue rechazada.',
+      accion: 'Ver postulación',
+      destino: 'Postulación tutor',
+    }, { session });
   });
-  await solicitud.save();
-
-  return solicitud.populate('estudiante', DATOS_ESTUDIANTE);
+  return SolicitudTutor.findById(id).populate('estudiante', DATOS_ESTUDIANTE);
 }

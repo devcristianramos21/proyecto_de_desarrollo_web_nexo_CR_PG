@@ -1,0 +1,197 @@
+.solicitudes-tutores-admin {
+  max-width: 1030px;
+  margin: 0 auto;
+}
+
+.solicitudes-tutores-admin__encabezado {
+  margin-bottom: 27px;
+}
+
+.solicitudes-tutores-admin__filtros {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.solicitudes-tutores-admin__filtro {
+  min-height: 40px;
+  padding: 0 15px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #6b7280;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.solicitudes-tutores-admin__filtro--activo {
+  border-bottom-color: #98111e;
+  color: #98111e;
+  font-weight: 600;
+}
+
+.solicitudes-tutores-admin__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.solicitudes-tutores-admin__tarjeta {
+  padding: 17px 18px;
+}
+
+.solicitudes-tutores-admin__resumen {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.solicitudes-tutores-admin__persona {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.solicitudes-tutores-admin__persona strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+.solicitudes-tutores-admin__persona span,
+.solicitudes-tutores-admin__persona small,
+.solicitudes-tutores-admin__estado-y-fecha small {
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.solicitudes-tutores-admin__estado-y-fecha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.solicitudes-tutores-admin__estado {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #fff1dc;
+  color: #a66300;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.solicitudes-tutores-admin__estado--aprobada {
+  background: #e6f7ec;
+  color: #15803d;
+}
+
+.solicitudes-tutores-admin__estado--rechazada {
+  background: #fde9ec;
+  color: #a41221;
+}
+
+.solicitudes-tutores-admin__detalle {
+  margin-top: 16px;
+  padding-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 26px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.solicitudes-tutores-admin__detalle > div > strong,
+.solicitudes-tutores-admin__formulario-rechazo label {
+  color: #111827;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.solicitudes-tutores-admin__detalle ul,
+.solicitudes-tutores-admin__detalle p {
+  margin: 7px 0 0;
+  color: #4b5563;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.solicitudes-tutores-admin__detalle ul {
+  padding-left: 18px;
+}
+
+.solicitudes-tutores-admin__acciones {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  grid-column: 1 / -1;
+}
+
+.solicitudes-tutores-admin__formulario-rechazo {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.solicitudes-tutores-admin__formulario-rechazo label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.solicitudes-tutores-admin__formulario-rechazo > div {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.solicitudes-tutores-admin__vacio {
+  padding: 28px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.solicitudes-tutores-admin__aviso {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.solicitudes-tutores-admin__error {
+  margin-bottom: 18px;
+}
+
+.solicitudes-tutores-admin__error p {
+  margin: 0;
+}
+
+.solicitudes-tutores-admin__error button {
+  margin-left: auto;
+}
+
+@media (max-width: 760px) {
+  .solicitudes-tutores-admin__resumen {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .solicitudes-tutores-admin__persona {
+    flex-basis: calc(100% - 130px);
+  }
+
+  .solicitudes-tutores-admin__estado-y-fecha {
+    align-items: flex-start;
+  }
+
+  .solicitudes-tutores-admin__detalle {
+    grid-template-columns: 1fr;
+  }
+
+  .solicitudes-tutores-admin__acciones,
+  .solicitudes-tutores-admin__formulario-rechazo {
+    grid-column: 1;
+  }
+}

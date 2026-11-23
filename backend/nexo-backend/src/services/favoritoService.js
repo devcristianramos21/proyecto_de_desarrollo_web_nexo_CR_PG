@@ -10,7 +10,7 @@ export async function listar(idUsuario) {
     select: CAMPOS_PUBLICOS_TUTOR,
   });
 
-  return usuario?.favoritos ?? [];
+  return tutorService.enriquecerDatosPublicos(usuario?.favoritos ?? []);
 }
 
 export async function agregar(idUsuario, idTutor) {

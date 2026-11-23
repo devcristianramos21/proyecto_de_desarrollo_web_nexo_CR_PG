@@ -22,6 +22,12 @@
   background: #FCF1F1;
 }
 
+.centro-soporte__error {
+  margin: 12px 24px;
+  color: #B42318;
+  font-size: 13px;
+}
+
 .centro-soporte__contenido {
   width: 100%;
   max-width: 1201px;

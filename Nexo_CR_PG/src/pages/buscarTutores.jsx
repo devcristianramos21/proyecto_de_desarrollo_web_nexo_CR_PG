@@ -47,8 +47,6 @@ export default function BuscarTutores({ onNavegar, onBuscar }) {
       tema,
     };
 
-    console.log('Filtros de búsqueda:', filtros);
-
     // Enviamos los filtros a App.jsx
     onBuscar?.(filtros);
   };

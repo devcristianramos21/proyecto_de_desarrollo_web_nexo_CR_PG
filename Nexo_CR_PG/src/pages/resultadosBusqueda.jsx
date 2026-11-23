@@ -4,93 +4,6 @@ import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import './resultadosBusqueda.css';
 
-const tutoresIniciales = [
-  {
-    id: 1,
-    nombre: 'Nombre del tutor',
-    iniciales: 'NT',
-    programa: 'Ing. de Sistemas',
-    semestre: 7,
-    calificacion: 5.0,
-    resenas: 32,
-    materias: ['Cálculo diferencial', 'Álgebra lineal', 'Programación I'],
-    disponibilidad: 'Disponible hoy',
-    estado: 'disponible',
-    modalidad: 'Virtual',
-    favorito: false,
-  },
-  {
-    id: 2,
-    nombre: 'Nombre del tutor',
-    iniciales: 'NT',
-    programa: 'Matemáticas',
-    semestre: 9,
-    calificacion: 4.0,
-    resenas: 18,
-    materias: ['Ecuaciones diferenciales', 'Estadística'],
-    disponibilidad: 'Ocupado hasta las 4:00 PM',
-    estado: 'ocupado',
-    modalidad: 'Virtual',
-    favorito: false,
-  },
-  {
-    id: 3,
-    nombre: 'Nombre del tutor',
-    iniciales: 'NT',
-    programa: 'Ing. Industrial',
-    semestre: 8,
-    calificacion: 5.0,
-    resenas: 24,
-    materias: ['Física I', 'Cálculo diferencial'],
-    disponibilidad: 'Disponible hoy',
-    estado: 'disponible',
-    modalidad: 'Virtual',
-    favorito: false,
-  },
-  {
-    id: 4,
-    nombre: 'Nombre del tutor',
-    iniciales: 'NT',
-    programa: 'Ing. de Sistemas',
-    semestre: 6,
-    calificacion: 5.0,
-    resenas: 11,
-    materias: ['Bases de datos', 'Programación I'],
-    disponibilidad: 'Disponible mañana',
-    estado: 'manana',
-    modalidad: 'Virtual',
-    favorito: false,
-  },
-  {
-    id: 5,
-    nombre: 'Nombre del tutor',
-    iniciales: 'NT',
-    programa: 'Matemáticas',
-    semestre: 10,
-    calificacion: 5.0,
-    resenas: 45,
-    materias: ['Álgebra lineal', 'Cálculo integral'],
-    disponibilidad: 'Disponible hoy',
-    estado: 'disponible',
-    modalidad: 'Virtual',
-    favorito: false,
-  },
-  {
-    id: 6,
-    nombre: 'Nombre del tutor',
-    iniciales: 'NT',
-    programa: 'Física',
-    semestre: 7,
-    calificacion: 4.0,
-    resenas: 8,
-    materias: ['Física I', 'Física II', 'Cálculo'],
-    disponibilidad: 'Disponible mañana',
-    estado: 'manana',
-    modalidad: 'Virtual',
-    favorito: false,
-  },
-];
-
 function normalizar(texto = '') {
   return texto
     .toLowerCase()
@@ -102,6 +15,9 @@ function normalizar(texto = '') {
 export default function ResultadosBusqueda({
   onNavegar,
   filtrosBusqueda = {},
+  tutores = [],
+  cargando = false,
+  error = '',
   onVerPerfilTutor,
   onSolicitarTutoria,
   tutoresFavoritos = [],
@@ -111,19 +27,35 @@ export default function ResultadosBusqueda({
     filtrosBusqueda.materia &&
     filtrosBusqueda.materia !== 'Todas las materias'
       ? filtrosBusqueda.materia
-      : filtrosBusqueda.busqueda || 'Cálculo diferencial';
+      : filtrosBusqueda.busqueda || 'Todas las materias';
+  const materiaSeleccionada = filtrosBusqueda.materia
+    && filtrosBusqueda.materia !== 'Todas las materias'
+    ? filtrosBusqueda.materia
+    : '';
 
   const [orden, setOrden] = useState('coincidencia');
   const [paginaActual, setPaginaActual] = useState(1);
-
-  const [filtrosActivos, setFiltrosActivos] = useState([
-    materiaBuscada,
-    ...(filtrosBusqueda.modalidad === 'Virtual' ? ['Virtual'] : []),
-    ...(filtrosBusqueda.calificacion &&
-    filtrosBusqueda.calificacion !== 'Cualquier calificación'
-      ? ['4.0+ ★']
-      : ['4.0+ ★']),
-  ]);
+  const [fechaReferencia] = useState(() => new Date());
+  const filtrosIniciales = [
+    ...(materiaSeleccionada
+      ? [materiaSeleccionada]
+      : filtrosBusqueda.busqueda
+        ? [filtrosBusqueda.busqueda]
+        : []),
+    ...(filtrosBusqueda.disponibilidad
+      && filtrosBusqueda.disponibilidad !== 'Cualquier horario'
+      ? [filtrosBusqueda.disponibilidad]
+      : []),
+    ...(filtrosBusqueda.modalidad
+      && filtrosBusqueda.modalidad !== 'Ambas modalidades'
+      ? [filtrosBusqueda.modalidad]
+      : []),
+    ...(filtrosBusqueda.calificacion
+      && filtrosBusqueda.calificacion !== 'Cualquier calificación'
+      ? [`${Number.parseFloat(filtrosBusqueda.calificacion).toFixed(1)}+ ★`]
+      : []),
+  ];
+  const [filtrosActivos, setFiltrosActivos] = useState(filtrosIniciales);
 
   const quitarFiltro = (filtro) => {
     setFiltrosActivos((actuales) =>
@@ -138,50 +70,109 @@ export default function ResultadosBusqueda({
   };
 
   const tutoresFiltrados = useMemo(() => {
-    let resultado = [...tutoresIniciales];
-
-    const filtroMateria = filtrosActivos.find(
-      (filtro) =>
-        !['Virtual', 'Presencial', '4.0+ ★'].includes(filtro)
+    const filtroMateria = materiaSeleccionada
+      && filtrosActivos.includes(materiaSeleccionada)
+      ? materiaSeleccionada
+      : '';
+    const filtroTexto = !filtroMateria
+      && filtrosBusqueda.busqueda
+      && filtrosActivos.includes(filtrosBusqueda.busqueda)
+      ? normalizar(filtrosBusqueda.busqueda)
+      : '';
+    const filtroDisponibilidad = filtrosActivos.find((filtro) =>
+      ['Disponible hoy', 'Disponible entre semana', 'Disponible fines de semana'].includes(filtro)
     );
+    const filtroCalificacion = filtrosActivos.find((filtro) => filtro.endsWith('+ ★'));
+    const minimoCalificacion = filtroCalificacion
+      ? Number.parseFloat(filtroCalificacion)
+      : null;
+    const partesHora = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Bogota',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(fechaReferencia);
+    const partesFecha = Object.fromEntries(
+      partesHora.map(({ type, value }) => [type, value])
+    );
+    const diasSemana = {
+      Sunday: 'domingo',
+      Monday: 'lunes',
+      Tuesday: 'martes',
+      Wednesday: 'miercoles',
+      Thursday: 'jueves',
+      Friday: 'viernes',
+      Saturday: 'sabado',
+    };
+    const diaActual = diasSemana[partesFecha.weekday];
+    const horaActual = `${partesFecha.hour}:${partesFecha.minute}`;
+
+    let resultado = tutores.map((tutor) => {
+      const horarios = tutor.horarios || [];
+      const iniciales = (tutor.nombre || 'Tutor')
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((parte) => parte[0])
+        .join('')
+        .toUpperCase();
+      return {
+        ...tutor,
+        id: String(tutor._id),
+        programa: tutor.carrera || 'Programa académico',
+        semestre: tutor.semestre ?? '—',
+        iniciales,
+        materias: tutor.materias || [],
+        horarios,
+        disponibilidad: horarios.length ? 'Horarios registrados' : 'Sin horarios registrados',
+        estado: horarios.length ? 'disponible' : 'ocupado',
+        resenas: tutor.resenas ?? 0,
+      };
+    });
 
     if (filtroMateria) {
+      const materiaNormalizada = normalizar(filtroMateria);
       resultado = resultado.filter((tutor) =>
-        tutor.materias.some(
-          (materia) =>
-            normalizar(materia) === normalizar(filtroMateria)
-        )
+        tutor.materias.some((materia) => normalizar(materia).includes(materiaNormalizada))
       );
+    } else if (filtroTexto) {
+      resultado = resultado.filter((tutor) => normalizar([
+        tutor.nombre,
+        tutor.carrera,
+        tutor.biografia,
+        ...(tutor.materias || []),
+      ].join(' ')).includes(filtroTexto));
     }
 
-    if (filtrosActivos.includes('Virtual')) {
-      resultado = resultado.filter(
-        (tutor) => tutor.modalidad === 'Virtual'
-      );
+    if (filtroDisponibilidad === 'Disponible hoy') {
+      resultado = resultado.filter((tutor) => tutor.horarios.some((horario) =>
+        horario.diaSemana === diaActual && horario.horaFin > horaActual
+      ));
+    } else if (filtroDisponibilidad === 'Disponible entre semana') {
+      resultado = resultado.filter((tutor) => tutor.horarios.some((horario) =>
+        ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'].includes(horario.diaSemana)
+      ));
+    } else if (filtroDisponibilidad === 'Disponible fines de semana') {
+      resultado = resultado.filter((tutor) => tutor.horarios.some((horario) =>
+        ['sabado', 'domingo'].includes(horario.diaSemana)
+      ));
     }
 
-    if (filtrosActivos.includes('Presencial')) {
-      resultado = resultado.filter(
-        (tutor) => tutor.modalidad === 'Presencial'
-      );
-    }
-
-    if (filtrosActivos.includes('4.0+ ★')) {
-      resultado = resultado.filter(
-        (tutor) => tutor.calificacion >= 4
+    if (minimoCalificacion != null) {
+      resultado = resultado.filter((tutor) =>
+        tutor.calificacion != null && tutor.calificacion >= minimoCalificacion
       );
     }
 
     if (orden === 'calificacion') {
-      resultado.sort(
-        (a, b) => b.calificacion - a.calificacion
-      );
+      resultado.sort((a, b) => (b.calificacion ?? -1) - (a.calificacion ?? -1));
     } else if (orden === 'resenas') {
       resultado.sort((a, b) => b.resenas - a.resenas);
     }
 
     return resultado;
-  }, [filtrosActivos, orden]);
+  }, [fechaReferencia, filtrosActivos, filtrosBusqueda.busqueda, materiaSeleccionada, orden, tutores]);
 
   const tutoresPorPagina = 6;
   const totalPaginas = Math.max(
@@ -248,8 +239,8 @@ export default function ResultadosBusqueda({
       </div>
 
       <div className="resultado-card__calificacion">
-        <span aria-hidden="true">★★★★★</span>
-        <strong>{tutor.calificacion.toFixed(1)}</strong>
+        <span aria-hidden="true">{tutor.calificacion == null ? '☆☆☆☆☆' : '★★★★★'}</span>
+        <strong>{tutor.calificacion == null ? '—' : Number(tutor.calificacion).toFixed(1)}</strong>
         <span className="resultado-card__resenas">
           ({tutor.resenas})
         </span>
@@ -317,7 +308,7 @@ export default function ResultadosBusqueda({
 
           <header className="resultados-busqueda__encabezado">
             <div>
-              <h1>{tutoresFiltrados.length} tutores encontrados</h1>
+              <h1>{cargando ? 'Buscando tutores…' : `${tutoresFiltrados.length} tutores encontrados`}</h1>
               <p>
                 Para: <strong>{materiaBuscada}</strong>
               </p>
@@ -376,11 +367,14 @@ export default function ResultadosBusqueda({
 
           {/* TARJETAS */}
 
-          {tutoresVisibles.length > 0 ? (
+          {error && <p role="alert">{error}</p>}
+          {cargando ? (
+            <p role="status">Cargando resultados…</p>
+          ) : tutoresVisibles.length > 0 ? (
             <section className="resultados-busqueda__grid">
               {tutoresVisibles.map(renderTarjeta)}
             </section>
-          ) : (
+          ) : !error && (
             <div className="resultados-busqueda__vacio">
               No encontramos tutores con los filtros seleccionados.
               <button type="button" onClick={limpiarFiltros}>
@@ -391,7 +385,7 @@ export default function ResultadosBusqueda({
 
           {/* PAGINACIÓN */}
 
-          <nav
+          {!cargando && tutoresFiltrados.length > tutoresPorPagina && <nav
             className="resultados-busqueda__paginacion"
             aria-label="Paginación de resultados"
           >
@@ -431,7 +425,7 @@ export default function ResultadosBusqueda({
             >
               ›
             </button>
-          </nav>
+          </nav>}
 
         </div>
       </main>

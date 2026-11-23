@@ -21,6 +21,7 @@ Crea el archivo `nexo-backend/.env` (no se sube a git):
 PORT=3001
 MONGODB_URI=mongodb+srv://USUARIO:CONTRASEÑA@cluster0.xxxxx.mongodb.net/nexo?appName=Cluster0
 JWT_SECRET=una_clave_larga_y_aleatoria
+FRONTEND_ORIGINS=http://localhost:5173
 
 # Opcionales
 JWT_EXPIRA_EN=7d                 # Duración de la sesión
@@ -101,6 +102,8 @@ Incluye disponibilidad de tutores, una solicitud para ser tutor pendiente, un pa
 
 **URL base:** `http://localhost:3001`
 
+Configura `FRONTEND_ORIGINS` con el origen exacto del frontend. En producción, separa varios orígenes con comas; no se aceptan comodines.
+
 ### Autenticación
 
 `POST /api/auth/login` devuelve un `token`. Envíalo en todas las demás peticiones:
@@ -114,6 +117,8 @@ const res = await fetch('http://localhost:3001/api/usuarios/me', {
   headers: { Authorization: `Bearer ${token}` },
 });
 ```
+
+Las peticiones del navegador desde un origen permitido reciben una cookie de sesión `HttpOnly`; el JWT no se expone al código JavaScript. El frontend debe enviar `credentials: 'include'` y, en métodos que modifican datos, la cabecera `X-NEXO-Requested-With: XMLHttpRequest`. El servidor valida el origen y esa cabecera como protección CSRF. Las integraciones no navegador sin cabecera `Origin` conservan la respuesta Bearer para compatibilidad.
 
 ### Errores
 
@@ -143,8 +148,9 @@ Leyenda de acceso: 🌐 público · 👤 cualquier usuario con sesión · 🎓 e
 
 | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|
-| POST | `/api/auth/registro` | 🌐 | `{ nombre, correo, password, carrera?, semestre? }` → `{ token, usuario }`. Siempre crea un estudiante |
-| POST | `/api/auth/login` | 🌐 | `{ correo, password }` → `{ token, usuario }` |
+| POST | `/api/auth/registro` | 🌐 | `{ nombre, correo, password, carrera?, semestre? }` → `{ token, usuario }` para clientes no navegador; cookie y `{ usuario }` para el frontend permitido. Siempre crea un estudiante |
+| POST | `/api/auth/login` | 🌐 | `{ correo, password }` → `{ token, usuario }` para clientes no navegador; cookie y `{ usuario }` para el frontend permitido |
+| POST | `/api/auth/logout` | 🌐 | Borra la cookie de sesión del navegador |
 | GET | `/api/usuarios/me` | 👤 | Mi perfil |
 | PUT | `/api/usuarios/me` | 👤 | Edita `nombre, carrera, semestre, foto, biografia` (y `materias` si es tutor). Ignora `rol` y `correo` |
 | PATCH | `/api/usuarios/me/password` | 👤 | `{ passwordActual, passwordNueva }` (mínimo 8 caracteres) |
@@ -161,8 +167,8 @@ Leyenda de acceso: 🌐 público · 👤 cualquier usuario con sesión · 🎓 e
 
 | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|
-| GET | `/api/tutores?materia=&nombre=` | 👤 | Buscar tutores (búsqueda parcial, sin distinguir mayúsculas ni tildes: "calculo" encuentra "Cálculo") |
-| GET | `/api/tutores/:id` | 👤 | Perfil público de un tutor |
+| GET | `/api/tutores?materia=&nombre=` | 👤 | Buscar tutores (búsqueda parcial, sin distinguir mayúsculas ni tildes: "calculo" encuentra "Cálculo"); incluye calificación promedio, cantidad de reseñas y franjas registradas |
+| GET | `/api/tutores/:id` | 👤 | Perfil público de un tutor con calificación promedio y cantidad de reseñas |
 | GET | `/api/tutores/:id/disponibilidad` | 👤 | Franjas semanales del tutor |
 | GET | `/api/disponibilidad/mia` | 🧑‍🏫 | Mis franjas (de lunes a domingo) |
 | POST | `/api/disponibilidad` | 🧑‍🏫 | `{ diaSemana, horaInicio, horaFin }`. No puede cruzarse con otra franja propia |
@@ -200,6 +206,30 @@ Leyenda de acceso: 🌐 público · 👤 cualquier usuario con sesión · 🎓 e
 | POST | `/api/monitorias/:id/cambio-grupo` | 🎓 | `{ destino: idOtroGrupo }` — solo obligatorias de la misma materia |
 | PATCH | `/api/monitorias/:id/cancelar` | 👤 | `{ motivo? }`. Par: sus participantes o admin. Grupal: tutor o admin. Antes de que empiece |
 | PATCH | `/api/monitorias/:id/finalizar` | 🧑‍🏫 🛠️ | Solo después de comenzar. Saber Pro exige al menos 7 inscritos |
+| PUT | `/api/monitorias/:id/propuesta-horario` | 🧑‍🏫 | Propone dos franjas futuras para una monitoría par aceptada |
+| PATCH | `/api/monitorias/:id/propuesta-horario/responder` | 🎓 | `{ decision: "aceptar", horario: "principal" \| "alternativo" }` o `{ decision: "rechazar" }` |
+
+### Soporte, evaluaciones y notificaciones
+
+| Método | Ruta | Acceso | Descripción |
+|---|---|---|---|
+| POST | `/api/soporte/tickets` | 🎓 | `{ categoria, asunto, descripcion }` |
+| GET | `/api/soporte/tickets/mias` | 🎓 | Mis tickets y sus respuestas |
+| GET | `/api/soporte/tickets?estado=` | 🛠️ | Bandeja administrativa; estados `pendiente`, `en_revision`, `resuelto` |
+| PATCH | `/api/soporte/tickets/:id` | 🛠️ | Actualiza estado y/o `{ respuesta }` |
+| POST | `/api/evaluaciones` | 🎓 | Evalúa una monitoría individual finalizada en la que participa el usuario |
+| GET | `/api/evaluaciones/mias` | 🎓 | Monitorías que el usuario ya evaluó |
+| GET | `/api/notificaciones` | 👤 | Notificaciones propias, más recientes primero |
+| PATCH | `/api/notificaciones/leidas` | 👤 | Marca todas las notificaciones propias como leídas |
+| PATCH | `/api/notificaciones/:id/leida` | 👤 | Marca una notificación propia como leída |
+
+Las nuevas colecciones se crean de forma perezosa al guardar el primer documento; no se ejecutan seeds ni migraciones automáticas. Las operaciones de lectura y actualización validan el rol en el servidor y restringen los documentos al usuario autenticado, salvo las bandejas administrativas.
+
+La evaluación acepta `calificacionGeneral` (1–5), cuatro criterios (`nombre`, `valor`), `comentario` opcional y `recomendacion` booleana. Solo se permite una evaluación por estudiante y monitoría finalizada.
+
+La propuesta de horario persiste en el documento de la monitoría. El tutor debe enviar `fechaPrincipal`, `horaInicioPrincipal`, `horaFinPrincipal`, `fechaAlternativa`, `horaInicioAlternativa`, `horaFinAlternativa` y, opcionalmente, `nota`. Se valida disponibilidad y cruces antes de guardar y al aceptar.
+
+Las notificaciones se guardan por usuario y se generan para solicitudes de tutoría, postulaciones, mensajes, tickets, evaluaciones, finalización de monitorías y propuestas/respuestas de horario. La entrega actual es persistente por REST; no añade un canal Socket.IO de notificaciones.
 
 **Solicitar una monitoría par:**
 
@@ -305,6 +335,7 @@ socket.emit('mensaje:enviar', { conversacion: id, texto }, (respuesta) => {
 socket.emit('conversacion:escribiendo', { conversacion: id });
 ```
 
+- El navegador puede autenticarse con la cookie `HttpOnly`: `io('http://localhost:3001', { withCredentials: true })`. Los clientes no navegador pueden seguir enviando `{ auth: { token } }`.
 - Los administradores no pueden conectarse al chat.
 - Un mensaje enviado por REST también se entrega por socket: el frontend puede usar cualquiera de las dos vías.
 

@@ -1,4 +1,10 @@
+import { useEffect, useState } from 'react';
 import AdminShell from './AdminShell';
+import {
+  listarNotificaciones,
+  marcarNotificacionLeida,
+  marcarTodasLasNotificacionesLeidas,
+} from '../../services/modulosIntegrados';
 import infoOutlineIcon from './assets/notification-info-outline.svg';
 import infoMarkIcon from './assets/notification-info-mark.svg';
 import infoDotIcon from './assets/notification-info-dot.svg';
@@ -30,26 +36,83 @@ function iconoNotificacion(tipo) {
 
 export default function NotificacionesAdmin({
   onNavegar,
-  notificaciones = [],
-  onMarcarLeida,
-  onMarcarTodasLeidas,
 }) {
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
   const noLeidas = notificaciones.filter((notificacion) => !notificacion.leida).length;
   const grupos = ['Sin leer', 'Anteriores'];
+
+  useEffect(() => {
+    let vigente = true;
+    listarNotificaciones()
+      .then((resultado) => {
+        if (vigente) {
+          setNotificaciones(resultado.map((notificacion) => ({
+            ...notificacion,
+            id: notificacion._id,
+            tiempo: new Date(notificacion.createdAt).toLocaleString('es-CO', {
+              dateStyle: 'medium',
+              timeStyle: 'short',
+            }),
+          })));
+        }
+      })
+      .catch((errorApi) => {
+        if (vigente) setError(errorApi.message);
+      })
+      .finally(() => {
+        if (vigente) setCargando(false);
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, []);
+
+  const marcarTodasLeidas = async () => {
+    setError('');
+    try {
+      await marcarTodasLasNotificacionesLeidas();
+      setNotificaciones((actuales) => actuales.map((notificacion) => ({
+        ...notificacion,
+        leida: true,
+      })));
+    } catch (errorApi) {
+      setError(errorApi.message);
+    }
+  };
+
+  const abrirNotificacion = async (notificacion) => {
+    if (!notificacion.leida) {
+      try {
+        await marcarNotificacionLeida(notificacion.id);
+        setNotificaciones((actuales) => actuales.map((actual) =>
+          actual.id === notificacion.id ? { ...actual, leida: true } : actual
+        ));
+      } catch (errorApi) {
+        setError(errorApi.message);
+        return;
+      }
+    }
+    if (notificacion.destino) onNavegar?.(notificacion.destino);
+  };
 
   return (
     <AdminShell titulo="Notificaciones" paginaActiva="Notificaciones Admin" onNavegar={onNavegar}>
       <div className="notificaciones-admin">
+        {error && <p role="alert">{error}</p>}
         <header className="notificaciones-admin__encabezado">
           <div>
             <h1>Notificaciones</h1>
             <p>{noLeidas} sin leer</p>
           </div>
-          <button type="button" className="admin-text-button" disabled={noLeidas === 0} onClick={onMarcarTodasLeidas}>
+          <button type="button" className="admin-text-button" disabled={noLeidas === 0 || cargando} onClick={marcarTodasLeidas}>
             Marcar todo como leído
           </button>
         </header>
 
+        {cargando && <p role="status">Cargando notificaciones…</p>}
         {grupos.map((grupo) => {
           const items = notificaciones.filter((notificacion) =>
             grupo === 'Sin leer' ? !notificacion.leida : notificacion.leida
@@ -68,10 +131,7 @@ export default function NotificacionesAdmin({
                     <button
                       type="button"
                       className="notificaciones-admin__contenido"
-                      onClick={() => {
-                        onMarcarLeida?.(notificacion.id);
-                        if (notificacion.destino) onNavegar?.(notificacion.destino);
-                      }}
+                      onClick={() => abrirNotificacion(notificacion)}
                     >
                       <strong>{notificacion.titulo}</strong>
                       <span>{notificacion.descripcion}</span>

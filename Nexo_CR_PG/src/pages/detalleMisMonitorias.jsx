@@ -31,9 +31,10 @@ function DetalleTutoria({
   };
 
   // Confirmar cancelación de la tutoría
-  const confirmarCancelacion = () => {
+  const confirmarCancelacion = async () => {
     if (onCancelarTutoria) {
-      onCancelarTutoria(datos.id);
+      const cancelada = await onCancelarTutoria(datos.id);
+      if (cancelada === false) return;
     }
 
     setMostrarConfirmacion(false);

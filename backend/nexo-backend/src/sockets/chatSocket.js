@@ -2,6 +2,8 @@ import { Server } from 'socket.io';
 import { Usuario } from '../models/Usuario.js';
 import * as chatService from '../services/chatService.js';
 import { verificarToken } from '../utils/token.js';
+import { ORIGENES_FRONTEND, origenFrontendPermitido } from '../config/origenesFrontend.js';
+import { leerCookie, NOMBRE_COOKIE_SESION } from '../config/cookieSesion.js';
 
 /**
  * Chat en tiempo real con Socket.IO.
@@ -50,12 +52,26 @@ function conRespuesta(manejador) {
 }
 
 export function configurarSockets(servidorHttp) {
-  const io = new Server(servidorHttp, { cors: { origin: '*' } });
+  const io = new Server(servidorHttp, {
+    cors: { origin: ORIGENES_FRONTEND, credentials: true },
+  });
 
   // Autenticación: el mismo token JWT que usa la API
   io.use(async (socket, next) => {
     try {
-      const token = socket.handshake.auth?.token;
+      const origen = socket.handshake.headers.origin;
+      const tokenCookie = leerCookie(
+        socket.handshake.headers.cookie,
+        NOMBRE_COOKIE_SESION,
+      );
+      if (origen && !origenFrontendPermitido(origen)) {
+        return next(new Error('Origen no autorizado'));
+      }
+      if (tokenCookie && !origen) {
+        return next(new Error('Se requiere un origen válido para la sesión'));
+      }
+
+      const token = socket.handshake.auth?.token || tokenCookie;
       if (!token) return next(new Error('Debes iniciar sesión'));
 
       const usuario = await Usuario.findById(verificarToken(token).sub);

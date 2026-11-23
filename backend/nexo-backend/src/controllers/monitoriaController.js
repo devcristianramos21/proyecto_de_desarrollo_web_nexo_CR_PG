@@ -45,6 +45,14 @@ export async function rechazarSolicitud(req, res) {
   res.json(await monitoriaService.responderSolicitud(req.usuario, req.params.id, { aceptar: false, motivo }));
 }
 
+export async function proponerHorario(req, res) {
+  res.json(await monitoriaService.proponerHorario(req.usuario, req.params.id, req.body ?? {}));
+}
+
+export async function responderPropuestaHorario(req, res) {
+  res.json(await monitoriaService.responderPropuestaHorario(req.usuario, req.params.id, req.body ?? {}));
+}
+
 // Monitorías grupales (administrador)
 export async function crearGrupal(req, res) {
   res.status(201).json(await monitoriaService.crearGrupal(req.usuario, req.body ?? {}));
