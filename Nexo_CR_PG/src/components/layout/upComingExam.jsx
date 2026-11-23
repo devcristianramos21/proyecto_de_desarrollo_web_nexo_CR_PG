@@ -1,4 +1,4 @@
-import './UpcomingExam.css';
+import './upComingExam.css';
 
 export default function UpcomingExam({
   titulo,

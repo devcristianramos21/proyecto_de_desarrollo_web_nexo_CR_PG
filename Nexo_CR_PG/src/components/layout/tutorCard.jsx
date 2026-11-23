@@ -1,5 +1,5 @@
 
-import './TutorCard.css';
+import './tutorCard.css';
 
 export default function TutorCard({
   nombre,

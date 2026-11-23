@@ -1,7 +1,7 @@
 
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
-import './Favoritos.css';
+import './favoritos.css';
 
 function Favoritos({
   onNavegar,
