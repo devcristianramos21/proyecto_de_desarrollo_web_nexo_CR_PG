@@ -1,297 +1,75 @@
-.detalle-layout,
-.detalle-layout * {
-  box-sizing: border-box;
-}
+
+/* ========================================
+   CONTENEDOR PRINCIPAL
+======================================== */
 
 .detalle-layout {
   display: flex;
   width: 100%;
   min-height: 100vh;
-  background: #fcf1f1;
+  background: #FCF1F1;
   color: #111827;
-  font-family: Inter, Arial, sans-serif;
-}
-
-.detalle-sidebar {
-  display: flex;
-  flex: 0 0 239px;
-  flex-direction: column;
-  width: 239px;
-  min-width: 239px;
-  min-height: 100vh;
-  background: #fff;
-  border-right: 1px solid #e5e7eb;
-}
-
-.detalle-brand {
-  display: flex;
-  flex: 0 0 82px;
-  align-items: center;
-  gap: 10px;
-  padding: 20px 16px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.detalle-logo {
-  display: grid;
-  flex: 0 0 62px;
-  width: 62px;
-  height: 41px;
-  place-items: center;
-  color: #98111e;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-.detalle-brand-text strong,
-.detalle-brand-text small {
-  display: block;
-  white-space: nowrap;
-}
-
-.detalle-brand-text strong {
-  color: #111827;
-  font-size: 14px;
-  line-height: 17px;
-}
-
-.detalle-brand-text small {
-  color: #0e0f11;
-  font-size: 11.5px;
-  line-height: 14px;
-}
-
-.detalle-menu {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 2px;
-  min-height: 0;
-  padding: 12px 8px 0;
-}
-
-.detalle-sidebar-titulo {
-  height: 31px;
-  margin: 0;
-  padding: 12px 10px 6px;
-  color: #9ca3af;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.66px;
-  line-height: 13px;
-  text-transform: uppercase;
-}
-
-.detalle-menu-item,
-.detalle-sidebar-footer button {
-  display: flex;
-  flex: 0 0 34px;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  height: 34px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: #111827;
-  font: 500 13.5px/16px Inter, Arial, sans-serif;
-  text-align: left;
-  cursor: pointer;
-}
-
-.detalle-menu-item:hover,
-.detalle-sidebar-footer button:hover {
-  background: #fcf1f1;
-}
-
-.detalle-menu-item.activo {
-  background: #fcf1f1;
-  color: #98111e;
-}
-
-.detalle-menu-icon {
-  flex: 0 0 16px;
-  width: 16px;
-  height: 16px;
-}
-
-.detalle-badge {
-  display: inline-flex;
-  min-width: 17px;
-  height: 14px;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: #fcf1f1;
-  color: #98111e;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 12px;
-}
-
-.detalle-sidebar-footer {
-  display: flex;
-  flex: 0 0 127px;
-  flex-direction: column;
-  gap: 0;
-  padding: 12px 8px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.detalle-cerrar-sesion {
-  color: #98111e !important;
+  font-family: 'Inter', Arial, sans-serif;
 }
 
 .detalle-contenido {
-  flex: 1 1 auto;
+  flex: 1;
   min-width: 0;
+  min-height: 100vh;
+  margin-left: 0;
 }
 
-.detalle-navbar {
-  display: flex;
-  height: 51px;
-  align-items: center;
-  gap: 16px;
-  padding: 0 34px 0 18px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #fff;
-}
-
-.detalle-navbar-titulo {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.detalle-volver {
-  width: 22px;
-  height: 23px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #111827;
-  font: 400 24px/20px Inter, Arial, sans-serif;
-  cursor: pointer;
-}
-
-.detalle-navbar-titulo strong {
-  color: #111827;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.detalle-navbar-usuario {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-left: auto;
-}
-
-.detalle-rol {
-  display: inline-flex;
-  width: 75px;
-  height: 25px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: #fcf1f1;
-  color: #98111e;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.detalle-notificaciones {
-  position: relative;
-  display: grid;
-  width: 37px;
-  height: 37px;
-  place-items: center;
-  margin-right: -12px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-}
-
-.detalle-campana {
-  position: relative;
-  display: block;
-  width: 16px;
-  height: 16px;
-}
-
-.detalle-campana::before {
-  position: absolute;
-  top: 2px;
-  left: 3px;
-  width: 10px;
-  height: 11px;
-  border: 1.5px solid #111827;
-  border-radius: 7px 7px 3px 3px;
-  content: '';
-}
-
-.detalle-campana::after {
-  position: absolute;
-  bottom: 1px;
-  left: 2px;
-  width: 12px;
-  height: 1.5px;
-  background: #111827;
-  box-shadow: 5px 2px 0 -0.25px #111827;
-  content: '';
-}
-
-.detalle-notificacion-punto {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 8px;
-  height: 8px;
-  border: 1px solid #fff;
-  border-radius: 4px;
-  background: #dc2626;
-}
-
-.detalle-avatar-usuario {
-  display: grid;
-  width: 32px;
-  height: 32px;
-  place-items: center;
-  border-radius: 16px;
-  background: #fcf1f1;
-  color: #98111e;
-  font-size: 12px;
-  font-weight: 700;
-}
+/* ========================================
+   CONTENIDO
+======================================== */
 
 .detalle-main {
   width: 100%;
   margin: 0;
   padding: 50px 104px 40px 58px;
+  box-sizing: border-box;
 }
+
+/* ========================================
+   BREADCRUMB
+======================================== */
 
 .detalle-migas {
   display: flex;
   align-items: center;
   gap: 6px;
-  height: 16px;
+  min-height: 16px;
   margin-bottom: 52px;
-  color: #6b7280;
+  color: #6B7280;
   font-size: 13px;
   line-height: 16px;
 }
 
-.detalle-migas span:nth-child(2) {
-  color: #d1d5db;
+.detalle-migas button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #6B7280;
+  font: inherit;
+  cursor: pointer;
+}
+
+.detalle-migas button:hover {
+  color: #98111E;
+}
+
+.detalle-migas span {
+  color: #D1D5DB;
 }
 
 .detalle-migas strong {
   color: #111827;
   font-weight: 600;
 }
+
+/* ========================================
+   ENCABEZADO
+======================================== */
 
 .detalle-encabezado {
   display: flex;
@@ -309,6 +87,7 @@
 .detalle-titulo-fila {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -318,7 +97,6 @@
   font-size: 20px;
   font-weight: 800;
   line-height: 24px;
-  white-space: nowrap;
 }
 
 .detalle-tipo,
@@ -335,20 +113,20 @@
 
 .detalle-tipo {
   padding: 2px 8px;
-  background: #fceef0;
-  color: #c0122c;
+  background: #FCEEF0;
+  color: #C0122C;
 }
 
 .detalle-estado {
   padding: 3px 10px;
-  background: #e9f8ef;
-  color: #0f7a38;
+  background: #E9F8EF;
+  color: #0F7A38;
   font-size: 11.5px;
 }
 
 .detalle-encabezado-info > p {
   margin: 4px 0 0;
-  color: #6b7280;
+  color: #6B7280;
   font-size: 13.5px;
   line-height: 16px;
 }
@@ -361,29 +139,42 @@
   align-items: center;
   justify-content: center;
   padding: 0 16px;
-  border: 0;
+  border: none;
   border-radius: 8px;
-  background: #98111e;
-  color: #fff;
-  font: 600 14px/17px Inter, Arial, sans-serif;
+  background: #98111E;
+  color: #FFFFFF;
+  font: 600 14px/17px 'Inter', Arial, sans-serif;
   cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
 }
 
-.detalle-boton-inscribir:hover {
-  background: #790d18;
+.detalle-boton-inscribir:hover:not(:disabled) {
+  background: #790D18;
+  transform: translateY(-1px);
 }
+
+.detalle-boton-inscribir:disabled {
+  background: #D1D5DB;
+  color: #6B7280;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   AVISO DE PREPARACIÓN
+======================================== */
 
 .detalle-aviso {
   display: flex;
-  height: 73px;
+  min-height: 73px;
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 32px;
   padding: 20px 16px 16px;
-  border: 1px solid #c4d7fb;
+  border: 1px solid #C4D7FB;
   border-radius: 12px;
-  background: #eaf0fe;
-  color: #2563eb;
+  background: #EAF0FE;
+  color: #2563EB;
+  box-sizing: border-box;
 }
 
 .detalle-aviso-icono {
@@ -422,6 +213,10 @@
   font-weight: 700;
 }
 
+/* ========================================
+   DISTRIBUCIÓN EN COLUMNAS
+======================================== */
+
 .detalle-columnas {
   display: grid;
   grid-template-columns: minmax(0, 591fr) minmax(0, 390fr);
@@ -437,27 +232,37 @@
   gap: 24px;
 }
 
+/* ========================================
+   TARJETAS GENERALES
+======================================== */
+
 .detalle-card {
   min-width: 0;
   padding: 20px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #E5E7EB;
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 1px 1px rgba(17, 24, 39, 0.06),
+  background: #FFFFFF;
+  box-shadow:
+    0 1px 1px rgba(17, 24, 39, 0.06),
     0 1px 0.5px rgba(17, 24, 39, 0.04);
+  box-sizing: border-box;
 }
 
 .detalle-card h2 {
   margin: 0;
-  color: #6b7280;
+  color: #6B7280;
   font-size: 13px;
   font-weight: 700;
   line-height: 16px;
   text-transform: uppercase;
 }
 
+/* ========================================
+   SOBRE ESTA MONITORÍA
+======================================== */
+
 .detalle-descripcion {
-  height: 227px;
+  min-height: 227px;
 }
 
 .detalle-descripcion h2 {
@@ -484,7 +289,7 @@
   align-items: center;
   padding: 4px 9px;
   border-radius: 999px;
-  background: #eef2f8;
+  background: #EEF2F8;
   color: #374151;
   font-size: 11.5px;
   font-weight: 600;
@@ -492,8 +297,12 @@
   white-space: nowrap;
 }
 
+/* ========================================
+   INFORMACIÓN DEL MONITOR
+======================================== */
+
 .detalle-monitor {
-  height: 158px;
+  min-height: 158px;
 }
 
 .detalle-monitor h2 {
@@ -514,8 +323,8 @@
   height: 44px;
   place-items: center;
   border-radius: 50%;
-  background: #fcf1f1;
-  color: #98111e;
+  background: #FCF1F1;
+  color: #98111E;
   font-size: 14px;
   font-weight: 700;
 }
@@ -534,7 +343,7 @@
 
 .detalle-monitor-datos > p {
   margin: 0;
-  color: #6b7280;
+  color: #6B7280;
   font-size: 13px;
   line-height: 16px;
 }
@@ -547,7 +356,7 @@
 }
 
 .detalle-estrellas {
-  color: #f5a623;
+  color: #F5A623;
   font-size: 12px;
   line-height: 15px;
 }
@@ -565,17 +374,26 @@
   height: 32px;
   margin-left: auto;
   padding: 0 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #D1D5DB;
   border-radius: 8px;
-  background: #fff;
+  background: #FFFFFF;
   color: #111827;
-  font: 600 13px/16px Inter, Arial, sans-serif;
+  font: 600 13px/16px 'Inter', Arial, sans-serif;
   cursor: pointer;
+  transition: background 0.2s;
 }
+
+.detalle-monitor-info > button:hover {
+  background: #F9FAFB;
+}
+
+/* ========================================
+   DATOS DE LA SESIÓN
+======================================== */
 
 .detalle-datos {
   display: flex;
-  height: 227px;
+  min-height: 227px;
   flex-direction: column;
 }
 
@@ -585,27 +403,34 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  height: 37px;
+  min-height: 37px;
   padding: 10px 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #E5E7EB;
   font-size: 13px;
   line-height: 16px;
 }
 
+.detalle-datos > div:last-child {
+  border-bottom: none;
+}
+
 .detalle-datos span {
-  color: #6b7280;
+  color: #6B7280;
 }
 
 .detalle-datos strong {
   color: #111827;
   font-weight: 600;
   text-align: right;
-  white-space: nowrap;
 }
+
+/* ========================================
+   INSCRIPCIONES
+======================================== */
 
 .detalle-inscripciones {
   display: flex;
-  height: 143px;
+  min-height: 143px;
   flex-direction: column;
   gap: 8px;
 }
@@ -618,7 +443,7 @@
   display: block;
   flex: 0 0 38px;
   padding-top: 4px;
-  color: #98111e;
+  color: #98111E;
   font-size: 28px;
   font-weight: 800;
   line-height: 34px;
@@ -630,25 +455,165 @@
   flex: 0 0 8px;
   overflow: hidden;
   border-radius: 999px;
-  background: #fcf1f1;
+  background: #FCF1F1;
 }
 
 .detalle-progreso span {
   display: block;
-  width: 70%;
   height: 100%;
   border-radius: 999px;
-  background: #98111e;
+  background: #98111E;
+  transition: width 0.3s ease;
 }
 
 .detalle-inscripciones > p {
   margin: 0;
-  color: #16a34a;
+  color: #16A34A;
   font-size: 12px;
   font-weight: 600;
   line-height: 15px;
-  white-space: nowrap;
 }
+
+.detalle-inscripciones > .detalle-inscripciones-pendientes {
+  color: #B45309;
+}
+
+/* ========================================
+   MODAL DE CONFIRMACIÓN
+======================================== */
+
+/* Overlay: oscurece únicamente el área principal */
+.detalle-modal-overlay {
+  position: fixed;
+  top: 51px;
+  left: 239px;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+  background: rgba(17, 24, 39, 0.45);
+  box-sizing: border-box;
+}
+
+/* Ventana del modal */
+.detalle-modal {
+  width: 380px;
+  max-width: 100%;
+  padding: 24px;
+
+  border-radius: 16px;
+  background: #FFFFFF;
+
+  box-shadow:
+    0 8px 12px rgba(17, 24, 39, 0.10),
+    0 2px 4px rgba(17, 24, 39, 0.08);
+
+  box-sizing: border-box;
+  animation: aparecer-modal 0.2s ease-out;
+}
+
+/* Título */
+.detalle-modal h2 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 21px;
+}
+
+/* Mensaje */
+.detalle-modal p {
+  margin: 0;
+  color: #374151;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 20.93px;
+}
+
+.detalle-modal p strong {
+  color: #111827;
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+/* Contenedor de botones */
+.detalle-modal-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12.5px;
+}
+
+/* Botón cancelar */
+.detalle-modal-cancelar {
+  width: 95px;
+  height: 37px;
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 8px;
+  background: #FFFFFF;
+
+  color: #111827;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.detalle-modal-cancelar:hover {
+  background: #F3F4F6;
+}
+
+/* Botón confirmar */
+.detalle-modal-confirmar {
+  width: 181px;
+  height: 37px;
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 8px;
+  background: #98111E;
+
+  color: #FFFFFF;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.detalle-modal-confirmar:hover {
+  background: #790D18;
+}
+
+/* Animación de entrada */
+@keyframes aparecer-modal {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
 
 @media (max-width: 1200px) {
   .detalle-main {
@@ -663,12 +628,6 @@
 }
 
 @media (max-width: 900px) {
-  .detalle-sidebar {
-    flex-basis: 190px;
-    width: 190px;
-    min-width: 190px;
-  }
-
   .detalle-main {
     padding: 32px 24px;
   }
@@ -686,25 +645,13 @@
     height: auto;
     min-height: 143px;
   }
+
+  .detalle-modal-overlay {
+    left: 0;
+  }
 }
 
 @media (max-width: 600px) {
-  .detalle-sidebar {
-    display: none;
-  }
-
-  .detalle-navbar {
-    padding: 0 15px;
-  }
-
-  .detalle-navbar-usuario {
-    gap: 12px;
-  }
-
-  .detalle-rol {
-    display: none;
-  }
-
   .detalle-main {
     padding: 24px 16px;
   }
@@ -730,7 +677,6 @@
   }
 
   .detalle-aviso {
-    height: auto;
     min-height: 73px;
     margin-bottom: 24px;
   }
@@ -746,4 +692,70 @@
   .detalle-inscripciones > p {
     white-space: normal;
   }
+
+  .detalle-datos > div {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .detalle-modal {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .detalle-modal-acciones {
+    flex-wrap: wrap;
+  }
+
+  .detalle-modal-cancelar,
+  .detalle-modal-confirmar {
+    flex: 1;
+    width: auto;
+  }
+}
+
+
+/* ========================================
+   AVISO VERDE DE INSCRIPCIÓN CONFIRMADA
+======================================== */
+
+.detalle-aviso-exito {
+  border-color: #86D6A4;
+  background: #E9F8EF;
+  color: #0F7A38;
+}
+
+.detalle-aviso-exito .detalle-aviso-icono {
+  font-size: 11px;
+}
+
+/* ========================================
+   BOTÓN CANCELAR INSCRIPCIÓN
+======================================== */
+
+.detalle-boton-cancelar-inscripcion {
+  display: inline-flex;
+  flex: 0 0 auto;
+  min-width: 155px;
+  height: 37px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+
+  color: #DC2626;
+  font-family: 'Inter', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.detalle-boton-cancelar-inscripcion:hover {
+  background: #FCEEF0;
 }

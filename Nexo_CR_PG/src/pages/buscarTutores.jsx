@@ -22,8 +22,7 @@ const opcionesMateria = [
   ...materias,
 ];
 
-export default function BuscarTutores({ onNavegar }) {
-
+export default function BuscarTutores({ onNavegar, onBuscar }) {
   const [busqueda, setBusqueda] = useState('');
   const [materia, setMateria] = useState('Todas las materias');
   const [disponibilidad, setDisponibilidad] = useState('Cualquier horario');
@@ -31,26 +30,27 @@ export default function BuscarTutores({ onNavegar }) {
   const [calificacion, setCalificacion] = useState('Cualquier calificación');
   const [tema, setTema] = useState('');
 
-  const [busquedaRealizada, setBusquedaRealizada] = useState(false);
-
   const seleccionarMateria = (nombre) => {
     setMateria(nombre);
     setBusqueda(nombre);
-    setBusquedaRealizada(false);
   };
 
   const realizarBusqueda = (event) => {
     event.preventDefault();
-    setBusquedaRealizada(true);
 
-    console.log('Filtros de búsqueda:', {
+    const filtros = {
       busqueda,
       materia,
       disponibilidad,
       modalidad,
       calificacion,
       tema,
-    });
+    };
+
+    console.log('Filtros de búsqueda:', filtros);
+
+    // Enviamos los filtros a App.jsx
+    onBuscar?.(filtros);
   };
 
   return (
@@ -78,7 +78,10 @@ export default function BuscarTutores({ onNavegar }) {
             </label>
 
             <div className="busqueda-card__buscador">
-              <span className="busqueda-card__icono" aria-hidden="true">
+              <span
+                className="busqueda-card__icono"
+                aria-hidden="true"
+              >
                 <svg viewBox="0 0 24 24" fill="none">
                   <circle
                     cx="10.8"
@@ -100,10 +103,7 @@ export default function BuscarTutores({ onNavegar }) {
                 type="search"
                 placeholder="Buscar por materia, tema o programa..."
                 value={busqueda}
-                onChange={(event) => {
-                  setBusqueda(event.target.value);
-                  setBusquedaRealizada(false);
-                }}
+                onChange={(event) => setBusqueda(event.target.value)}
               />
             </div>
 
@@ -115,10 +115,7 @@ export default function BuscarTutores({ onNavegar }) {
                 <select
                   id="filtro-materia"
                   value={materia}
-                  onChange={(event) => {
-                    setMateria(event.target.value);
-                    setBusquedaRealizada(false);
-                  }}
+                  onChange={(event) => setMateria(event.target.value)}
                 >
                   {opcionesMateria.map((opcion) => (
                     <option key={opcion} value={opcion}>
@@ -135,10 +132,9 @@ export default function BuscarTutores({ onNavegar }) {
                 <select
                   id="filtro-disponibilidad"
                   value={disponibilidad}
-                  onChange={(event) => {
-                    setDisponibilidad(event.target.value);
-                    setBusquedaRealizada(false);
-                  }}
+                  onChange={(event) =>
+                    setDisponibilidad(event.target.value)
+                  }
                 >
                   <option>Cualquier horario</option>
                   <option>Disponible hoy</option>
@@ -152,10 +148,7 @@ export default function BuscarTutores({ onNavegar }) {
                 <select
                   id="filtro-modalidad"
                   value={modalidad}
-                  onChange={(event) => {
-                    setModalidad(event.target.value);
-                    setBusquedaRealizada(false);
-                  }}
+                  onChange={(event) => setModalidad(event.target.value)}
                 >
                   <option>Ambas modalidades</option>
                   <option>Virtual</option>
@@ -170,10 +163,9 @@ export default function BuscarTutores({ onNavegar }) {
                 <select
                   id="filtro-calificacion"
                   value={calificacion}
-                  onChange={(event) => {
-                    setCalificacion(event.target.value);
-                    setBusquedaRealizada(false);
-                  }}
+                  onChange={(event) =>
+                    setCalificacion(event.target.value)
+                  }
                 >
                   <option>Cualquier calificación</option>
                   <option>3.0 estrellas</option>
@@ -191,10 +183,7 @@ export default function BuscarTutores({ onNavegar }) {
                 type="text"
                 placeholder="ej. Integrales, recursividad, regresión lineal..."
                 value={tema}
-                onChange={(event) => {
-                  setTema(event.target.value);
-                  setBusquedaRealizada(false);
-                }}
+                onChange={(event) => setTema(event.target.value)}
               />
             </div>
 
@@ -217,15 +206,9 @@ export default function BuscarTutores({ onNavegar }) {
                   strokeLinecap="round"
                 />
               </svg>
+
               Buscar tutores
             </button>
-
-            {busquedaRealizada && (
-              <p className="busqueda-card__confirmacion" role="status">
-                Filtros aplicados. La búsqueda de tutores estará disponible
-                cuando conectemos los datos de la plataforma.
-              </p>
-            )}
           </form>
 
           <section className="materias-populares">

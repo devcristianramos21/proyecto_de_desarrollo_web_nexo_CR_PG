@@ -58,6 +58,33 @@ const monitoriasIniciales = [
     inscritos: 25,
     cupo: 25,
   },
+  {
+    id: 6,
+    titulo: 'Pre-parcial Álgebra Lineal',
+    tipo: 'Pre-parcial',
+    estado: 'Disponible',
+    monitor: 'Felipe Castro',
+    horario: 'Dom 21 Sep 2026 · 10:00 AM – 12:00 PM',
+    fecha: 'Dom 21 Sep 2026',
+    hora: '10:00 AM – 12:00 PM',
+    modalidad: 'Presencial',
+    lugar: 'Edificio G, Sala 2',
+    preparacion:
+      'Preparación para: Parcial de Álgebra Lineal — Martes 24 Sep a las 10:00 AM',
+    descripcion:
+      'Sesión de repaso intensivo. Se cubrirán: espacios vectoriales, transformaciones lineales, valores y vectores propios, sistemas de ecuaciones.',
+    temas: [
+      'Espacios vectoriales',
+      'Transformaciones lineales',
+      'Valores propios',
+      'Sistemas de ecuaciones',
+    ],
+    semestreMonitor: 'Matemáticas · 10° semestre',
+    calificacion: 4.8,
+    iniciales: 'FC',
+    inscritos: 14,
+    cupo: 20,
+  },
 ];
 
 const categorias = ['Todas', 'Obligatoria', 'Par', 'Pre-parcial'];
@@ -66,72 +93,125 @@ function Monitorias({ onVerDetalle, onNavegar }) {
   const [categoria, setCategoria] = useState('Todas');
   const [monitorias, setMonitorias] = useState(monitoriasIniciales);
 
+  // Monitoría seleccionada para confirmar una acción
+  const [monitoriaSeleccionada, setMonitoriaSeleccionada] = useState(null);
+
+  // Acción pendiente: inscribir o cancelar
+  const [accionPendiente, setAccionPendiente] = useState(null);
+
   const monitoriasFiltradas =
     categoria === 'Todas'
       ? monitorias
       : monitorias.filter((monitoria) => monitoria.tipo === categoria);
 
-  const actualizarInscripcion = (id) => {
+  const calcularProgreso = (inscritos, cupo) =>
+    cupo > 0 ? Math.min((inscritos / cupo) * 100, 100) : 0;
+
+  const verDetalle = (monitoria) => {
+    onVerDetalle?.(monitoria);
+  };
+
+  // Abrir modal de inscripción
+  const abrirModalInscripcion = (monitoria) => {
+    setMonitoriaSeleccionada(monitoria);
+    setAccionPendiente('inscribir');
+  };
+
+  // Abrir modal de cancelación
+  const abrirModalCancelacion = (monitoria) => {
+    setMonitoriaSeleccionada(monitoria);
+    setAccionPendiente('cancelar');
+  };
+
+  // Cerrar modal
+  const cerrarModal = () => {
+    setMonitoriaSeleccionada(null);
+    setAccionPendiente(null);
+  };
+
+  // Confirmar inscripción o cancelación
+  const confirmarAccion = () => {
+    if (!monitoriaSeleccionada || !accionPendiente) return;
+
+    const id = monitoriaSeleccionada.id;
+
     setMonitorias((actuales) =>
       actuales.map((monitoria) => {
         if (monitoria.id !== id) return monitoria;
 
-        if (monitoria.estado === 'Inscrito') {
+        if (accionPendiente === 'inscribir') {
+          if (
+            monitoria.estado === 'Inscrito' ||
+            monitoria.estado === 'Cupo lleno' ||
+            monitoria.inscritos >= monitoria.cupo
+          ) {
+            return monitoria;
+          }
+
           return {
             ...monitoria,
-            estado: 'Disponible',
-            inscritos: Math.max(0, monitoria.inscritos - 1),
+            estado: 'Inscrito',
+            inscritos: monitoria.inscritos + 1,
           };
-        }
-
-        if (monitoria.inscritos >= monitoria.cupo) {
-          return monitoria;
         }
 
         return {
           ...monitoria,
-          estado: 'Inscrito',
-          inscritos: monitoria.inscritos + 1,
+          estado: 'Disponible',
+          inscritos: Math.max(0, monitoria.inscritos - 1),
         };
       })
     );
+
+    cerrarModal();
   };
 
-  const calcularProgreso = (inscritos, cupo) =>
-    Math.min((inscritos / cupo) * 100, 100);
-
-  const verDetalle = (monitoria) => {
-    if (onVerDetalle) {
-      onVerDetalle(monitoria);
-    }
-  };
+  const esInscripcion = accionPendiente === 'inscribir';
+  const esPreParcial =
+    monitoriaSeleccionada?.tipo === 'Pre-parcial';
 
   return (
     <div className="monitorias-layout">
+
+      {/* SIDEBAR */}
       <Sidebar
         paginaActiva="Monitorías"
         onNavegar={onNavegar}
       />
 
       <div className="monitorias-contenido">
+
+        {/* NAVBAR */}
         <Navbar titulo="Monitorías disponibles" />
 
         <main className="monitorias-main">
+
+          {/* ENCABEZADO */}
           <section className="monitorias-encabezado">
             <h1>Monitorías disponibles</h1>
+
             <p>
               Sesiones de apoyo académico — Universidad del Rosario ·
               Semestre 2026-2
             </p>
           </section>
 
+          {/* AVISO DE PARCIALES */}
           <section className="monitorias-aviso">
-            <div className="monitorias-aviso__icono" aria-hidden="true">
-              <img src="/assets/calendar_clock_23dp_E3E3E3_FILL0_wght400_GRAD0_opsz24 1.svg" alt="" />
+
+            <div
+              className="monitorias-aviso__icono"
+              aria-hidden="true"
+            >
+              <img
+                src="/assets/calendar_clock_23dp_E3E3E3_FILL0_wght400_GRAD0_opsz24 1.svg"
+                alt=""
+              />
             </div>
 
             <div className="monitorias-aviso__contenido">
               <strong>Parciales en los próximos 7 días</strong>
+
               <p>
                 Cálculo Diferencial (Lun 23 Sep), Álgebra Lineal
                 (Mar 24 Sep), Programación II (Mié 25 Sep).
@@ -139,9 +219,15 @@ function Monitorias({ onVerDetalle, onNavegar }) {
                 se cancelen por bajo cupo.
               </p>
             </div>
+
           </section>
 
-          <div className="monitorias-filtros" role="tablist" aria-label="Filtrar monitorías">
+          {/* FILTROS */}
+          <div
+            className="monitorias-filtros"
+            role="tablist"
+            aria-label="Filtrar monitorías"
+          >
             {categorias.map((filtro) => (
               <button
                 key={filtro}
@@ -158,112 +244,224 @@ function Monitorias({ onVerDetalle, onNavegar }) {
             ))}
           </div>
 
+          {/* LISTADO DE MONITORÍAS */}
           <section className="monitorias-lista">
-            {monitoriasFiltradas.map((monitoria) => (
-              <article
-                className={`monitoria-card ${
-                  monitoria.id === 2 ? 'monitoria-card--preparcial' : ''
-                }`}
-                key={monitoria.id}
-              >
-                <div className="monitoria-informacion">
-                  <div className="monitoria-titulo-fila">
-                    <h2>{monitoria.titulo}</h2>
 
-                    <span className={`monitoria-tipo tipo-${monitoria.tipo.toLowerCase().replaceAll('-', '')}`}>
-                      {monitoria.tipo}
-                    </span>
+            {monitoriasFiltradas.map((monitoria) => {
+              const progreso = calcularProgreso(
+                monitoria.inscritos,
+                monitoria.cupo
+              );
 
-                    <span
-                      className={`monitoria-estado estado-${monitoria.estado
-                        .toLowerCase()
-                        .replaceAll(' ', '-')}`}
-                    >
-                      {monitoria.estado}
-                    </span>
-                  </div>
+              const esPorConfirmar =
+                monitoria.estado === 'Por confirmar';
 
-                  {monitoria.preparacion && (
-                    <p className="monitoria-preparacion">
-                      <span aria-hidden="true">▣</span>
-                      {monitoria.preparacion}
-                    </p>
-                  )}
+              return (
+                <article
+                  className={`monitoria-card ${
+                    monitoria.tipo === 'Pre-parcial'
+                      ? 'monitoria-card--preparcial'
+                      : ''
+                  }`}
+                  key={monitoria.id}
+                >
 
-                  <p className="monitoria-horario">
-                    <strong>{monitoria.monitor}</strong>
-                    {' · '}
-                    {monitoria.horario}
-                  </p>
+                  <div className="monitoria-informacion">
 
-                  <div className="monitoria-cupos">
-                    <div
-                      className="monitoria-progreso"
-                      role="progressbar"
-                      aria-label={`Inscripciones de ${monitoria.titulo}`}
-                      aria-valuenow={monitoria.inscritos}
-                      aria-valuemin={0}
-                      aria-valuemax={monitoria.cupo}
-                    >
+                    {/* TÍTULO Y ESTADOS */}
+                    <div className="monitoria-titulo-fila">
+
+                      <h2>{monitoria.titulo}</h2>
+
                       <span
-                        style={{
-                          width: `${calcularProgreso(
-                            monitoria.inscritos,
-                            monitoria.cupo
-                          )}%`,
-                        }}
-                      />
+                        className={`monitoria-tipo tipo-${monitoria.tipo
+                          .toLowerCase()
+                          .replaceAll('-', '')}`}
+                      >
+                        {monitoria.tipo}
+                      </span>
+
+                      <span
+                        className={`monitoria-estado estado-${monitoria.estado
+                          .toLowerCase()
+                          .replaceAll(' ', '-')}`}
+                      >
+                        {monitoria.estado}
+                      </span>
+
                     </div>
 
-                    <small>
-                      {monitoria.inscritos}/{monitoria.cupo} inscritos
-                    </small>
+                    {/* PREPARACIÓN PARA PARCIAL */}
+                    {monitoria.preparacion && (
+                      <p className="monitoria-preparacion">
+                        <span aria-hidden="true">▣</span>
+                        {monitoria.preparacion}
+                      </p>
+                    )}
+
+                    {/* MONITOR Y HORARIO */}
+                    <p className="monitoria-horario">
+                      <strong>{monitoria.monitor}</strong>
+                      {' · '}
+                      {monitoria.horario}
+                    </p>
+
+                    {/* CUPOS */}
+                    <div className="monitoria-cupos">
+
+                      <div
+                        className="monitoria-progreso"
+                        role="progressbar"
+                        aria-label={`Inscripciones de ${monitoria.titulo}`}
+                        aria-valuenow={monitoria.inscritos}
+                        aria-valuemin={0}
+                        aria-valuemax={monitoria.cupo}
+                      >
+                        <span
+                          style={{ width: `${progreso}%` }}
+                        />
+                      </div>
+
+                      <small>
+                        {monitoria.inscritos}/{monitoria.cupo} inscritos
+                      </small>
+
+                    </div>
+
+                    {/* ALERTA DE CONFIRMACIÓN */}
+                    {esPorConfirmar && (
+                      <small className="monitoria-alerta">
+                        <span aria-hidden="true">⚠</span>
+                        {' '}Necesita{' '}
+                        {Math.max(0, 10 - monitoria.inscritos)}{' '}
+                        inscripciones más para confirmarse
+                      </small>
+                    )}
+
                   </div>
 
-                  {monitoria.estado === 'Por confirmar' && (
-                    <small className="monitoria-alerta">
-                      <span aria-hidden="true">⚠</span>
-                      Necesita {monitoria.cupo - monitoria.inscritos} inscripciones más para confirmarse
-                    </small>
-                  )}
-                </div>
+                  {/* ACCIONES */}
+                  <div className="monitoria-acciones">
 
-                <div className="monitoria-acciones">
-                  <button
-                    type="button"
-                    className="boton-detalle"
-                    onClick={() => verDetalle(monitoria)}
-                  >
-                    Ver detalle
-                  </button>
-
-                  {monitoria.estado !== 'Cupo lleno' && (
                     <button
                       type="button"
-                      className={
-                        monitoria.estado === 'Inscrito'
-                          ? 'boton-cancelar'
-                          : 'boton-inscripcion'
-                      }
-                      onClick={() => actualizarInscripcion(monitoria.id)}
+                      className="boton-detalle"
+                      onClick={() => verDetalle(monitoria)}
                     >
-                      {monitoria.estado === 'Inscrito'
-                        ? 'Cancelar'
-                        : 'Inscribirse'}
+                      Ver detalle
                     </button>
-                  )}
-                </div>
-              </article>
-            ))}
 
+                    {monitoria.estado !== 'Cupo lleno' && (
+                      <button
+                        type="button"
+                        className={
+                          monitoria.estado === 'Inscrito'
+                            ? 'boton-cancelar'
+                            : 'boton-inscripcion'
+                        }
+                        onClick={() =>
+                          monitoria.estado === 'Inscrito'
+                            ? abrirModalCancelacion(monitoria)
+                            : abrirModalInscripcion(monitoria)
+                        }
+                      >
+                        {monitoria.estado === 'Inscrito'
+                          ? 'Cancelar'
+                          : 'Inscribirse'}
+                      </button>
+                    )}
+
+                  </div>
+
+                </article>
+              );
+            })}
+
+            {/* ESTADO VACÍO */}
             {monitoriasFiltradas.length === 0 && (
               <p className="monitorias-vacio">
                 No hay monitorías disponibles en esta categoría.
               </p>
             )}
+
           </section>
         </main>
       </div>
+
+      {/* MODAL DE CONFIRMACIÓN */}
+      {monitoriaSeleccionada && accionPendiente && (
+        <div
+          className="monitorias-modal-overlay"
+          onClick={cerrarModal}
+        >
+          <section
+            className="monitorias-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="monitorias-modal-titulo"
+            onClick={(e) => e.stopPropagation()}
+          >
+
+            <h2 id="monitorias-modal-titulo">
+              {esInscripcion
+                ? 'Confirmar inscripción'
+                : 'Cancelar inscripción'}
+            </h2>
+
+            {esInscripcion ? (
+              <p>
+                ¿Deseas inscribirte en{' '}
+                <strong>{monitoriaSeleccionada.titulo}</strong>?
+                {' '}
+
+                {esPreParcial ? (
+                  <>
+                    Esta monitoría aún no ha alcanzado el mínimo de
+                    inscritos para confirmarse. Si no se completa
+                    el cupo mínimo, se cancelará.
+                  </>
+                ) : (
+                  <>
+                    Confirma tu inscripción para reservar tu cupo
+                    en esta monitoría.
+                  </>
+                )}
+              </p>
+            ) : (
+              <p>
+                ¿Estás seguro de que deseas cancelar tu inscripción
+                en{' '}
+                <strong>{monitoriaSeleccionada.titulo}</strong>?
+                Tu cupo quedará disponible para otro estudiante.
+              </p>
+            )}
+
+            <div className="monitorias-modal-acciones">
+
+              <button
+                type="button"
+                className="monitorias-modal-cancelar"
+                onClick={cerrarModal}
+              >
+                Volver
+              </button>
+
+              <button
+                type="button"
+                className="monitorias-modal-confirmar"
+                onClick={confirmarAccion}
+              >
+                {esInscripcion
+                  ? 'Confirmar inscripción'
+                  : 'Sí, cancelar inscripción'}
+              </button>
+
+            </div>
+
+          </section>
+        </div>
+      )}
+
     </div>
   );
 }

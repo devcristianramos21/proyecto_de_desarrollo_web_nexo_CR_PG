@@ -65,7 +65,10 @@ const monitorias = [
   },
 ];
 
-export default function HomeEstudiante({ onNavegar }) {
+export default function HomeEstudiante({
+  onNavegar,
+  onVerPerfilTutor,
+}) {
   const [tutores, setTutores] = useState(tutoresIniciales);
 
   const cambiarFavorito = (id) => {
@@ -215,9 +218,7 @@ export default function HomeEstudiante({ onNavegar }) {
                   key={tutor.id}
                   {...tutor}
                   onToggleFavorito={() => cambiarFavorito(tutor.id)}
-                  onVerPerfil={() =>
-                    mostrarMensaje(`Perfil de ${tutor.nombre}`)
-                  }
+                  onVerPerfil={() => onVerPerfilTutor?.(tutor)}
                   onSolicitar={() =>
                     mostrarMensaje(`Solicitud para ${tutor.nombre}`)
                   }

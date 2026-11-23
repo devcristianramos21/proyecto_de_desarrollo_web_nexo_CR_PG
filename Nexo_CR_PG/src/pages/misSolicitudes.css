@@ -1,4 +1,8 @@
 
+/* ==========================================
+   NEXO - MIS SOLICITUDES
+========================================== */
+
 .solicitudes-layout {
   display: flex;
   min-height: 100vh;
@@ -17,9 +21,12 @@
   flex: 1;
   padding: 38px 42px 50px;
   background: #FCF1F1;
+  box-sizing: border-box;
 }
 
-/* Encabezado */
+/* ==========================================
+   ENCABEZADO
+========================================== */
 
 .solicitudes__encabezado {
   display: flex;
@@ -61,6 +68,7 @@
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  transition: background 0.2s;
 }
 
 .solicitudes__nueva:hover {
@@ -72,7 +80,9 @@
   line-height: 1;
 }
 
-/* Pestañas */
+/* ==========================================
+   PESTAÑAS
+========================================== */
 
 .solicitudes__tabs {
   display: flex;
@@ -98,6 +108,11 @@
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.solicitudes__tab:hover {
+  color: #98111E;
 }
 
 .solicitudes__tab--activa {
@@ -119,7 +134,9 @@
   font-weight: 700;
 }
 
-/* Lista de solicitudes */
+/* ==========================================
+   LISTA DE SOLICITUDES
+========================================== */
 
 .solicitudes__lista {
   display: flex;
@@ -140,9 +157,12 @@
   box-shadow:
     0 1px 1px rgba(17, 24, 39, 0.06),
     0 1px 0.5px rgba(17, 24, 39, 0.04);
+  box-sizing: border-box;
 }
 
-/* Avatar */
+/* ==========================================
+   AVATAR
+========================================== */
 
 .solicitudes__avatar {
   display: flex;
@@ -158,7 +178,9 @@
   font-weight: 700;
 }
 
-/* Información */
+/* ==========================================
+   INFORMACIÓN
+========================================== */
 
 .solicitudes__informacion {
   flex: 1;
@@ -192,7 +214,9 @@
   line-height: 1;
 }
 
-/* Estados y acciones */
+/* ==========================================
+   ESTADOS Y ACCIONES
+========================================== */
 
 .solicitudes__acciones {
   display: flex;
@@ -237,6 +261,10 @@
   background: #F1F2FA;
 }
 
+/* ==========================================
+   PROPUESTA PENDIENTE
+========================================== */
+
 .solicitudes__propuesta {
   display: inline-flex;
   align-items: center;
@@ -256,27 +284,80 @@
   font-size: 14px;
 }
 
-.solicitudes__cancelar {
+/* ==========================================
+   BOTONES VER Y CANCELAR
+========================================== */
+
+.solicitudes__botones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* BOTÓN VER - ESTILO DE MIS TUTORÍAS */
+
+.solicitudes-layout .solicitudes__botones .solicitudes__ver {
+  appearance: none;
+  -webkit-appearance: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 83px;
-  height: 32px;
-  color: #FFFFFF;
-  background: #DC2626;
-  border: none;
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 12px;
+  width: 60px;
+  min-width: 60px;
+  height: 40px;
+  padding: 0 14px;
+  color: #111827;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 9px;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 15px;
   font-weight: 600;
+  line-height: 1;
   cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: background 0.2s, border-color 0.2s;
 }
 
-.solicitudes__cancelar:hover {
+.solicitudes-layout .solicitudes__botones .solicitudes__ver:hover {
+  background: #F9FAFB;
+  border-color: #9CA3AF;
+}
+
+/* BOTÓN CANCELAR */
+
+.solicitudes-layout .solicitudes__botones .solicitudes__cancelar {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 83px;
+  height: 40px;
+  padding: 0 16px;
+  color: #FFFFFF;
+  background: #DC2626;
+  border: 1px solid #DC2626;
+  border-radius: 9px;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: background 0.2s;
+}
+
+.solicitudes-layout .solicitudes__botones .solicitudes__cancelar:hover {
   background: #B91C1C;
 }
 
-/* Estado vacío */
+/* ==========================================
+   ESTADO VACÍO
+========================================== */
 
 .solicitudes__vacio {
   padding: 35px 20px;
@@ -288,7 +369,9 @@
   font-size: 14px;
 }
 
-/* Responsive */
+/* ==========================================
+   RESPONSIVE
+========================================== */
 
 @media (max-width: 900px) {
   .solicitudes-main {
@@ -325,7 +408,129 @@
   .solicitudes__acciones {
     width: 100%;
     flex-direction: row;
+    align-items: center;
     justify-content: flex-end;
     flex-wrap: wrap;
+  }
+
+  .solicitudes__botones {
+    justify-content: flex-start;
+  }
+}
+
+
+/* ==========================================
+   AJUSTE FINAL DE TARJETAS Y BOTONES
+========================================== */
+
+/* Mantener la información y las acciones en una sola fila */
+.solicitudes-layout .solicitudes__tarjeta {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Acciones a la derecha */
+.solicitudes-layout .solicitudes__acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  flex-shrink: 0;
+  width: auto;
+  margin-left: auto;
+  gap: 6px;
+}
+
+/* Botones siempre uno al lado del otro */
+.solicitudes-layout .solicitudes__botones {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: auto;
+}
+
+/* Botón VER */
+.solicitudes-layout .solicitudes__botones .solicitudes__ver {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  min-width: 48px;
+  height: 32px;
+  padding: 0 10px;
+  color: #111827;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.2s;
+}
+
+.solicitudes-layout .solicitudes__botones .solicitudes__ver:hover {
+  background: #F9FAFB;
+}
+
+/* Botón CANCELAR */
+.solicitudes-layout .solicitudes__botones .solicitudes__cancelar {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  min-width: 76px;
+  height: 32px;
+  padding: 0 10px;
+  color: #FFFFFF;
+  background: #DC2626;
+  border: 1px solid #DC2626;
+  border-radius: 8px;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.2s;
+}
+
+.solicitudes-layout .solicitudes__botones .solicitudes__cancelar:hover {
+  background: #B91C1C;
+}
+
+/* Responsive: conservar los botones al lado */
+@media (max-width: 650px) {
+  .solicitudes-layout .solicitudes__tarjeta {
+    flex-wrap: nowrap;
+  }
+
+  .solicitudes-layout .solicitudes__informacion {
+    flex: 1;
+    min-width: 0;
+    width: auto;
+  }
+
+  .solicitudes-layout .solicitudes__acciones {
+    width: auto;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .solicitudes-layout .solicitudes__botones {
+    width: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
   }
 }

@@ -1,0 +1,424 @@
+
+/* ==========================================
+   NEXO - PROPUESTA DE HORARIO
+========================================== */
+
+.propuesta-horario-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #FCF1F1;
+  font-family: Inter, Arial, sans-serif;
+  color: #111827;
+}
+
+.propuesta-horario-contenido {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.propuesta-horario-main {
+  flex: 1;
+  padding: 28px 44px 45px;
+  background: #FCF1F1;
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   BREADCRUMB
+========================================== */
+
+.propuesta-horario__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 17px;
+  color: #6B7280;
+  font-size: 13px;
+}
+
+.propuesta-horario__breadcrumb button {
+  padding: 0;
+  color: #6B7280;
+  background: transparent;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.propuesta-horario__breadcrumb button:hover {
+  color: #98111E;
+}
+
+.propuesta-horario__breadcrumb strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+/* ==========================================
+   ENCABEZADO
+========================================== */
+
+.propuesta-horario__encabezado {
+  margin-bottom: 24px;
+}
+
+.propuesta-horario__encabezado h1 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.22px;
+}
+
+.propuesta-horario__encabezado p {
+  margin: 0;
+  color: #0E0F11;
+  font-size: 14px;
+}
+
+/* ==========================================
+   AVISO DE VENCIMIENTO
+========================================== */
+
+.propuesta-horario__aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: min(516px, 100%);
+  min-height: 71px;
+  margin-bottom: 28px;
+  padding: 14px 15px;
+  background: #FEF3E2;
+  border: 1px solid #F6DFAF;
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.propuesta-horario__aviso-icono {
+  flex-shrink: 0;
+  color: #92610A;
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.propuesta-horario__aviso h2 {
+  margin: 0 0 3px;
+  color: #92610A;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.propuesta-horario__aviso p {
+  margin: 0;
+  color: #92610A;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   TARJETA DE PROPUESTA
+========================================== */
+
+.propuesta-horario__tarjeta {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 24px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
+  box-sizing: border-box;
+}
+
+.propuesta-horario__tarjeta-encabezado {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 17px;
+}
+
+.propuesta-horario__tarjeta-encabezado h2 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.propuesta-horario__tarjeta-encabezado p {
+  margin: 0;
+  color: #6B7280;
+  font-size: 12px;
+}
+
+/* Estado */
+
+.propuesta-horario__estado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 75px;
+  min-height: 20px;
+  padding: 3px 9px;
+  color: #92610A;
+  background: #FEF3E2;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.propuesta-horario__estado--aceptado {
+  color: #0F7A38;
+  background: #E9F8EF;
+}
+
+.propuesta-horario__estado--rechazado {
+  color: #DC2626;
+  background: #FEECEC;
+}
+
+/* ==========================================
+   OPCIONES DE HORARIO SELECCIONABLES
+========================================== */
+
+.propuesta-horario__opcion {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 46px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  color: #111827;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+/* Horario seleccionado */
+
+.propuesta-horario__opcion--seleccionada {
+  background: #E9F8EF;
+  border: 1px solid #16A34A;
+}
+
+/* Efecto hover */
+
+.propuesta-horario__opcion:not(:disabled):hover {
+  border-color: #16A34A;
+}
+
+/* Información del horario */
+
+.propuesta-horario__opcion-info {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  color: #111827;
+  font-size: 12px;
+}
+
+.propuesta-horario__calendario {
+  flex-shrink: 0;
+  color: #374151;
+  font-size: 16px;
+}
+
+/* Etiquetas */
+
+.propuesta-horario__etiqueta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 19px;
+  padding: 2px 9px;
+  color: #374151;
+  background: #EEF0FD;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Horarios bloqueados después de responder */
+
+.propuesta-horario__opcion:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* ==========================================
+   NOTA DEL TUTOR
+========================================== */
+
+.propuesta-horario__nota {
+  width: 100%;
+  min-height: 85px;
+  margin-bottom: 18px;
+  padding: 17px 20px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(17, 24, 39, 0.05);
+  box-sizing: border-box;
+}
+
+.propuesta-horario__nota h2 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+}
+
+.propuesta-horario__nota p {
+  margin: 0;
+  color: #374151;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   BOTONES
+========================================== */
+
+.propuesta-horario__acciones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.propuesta-horario__boton {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 37px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.propuesta-horario__boton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Aceptar */
+
+.propuesta-horario__boton--aceptar {
+  min-width: 164px;
+  color: #FFFFFF;
+  background: #98111E;
+  border: 1px solid #98111E;
+}
+
+.propuesta-horario__boton--aceptar:hover:not(:disabled) {
+  background: #7F0E19;
+}
+
+.propuesta-horario__boton--aceptar span {
+  font-size: 15px;
+}
+
+/* Rechazar */
+
+.propuesta-horario__boton--rechazar {
+  min-width: 98px;
+  color: #111827;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+}
+
+.propuesta-horario__boton--rechazar:hover:not(:disabled) {
+  background: #F9FAFB;
+}
+
+/* Proponer otro horario */
+
+.propuesta-horario__boton--proponer {
+  min-width: 180px;
+  color: #111827;
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.propuesta-horario__boton--proponer:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 900px) {
+  .propuesta-horario-main {
+    padding: 26px 24px 35px;
+  }
+}
+
+@media (max-width: 600px) {
+  .propuesta-horario-main {
+    padding: 22px 16px 30px;
+  }
+
+  .propuesta-horario__opcion {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .propuesta-horario__acciones {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .propuesta-horario__boton {
+    width: 100%;
+  }
+}
+
+
+.propuesta-horario__opcion {
+  width: 100%;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: #FFFFFF;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.propuesta-horario__opcion--seleccionada {
+  background: #E9F8EF;
+  border: 1px solid #16A34A;
+}
+
+.propuesta-horario__opcion:not(.propuesta-horario__opcion--seleccionada):hover {
+  background: #F9FAFB;
+  border-color: #9CA3AF;
+}
+
+.propuesta-horario__opcion:disabled {
+  cursor: not-allowed;
+}

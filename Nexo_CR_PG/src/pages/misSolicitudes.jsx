@@ -60,50 +60,71 @@ const pestañas = [
   'Canceladas',
 ];
 
-function MisSolicitudes({ onNavegar }) {
+function MisSolicitudes({ onNavegar, onVerDetalleSolicitud }) {
   const [solicitudes, setSolicitudes] = useState(solicitudesIniciales);
   const [filtroActivo, setFiltroActivo] = useState('Todas');
 
+  // FILTRAR SOLICITUDES
   const solicitudesFiltradas = solicitudes.filter((solicitud) => {
     if (filtroActivo === 'Todas') return true;
 
-    return solicitud.estado.toLowerCase() ===
-      filtroActivo.slice(0, -1).toLowerCase() ||
+    return (
       (filtroActivo === 'Pendientes' && solicitud.estado === 'Pendiente') ||
       (filtroActivo === 'Aceptadas' && solicitud.estado === 'Aceptada') ||
       (filtroActivo === 'Rechazadas' && solicitud.estado === 'Rechazada') ||
-      (filtroActivo === 'Canceladas' && solicitud.estado === 'Cancelada');
+      (filtroActivo === 'Canceladas' && solicitud.estado === 'Cancelada')
+    );
   });
 
+  // CONTAR SOLICITUDES PENDIENTES
   const cantidadPendientes = solicitudes.filter(
     (solicitud) => solicitud.estado === 'Pendiente'
   ).length;
 
+  // CANCELAR SOLICITUD
   const cancelarSolicitud = (id) => {
     setSolicitudes((actuales) =>
       actuales.map((solicitud) =>
         solicitud.id === id
-          ? { ...solicitud, estado: 'Cancelada', propuesta: false }
+          ? {
+              ...solicitud,
+              estado: 'Cancelada',
+              propuesta: false,
+            }
           : solicitud
       )
     );
   };
 
+  // VER DETALLE
+  const verDetalle = (solicitud) => {
+    if (onVerDetalleSolicitud) {
+      onVerDetalleSolicitud(solicitud);
+    } else {
+      alert('La pantalla de detalle de la solicitud está pendiente de implementar.');
+    }
+  };
+
+  // NUEVA SOLICITUD
   const nuevaSolicitud = () => {
     alert('La creación de nuevas solicitudes estará disponible próximamente.');
   };
 
   return (
     <div className="solicitudes-layout">
+
       <Sidebar
         paginaActiva="Mis solicitudes"
         onNavegar={onNavegar}
       />
 
       <div className="solicitudes-contenido">
+
         <Navbar titulo="Mis solicitudes" />
 
         <main className="solicitudes-main">
+
+          {/* ENCABEZADO */}
           <header className="solicitudes__encabezado">
             <div>
               <h1>Mis solicitudes</h1>
@@ -120,6 +141,7 @@ function MisSolicitudes({ onNavegar }) {
             </button>
           </header>
 
+          {/* PESTAÑAS */}
           <nav className="solicitudes__tabs">
             {pestañas.map((pestaña) => (
               <button
@@ -143,20 +165,29 @@ function MisSolicitudes({ onNavegar }) {
             ))}
           </nav>
 
+          {/* LISTADO */}
           <section className="solicitudes__lista">
+
             {solicitudesFiltradas.length > 0 ? (
               solicitudesFiltradas.map((solicitud) => (
                 <article
                   className="solicitudes__tarjeta"
                   key={solicitud.id}
                 >
-                  <div className="solicitudes__avatar">NT</div>
 
+                  {/* AVATAR */}
+                  <div className="solicitudes__avatar">
+                    NT
+                  </div>
+
+                  {/* INFORMACIÓN */}
                   <div className="solicitudes__informacion">
                     <h2>{solicitud.materia}</h2>
+
                     <p>
                       {solicitud.tema} · {solicitud.tutor}
                     </p>
+
                     <span className="solicitudes__fecha">
                       <span className="solicitudes__icono-calendario">
                         ▢
@@ -165,7 +196,9 @@ function MisSolicitudes({ onNavegar }) {
                     </span>
                   </div>
 
+                  {/* ESTADO Y ACCIONES */}
                   <div className="solicitudes__acciones">
+
                     <span
                       className={`solicitudes__estado solicitudes__estado--${solicitud.estado.toLowerCase()}`}
                     >
@@ -179,16 +212,30 @@ function MisSolicitudes({ onNavegar }) {
                       </span>
                     )}
 
-                    {solicitud.estado === 'Pendiente' && (
+                    {/* BOTONES */}
+                    <div className="solicitudes__botones">
+
                       <button
                         type="button"
-                        className="solicitudes__cancelar"
-                        onClick={() => cancelarSolicitud(solicitud.id)}
+                        className="solicitudes__ver"
+                        onClick={() => verDetalle(solicitud)}
                       >
-                        Cancelar
+                        Ver
                       </button>
-                    )}
+
+                      {solicitud.estado === 'Pendiente' && (
+                        <button
+                          type="button"
+                          className="solicitudes__cancelar"
+                          onClick={() => cancelarSolicitud(solicitud.id)}
+                        >
+                          Cancelar
+                        </button>
+                      )}
+
+                    </div>
                   </div>
+
                 </article>
               ))
             ) : (
@@ -196,11 +243,14 @@ function MisSolicitudes({ onNavegar }) {
                 No tienes solicitudes en esta categoría.
               </div>
             )}
+
           </section>
         </main>
       </div>
     </div>
   );
 }
+
+
 
 export default MisSolicitudes;

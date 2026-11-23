@@ -1,0 +1,131 @@
+
+.confirmacion-evaluacion-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #FCF1F1;
+  font-family: 'Inter', sans-serif;
+}
+
+.confirmacion-evaluacion-contenido {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.confirmacion-evaluacion-principal {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: #FCF1F1;
+  box-sizing: border-box;
+}
+
+.confirmacion-evaluacion-tarjeta {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.confirmacion-evaluacion-icono {
+  font-size: 52px;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.confirmacion-evaluacion-tarjeta h1 {
+  margin: 0;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.confirmacion-evaluacion-tarjeta p {
+  max-width: 496px;
+  margin: 0;
+  color: #6B7280;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.confirmacion-evaluacion-estrellas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 2px 0 8px;
+}
+
+.confirmacion-evaluacion-estrellas span {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.estrella-activa {
+  color: #F5A623;
+}
+
+.estrella-inactiva {
+  color: #E5E7EB;
+}
+
+.confirmacion-evaluacion-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.confirmacion-evaluacion-acciones button {
+  height: 37px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-confirmacion-mis-tutorias {
+  min-width: 115px;
+  color: #111827;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+}
+
+.btn-confirmacion-mis-tutorias:hover {
+  background: #F9FAFB;
+}
+
+.btn-confirmacion-inicio {
+  min-width: 99px;
+  color: #FFFFFF;
+  background: #98111E;
+  border: 1px solid #98111E;
+}
+
+.btn-confirmacion-inicio:hover {
+  background: #7F0E19;
+}
+
+@media (max-width: 600px) {
+  .confirmacion-evaluacion-principal {
+    padding: 30px 18px;
+  }
+
+  .confirmacion-evaluacion-tarjeta h1 {
+    font-size: 20px;
+  }
+
+  .confirmacion-evaluacion-tarjeta p {
+    font-size: 13px;
+  }
+}

@@ -1,0 +1,863 @@
+
+/* ========================================
+   CONTENEDOR PRINCIPAL
+======================================== */
+
+.solicitar-tutoria {
+  min-height: 100vh;
+  width: 100%;
+  background: #FCF1F1;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: flex-start;
+}
+
+.solicitar-tutoria__principal {
+  flex: 1;
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: 0;
+}
+
+.solicitar-tutoria__contenido {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 36px 4.85% 60px;
+  box-sizing: border-box;
+}
+
+/* ========================================
+   BREADCRUMB
+======================================== */
+
+.solicitar-tutoria__breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 27px;
+  font-size: 13px;
+  color: #6B7280;
+}
+
+.solicitar-tutoria__breadcrumb button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #6B7280;
+  font: inherit;
+  cursor: pointer;
+}
+
+.solicitar-tutoria__breadcrumb button:hover {
+  color: #98111E;
+}
+
+.solicitar-tutoria__breadcrumb strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+/* ========================================
+   ENCABEZADO
+======================================== */
+
+.solicitar-tutoria__encabezado {
+  margin-bottom: 30px;
+}
+
+.solicitar-tutoria__encabezado h1 {
+  margin: 0 0 5px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.22px;
+}
+
+.solicitar-tutoria__encabezado p {
+  margin: 0;
+  color: #6B7280;
+  font-size: 14px;
+}
+
+.solicitar-tutoria__encabezado strong {
+  color: #374151;
+  font-weight: 500;
+}
+
+/* ========================================
+   INDICADOR DE PASOS
+======================================== */
+
+.solicitar-tutoria__pasos {
+  width: 100%;
+  max-width: 536px;
+  margin: 0 auto 36px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.solicitar-tutoria__paso {
+  width: 100px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.solicitar-tutoria__circulo {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background: #E5E7EB;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.solicitar-tutoria__paso--activo {
+  color: #98111E;
+  font-weight: 700;
+}
+
+.solicitar-tutoria__paso--activo .solicitar-tutoria__circulo {
+  background: #98111E;
+  color: #FFFFFF;
+}
+
+.solicitar-tutoria__paso--completado {
+  color: #111827;
+}
+
+.solicitar-tutoria__paso--completado .solicitar-tutoria__circulo {
+  background: #16A34A;
+  color: #FFFFFF;
+}
+
+.solicitar-tutoria__linea {
+  height: 2px;
+  flex: 1;
+  margin-top: 13px;
+  background: #E5E7EB;
+}
+
+.solicitar-tutoria__linea--completada {
+  background: #98111E;
+}
+
+/* ========================================
+   TARJETA GENERAL DEL FORMULARIO
+======================================== */
+
+.solicitar-tutoria__formulario {
+  width: 100%;
+  max-width: 1086px;
+  min-height: 488px;
+  margin: 0 auto;
+  padding: 39px 28px 27px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(17, 24, 39, 0.04);
+  box-sizing: border-box;
+}
+
+/* ========================================
+   CAMPOS DEL PASO 1
+======================================== */
+
+.solicitar-tutoria__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.solicitar-tutoria__campo > label {
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.solicitar-tutoria__campo select,
+.solicitar-tutoria__campo input[type='text'],
+.solicitar-tutoria__campo textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #374151;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.solicitar-tutoria__campo select,
+.solicitar-tutoria__campo input[type='text'] {
+  height: 39px;
+  padding: 0 12px;
+}
+
+.solicitar-tutoria__campo textarea {
+  min-height: 88px;
+  padding: 12px;
+  resize: vertical;
+}
+
+.solicitar-tutoria__campo select:focus,
+.solicitar-tutoria__campo input[type='text']:focus,
+.solicitar-tutoria__campo textarea:focus {
+  border-color: #98111E;
+  box-shadow: 0 0 0 2px rgba(152, 17, 30, 0.08);
+}
+
+.solicitar-tutoria__campo input::placeholder,
+.solicitar-tutoria__campo textarea::placeholder {
+  color: #9CA3AF;
+  opacity: 1;
+}
+
+.solicitar-tutoria__ayuda {
+  color: #6B7280;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* ========================================
+   MODALIDAD
+======================================== */
+
+.solicitar-tutoria__modalidades {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.solicitar-tutoria__opcion {
+  min-height: 39px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  box-sizing: border-box;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.solicitar-tutoria__opcion--activa {
+  border-color: #4F46E5;
+  background: #EEF0FD;
+}
+
+.solicitar-tutoria__opcion input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #0075FF;
+  cursor: pointer;
+}
+
+/* ========================================
+   PASO 2: SELECCIÓN DE HORARIO
+======================================== */
+
+.solicitar-tutoria__formulario--horario {
+  max-width: 1046px;
+  min-height: 484px;
+  padding: 39px 28px 27px;
+  gap: 0;
+}
+
+.solicitar-tutoria__titulo-horario {
+  margin-bottom: 15px;
+}
+
+.solicitar-tutoria__titulo-horario h2 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.solicitar-tutoria__titulo-horario p {
+  margin: 0;
+  color: #6B7280;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* Lista de horarios */
+
+.solicitar-tutoria__lista-horarios {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.solicitar-tutoria__horario {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  box-sizing: border-box;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: #374151;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.solicitar-tutoria__horario:hover {
+  border-color: #D1A0A5;
+  background: #FFFAFA;
+}
+
+.solicitar-tutoria__horario--seleccionado {
+  border: 1px solid #98111E;
+  background: #FCF1F1;
+}
+
+.solicitar-tutoria__horario--seleccionado:hover {
+  border-color: #98111E;
+  background: #FCF1F1;
+}
+
+/* Icono de calendario */
+
+.solicitar-tutoria__icono-horario {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #292929;
+}
+
+.solicitar-tutoria__icono-horario svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Etiqueta de horario seleccionado */
+
+.solicitar-tutoria__horario-etiqueta {
+  margin-left: auto;
+  color: #98111E;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ========================================
+   PASO 3: RESUMEN DE SOLICITUD
+======================================== */
+
+.solicitar-tutoria__formulario--confirmar {
+  max-width: 1056px;
+  min-height: 451px;
+  padding: 25px 24px;
+  gap: 0;
+}
+
+.solicitar-tutoria__titulo-resumen {
+  margin: 0 0 14px;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Tabla de resumen */
+
+.solicitar-tutoria__resumen {
+  width: 100%;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.solicitar-tutoria__fila-resumen {
+  min-height: 39px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid #E5E7EB;
+  color: #374151;
+  font-size: 12px;
+}
+
+.solicitar-tutoria__fila-resumen:last-child {
+  border-bottom: none;
+}
+
+.solicitar-tutoria__fila-resumen span {
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.solicitar-tutoria__fila-resumen strong {
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Aviso informativo */
+
+.solicitar-tutoria__aviso {
+  min-height: 55px;
+  margin-top: 14px;
+  padding: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  box-sizing: border-box;
+  border: 1px solid #C4D7FB;
+  border-radius: 9px;
+  background: #EAF0FE;
+  color: #2563EB;
+}
+
+.solicitar-tutoria__aviso-icono {
+  flex-shrink: 0;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.solicitar-tutoria__aviso p {
+  margin: 0;
+  color: #2563EB;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ========================================
+   BOTONES Y ACCIONES
+======================================== */
+
+.solicitar-tutoria__acciones {
+  display: flex;
+  align-items: center;
+}
+
+.solicitar-tutoria__continuar {
+  min-width: 126px;
+  height: 37px;
+  padding: 0 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: none;
+  border-radius: 8px;
+  background: #98111E;
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.solicitar-tutoria__continuar:hover {
+  background: #7D0D18;
+  transform: translateY(-1px);
+}
+
+.solicitar-tutoria__continuar span {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.solicitar-tutoria__atras {
+  min-width: 44px;
+  height: 37px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #111827;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.solicitar-tutoria__atras:hover {
+  background: #F3F4F6;
+}
+
+/* Acciones del paso 2 */
+
+.solicitar-tutoria__acciones--horario {
+  gap: 10px;
+  margin-top: 13px;
+}
+
+.solicitar-tutoria__acciones--horario .solicitar-tutoria__continuar {
+  min-width: 146px;
+}
+
+/* Acciones del paso 3 */
+
+.solicitar-tutoria__acciones--confirmar {
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.solicitar-tutoria__enviar {
+  min-width: 136px;
+}
+
+/* ========================================
+   MODAL DE CONFIRMACIÓN
+======================================== */
+
+.solicitar-tutoria__overlay {
+  position: fixed;
+  top: 51px;
+  left: 239px;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  background: rgba(17, 24, 39, 0.45);
+}
+
+.solicitar-tutoria__modal {
+  width: 100%;
+  max-width: 380px;
+  min-height: 176px;
+  padding: 24px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  background: #FFFFFF;
+  box-shadow:
+    0 8px 12px rgba(17, 24, 39, 0.10),
+    0 2px 5px rgba(17, 24, 39, 0.08);
+}
+
+.solicitar-tutoria__modal h2 {
+  margin: 0 0 9px;
+  color: #111827;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.solicitar-tutoria__modal p {
+  margin: 0;
+  color: #374151;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.solicitar-tutoria__modal p strong {
+  color: #111827;
+  font-weight: 700;
+}
+
+.solicitar-tutoria__modal-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.solicitar-tutoria__modal-cancelar,
+.solicitar-tutoria__modal-confirmar {
+  min-height: 37px;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.solicitar-tutoria__modal-cancelar {
+  min-width: 95px;
+  border: none;
+  background: transparent;
+  color: #111827;
+}
+
+.solicitar-tutoria__modal-cancelar:hover {
+  background: #F3F4F6;
+}
+
+.solicitar-tutoria__modal-confirmar {
+  min-width: 159px;
+  border: none;
+  background: #98111E;
+  color: #FFFFFF;
+}
+
+.solicitar-tutoria__modal-confirmar:hover {
+  background: #7D0D18;
+}
+
+/* ========================================
+   PANTALLA DE SOLICITUD ENVIADA
+======================================== */
+
+.solicitar-tutoria__exito {
+  width: 100%;
+  max-width: 500px;
+  min-height: calc(100vh - 160px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Círculo verde */
+
+.solicitar-tutoria__exito-icono {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #E9F8EF;
+  color: #16A34A;
+}
+
+.solicitar-tutoria__exito-icono svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Título */
+
+.solicitar-tutoria__exito h1 {
+  margin: 0 0 7px;
+  color: #111827;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* Descripción */
+
+.solicitar-tutoria__exito-descripcion {
+  margin: 0;
+  color: #374151;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.solicitar-tutoria__exito-descripcion strong {
+  color: #111827;
+  font-weight: 700;
+}
+
+/* Aviso de qué pasa ahora */
+
+.solicitar-tutoria__exito-aviso {
+  width: 100%;
+  min-height: 84px;
+  margin-top: 24px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  box-sizing: border-box;
+  border: 1px solid #C4D7FB;
+  border-radius: 12px;
+  background: #EAF0FE;
+  text-align: left;
+}
+
+.solicitar-tutoria__exito-aviso-icono {
+  flex-shrink: 0;
+  color: #2563EB;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.solicitar-tutoria__exito-aviso h2 {
+  margin: 0 0 4px;
+  color: #2563EB;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.solicitar-tutoria__exito-aviso p {
+  margin: 0;
+  color: #2563EB;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.solicitar-tutoria__exito-aviso p strong {
+  font-weight: 700;
+}
+
+/* Botones finales */
+
+.solicitar-tutoria__exito-acciones {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.solicitar-tutoria__exito-secundario,
+.solicitar-tutoria__exito-principal {
+  min-height: 37px;
+  padding: 0 13px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.solicitar-tutoria__exito-secundario {
+  min-width: 162px;
+  border: 1px solid #D1D5DB;
+  background: #FFFFFF;
+  color: #111827;
+}
+
+.solicitar-tutoria__exito-secundario:hover {
+  background: #F9FAFB;
+}
+
+.solicitar-tutoria__exito-principal {
+  min-width: 99px;
+  border: none;
+  background: #98111E;
+  color: #FFFFFF;
+}
+
+.solicitar-tutoria__exito-principal:hover {
+  background: #7D0D18;
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   MENSAJES DE ERROR
+======================================== */
+
+.solicitar-tutoria__error {
+  margin: 10px 0 0;
+  color: #B91C1C;
+  font-size: 12px;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 900px) {
+  .solicitar-tutoria__principal {
+    margin-left: 0;
+  }
+
+  .solicitar-tutoria__contenido {
+    padding: 28px 22px 45px;
+  }
+
+  .solicitar-tutoria__formulario--horario,
+  .solicitar-tutoria__formulario--confirmar {
+    max-width: 100%;
+  }
+
+  .solicitar-tutoria__overlay {
+    left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .solicitar-tutoria__contenido {
+    padding: 24px 15px 35px;
+  }
+
+  .solicitar-tutoria__formulario {
+    padding: 25px 18px;
+  }
+
+  .solicitar-tutoria__paso {
+    width: 85px;
+    font-size: 11px;
+  }
+
+  .solicitar-tutoria__modalidades {
+    grid-template-columns: 1fr;
+  }
+
+  .solicitar-tutoria__horario {
+    font-size: 11px;
+    padding: 0 8px;
+  }
+
+  .solicitar-tutoria__horario-etiqueta {
+    font-size: 10px;
+  }
+
+  .solicitar-tutoria__fila-resumen {
+    padding: 9px;
+    font-size: 11px;
+  }
+
+  .solicitar-tutoria__exito {
+    min-height: calc(100vh - 110px);
+  }
+
+  .solicitar-tutoria__exito-acciones {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .solicitar-tutoria__exito-secundario,
+  .solicitar-tutoria__exito-principal {
+    width: 100%;
+  }
+
+  .solicitar-tutoria__modal {
+    padding: 20px;
+  }
+
+  .solicitar-tutoria__modal-acciones {
+    flex-wrap: wrap;
+  }
+}
