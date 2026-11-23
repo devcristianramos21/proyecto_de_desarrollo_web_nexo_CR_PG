@@ -12,7 +12,7 @@ const notificacionesIniciales = [
     descripcion: 'Tu tutoría de Cálculo diferencial empieza en 30 minutos.',
     tiempo: 'Hace 5 min',
     accion: 'Ver tutoría',
-    destino: 'Mis tutorías',
+    destino: 'Mis monitorias',
     leida: false,
   },
   {
@@ -52,7 +52,7 @@ const notificacionesIniciales = [
     descripcion: 'Tu sesión de Álgebra lineal fue completada. ¿Cómo estuvo la experiencia?',
     tiempo: 'Ayer',
     accion: 'Dejar reseña',
-    destino: 'Mis tutorías',
+    destino: 'Mis monitorias',
     leida: true,
   },
   {
@@ -171,7 +171,7 @@ export default function Notificaciones({ onNavegar }) {
       />
 
       <main className="notificaciones-principal">
-        <Navbar titulo="Notificaciones" />
+        <Navbar titulo="Notificaciones" onNavegar={onNavegar} />
 
         <div className="notificaciones-contenido">
 

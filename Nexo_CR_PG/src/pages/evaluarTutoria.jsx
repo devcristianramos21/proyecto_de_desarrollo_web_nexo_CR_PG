@@ -115,12 +115,12 @@ function EvaluarTutoria({ onNavegar, tutoria, onEnviarEvaluacion }) {
   return (
     <div className="evaluar-tutoria-layout">
       <Sidebar
-        paginaActiva="Mis tutorías"
+        paginaActiva="Mis monitorias"
         onNavegar={onNavegar}
       />
 
       <main className="evaluar-tutoria-contenido">
-        <Navbar titulo="Evaluar tutor" />
+        <Navbar titulo="Evaluar tutor" onNavegar={onNavegar} />
 
         <div className="evaluar-tutoria-principal">
 

@@ -1,0 +1,118 @@
+.perfil-admin {
+  max-width: 1048px;
+  margin: 0 auto;
+}
+
+.perfil-admin__cuenta {
+  padding: 22px;
+  margin-bottom: 32px;
+}
+
+.perfil-admin__identidad {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 0 0 18px;
+}
+
+.perfil-admin__avatar {
+  width: 80px;
+  height: 80px;
+  flex: 0 0 80px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #a41221;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.perfil-admin__identidad h2 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 17px;
+}
+
+.perfil-admin__identidad p {
+  margin: 0 0 5px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.perfil-admin__identidad > div > span {
+  display: inline-flex;
+  padding: 3px 9px;
+  border: 1px solid #f1d08a;
+  border-radius: 999px;
+  background: #fff7e6;
+  color: #936000;
+  font-size: 10px;
+}
+
+.perfil-admin__datos {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+}
+
+.perfil-admin__datos div {
+  min-height: 40px;
+  padding: 8px 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 12px;
+}
+
+.perfil-admin__datos div:first-child {
+  border-top: 0;
+}
+
+.perfil-admin__datos dt {
+  color: #6b7280;
+}
+
+.perfil-admin__datos dd {
+  margin: 0;
+  color: #111827;
+  font-weight: 600;
+  text-align: right;
+}
+
+.perfil-admin__password {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.perfil-admin__password h2 {
+  margin: 0 0 2px;
+  color: #111827;
+  font-size: 14px;
+}
+
+.perfil-admin__password label {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #111827;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.perfil-admin__password .admin-primary-button {
+  min-height: 37px;
+}
+
+@media (max-width: 500px) {
+  .perfil-admin__datos div {
+    align-items: flex-start;
+  }
+}

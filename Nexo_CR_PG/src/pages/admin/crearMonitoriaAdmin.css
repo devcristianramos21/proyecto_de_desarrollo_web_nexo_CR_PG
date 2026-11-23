@@ -1,0 +1,147 @@
+.crear-monitoria-admin {
+  max-width: 1048px;
+  margin: 0 auto;
+}
+
+.crear-monitoria-admin__migas {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 23px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.crear-monitoria-admin__migas button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #6b7280;
+  font: inherit;
+  cursor: pointer;
+}
+
+.crear-monitoria-admin__migas strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.crear-monitoria-admin__formulario {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.crear-monitoria-admin__tipos {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.crear-monitoria-admin__tipos legend,
+.crear-monitoria-admin__campo {
+  color: #111827;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.crear-monitoria-admin__tipos > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 9px;
+}
+
+.crear-monitoria-admin__tipo {
+  min-height: 92px;
+  padding: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.crear-monitoria-admin__tipo--activo {
+  border-color: #4f46e5;
+  background: #eaf0fa;
+}
+
+.crear-monitoria-admin__tipo input {
+  margin: 2px 0 0;
+  accent-color: #1d4ed8;
+}
+
+.crear-monitoria-admin__tipo span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.crear-monitoria-admin__tipo strong {
+  color: #111827;
+  font-size: 12px;
+}
+
+.crear-monitoria-admin__tipo small {
+  color: #6b7280;
+  font-size: 11px;
+  line-height: 1.3;
+  white-space: pre-line;
+}
+
+.crear-monitoria-admin__campo {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.crear-monitoria-admin__campo small {
+  max-width: 280px;
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.crear-monitoria-admin__dos-columnas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.crear-monitoria-admin__acciones {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 4px;
+}
+
+.crear-monitoria-admin__acciones .admin-text-button {
+  min-width: 74px;
+}
+
+.crear-monitoria-admin__error {
+  margin: -4px 0 0;
+}
+
+@media (max-width: 700px) {
+  .crear-monitoria-admin__formulario {
+    padding: 20px;
+  }
+
+  .crear-monitoria-admin__tipos > div {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .crear-monitoria-admin__dos-columnas {
+    grid-template-columns: 1fr;
+  }
+}

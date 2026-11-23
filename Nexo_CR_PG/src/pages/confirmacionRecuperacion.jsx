@@ -1,7 +1,7 @@
 
 import './recuperacionContrasena.css';
 
-function ConfirmacionRecuperacion({ correo, onVolver }) {
+function ConfirmacionRecuperacion({ correo, onContinuar }) {
   return (
     <main className="recuperacion-pagina">
       <div className="recuperacion-marca">
@@ -32,9 +32,9 @@ function ConfirmacionRecuperacion({ correo, onVolver }) {
         <button
           type="button"
           className="recuperacion-boton-principal"
-          onClick={onVolver}
+          onClick={onContinuar}
         >
-          Volver al inicio de sesión
+          Continuar al cambio de contraseña
         </button>
       </section>
     </main>

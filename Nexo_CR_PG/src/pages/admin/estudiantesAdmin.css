@@ -1,0 +1,150 @@
+.estudiantes-admin {
+  max-width: 1048px;
+  margin: 0 auto;
+}
+
+.estudiantes-admin__kpis {
+  margin: 23px 0 39px;
+}
+
+.estudiantes-admin__filtros {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 12px;
+  margin-bottom: 65px;
+}
+
+.estudiantes-admin__busqueda {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 13px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  color: #6b7280;
+}
+
+.estudiantes-admin__busqueda-icono {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.estudiantes-admin__busqueda input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #111827;
+  font: inherit;
+  font-size: 13px;
+}
+
+.estudiantes-admin__filtros select {
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  font-size: 13px;
+}
+
+.estudiantes-admin__tabla-wrap {
+  overflow: auto;
+}
+
+.estudiantes-admin__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  color: #374151;
+  font-size: 12px;
+  text-align: left;
+}
+
+.estudiantes-admin__tabla thead {
+  background: #eef2f8;
+}
+
+.estudiantes-admin__tabla th {
+  height: 36px;
+  padding: 0 16px;
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.estudiantes-admin__tabla td {
+  min-height: 56px;
+  padding: 10px 16px;
+  border-top: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.estudiantes-admin__tabla td:first-child {
+  min-width: 260px;
+}
+
+.estudiantes-admin__tabla td strong,
+.estudiantes-admin__tabla td small {
+  display: block;
+}
+
+.estudiantes-admin__tabla td strong {
+  color: #111827;
+  font-size: 12px;
+}
+
+.estudiantes-admin__tabla td small {
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.estudiantes-admin__numero {
+  color: #1d3b6c;
+  font-weight: 700;
+}
+
+.estudiantes-admin__numero--oro {
+  color: #d29100;
+}
+
+.estudiantes-admin__estado {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #e8f7ed;
+  color: #15803d;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.estudiantes-admin__estado--inactivo {
+  background: #eef1f5;
+  color: #6b7280;
+}
+
+.estudiantes-admin__vacio {
+  padding: 30px !important;
+  color: #6b7280;
+  text-align: center;
+  white-space: normal !important;
+}
+
+@media (max-width: 800px) {
+  .estudiantes-admin__filtros {
+    margin-bottom: 32px;
+  }
+}
+
+@media (max-width: 560px) {
+  .estudiantes-admin__filtros {
+    grid-template-columns: 1fr;
+  }
+}

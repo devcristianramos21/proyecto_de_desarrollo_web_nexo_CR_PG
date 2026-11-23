@@ -1,6 +1,7 @@
 
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
+import { useUsuario } from '../components/layout/usuarioContext';
 import './MiPerfil.css';
 
 const estadisticas = [
@@ -21,33 +22,15 @@ const estadisticas = [
   },
 ];
 
-const informacionPersonal = [
-  {
-    etiqueta: 'Nombre',
-    valor: 'Nombre del estudiante',
-  },
-  {
-    etiqueta: 'Correo electrónico',
-    valor: 'correo@ejemplo.com',
-  },
-  {
-    etiqueta: 'Programa académico',
-    valor: 'Ingeniería de Sistemas',
-  },
-  {
-    etiqueta: 'Semestre',
-    valor: '5°',
-  },
-  {
-    etiqueta: 'Rol',
-    valor: 'Estudiante',
-  },
-];
-
 export default function MiPerfil({ onNavegar }) {
-  const mostrarMensaje = (mensaje) => {
-    alert(mensaje);
-  };
+  const { usuario } = useUsuario();
+  const informacionPersonal = [
+    { etiqueta: 'Nombre', valor: usuario.nombre },
+    { etiqueta: 'Correo electrónico', valor: usuario.correo },
+    { etiqueta: 'Programa académico', valor: usuario.programa },
+    { etiqueta: 'Semestre', valor: usuario.semestre },
+    { etiqueta: 'Rol', valor: usuario.rol },
+  ];
 
   return (
     <div className="perfil-estudiante">
@@ -57,7 +40,7 @@ export default function MiPerfil({ onNavegar }) {
       />
 
       <main className="perfil-estudiante__principal">
-        <Navbar titulo="Mi perfil" />
+        <Navbar titulo="Mi perfil" onNavegar={onNavegar} />
 
         <div className="perfil-estudiante__contenido">
 
@@ -76,18 +59,18 @@ export default function MiPerfil({ onNavegar }) {
 
             <article className="perfil-estudiante__tarjeta">
               <div className="perfil-estudiante__avatar">
-                NE
+                {usuario.iniciales}
               </div>
 
               <div className="perfil-estudiante__datos">
-                <h2>Nombre del estudiante</h2>
+                <h2>{usuario.nombre}</h2>
 
-                <p>Ingeniería de Sistemas · 5° semestre</p>
+                <p>{usuario.programa} · {usuario.semestre} semestre</p>
 
                 <div className="perfil-estudiante__badges">
                   <span className="perfil-estudiante__badge perfil-estudiante__badge--rol">
                     <span className="perfil-estudiante__punto"></span>
-                    Estudiante
+                    {usuario.rol}
                   </span>
 
                   <span className="perfil-estudiante__badge perfil-estudiante__badge--miembro">
@@ -99,9 +82,8 @@ export default function MiPerfil({ onNavegar }) {
               <button
                 type="button"
                 className="perfil-estudiante__boton-editar"
-                onClick={() =>
-                  mostrarMensaje('Próximamente podrás editar tu perfil.')
-                }
+                disabled
+                title="No hay un frame de edición de perfil en la referencia Figma."
               >
                 Editar perfil
               </button>
@@ -120,9 +102,7 @@ export default function MiPerfil({ onNavegar }) {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    mostrarMensaje('Próximamente podrás cambiar tu contraseña.')
-                  }
+                  onClick={() => onNavegar?.('Nueva contraseña')}
                 >
                   Cambiar contraseña
                 </button>

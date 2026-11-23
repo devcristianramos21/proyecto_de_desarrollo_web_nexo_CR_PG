@@ -104,6 +104,8 @@ export default function ResultadosBusqueda({
   filtrosBusqueda = {},
   onVerPerfilTutor,
   onSolicitarTutoria,
+  tutoresFavoritos = [],
+  onToggleFavorito,
 }) {
   const materiaBuscada =
     filtrosBusqueda.materia &&
@@ -111,7 +113,6 @@ export default function ResultadosBusqueda({
       ? filtrosBusqueda.materia
       : filtrosBusqueda.busqueda || 'Cálculo diferencial';
 
-  const [tutores, setTutores] = useState(tutoresIniciales);
   const [orden, setOrden] = useState('coincidencia');
   const [paginaActual, setPaginaActual] = useState(1);
 
@@ -136,18 +137,8 @@ export default function ResultadosBusqueda({
     setPaginaActual(1);
   };
 
-  const cambiarFavorito = (id) => {
-    setTutores((actuales) =>
-      actuales.map((tutor) =>
-        tutor.id === id
-          ? { ...tutor, favorito: !tutor.favorito }
-          : tutor
-      )
-    );
-  };
-
   const tutoresFiltrados = useMemo(() => {
-    let resultado = [...tutores];
+    let resultado = [...tutoresIniciales];
 
     const filtroMateria = filtrosActivos.find(
       (filtro) =>
@@ -190,10 +181,13 @@ export default function ResultadosBusqueda({
     }
 
     return resultado;
-  }, [tutores, filtrosActivos, orden]);
+  }, [filtrosActivos, orden]);
 
   const tutoresPorPagina = 6;
-  const totalPaginas = 4;
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(tutoresFiltrados.length / tutoresPorPagina)
+  );
 
   const tutoresVisibles = tutoresFiltrados.slice(
     (paginaActual - 1) * tutoresPorPagina,
@@ -235,19 +229,21 @@ export default function ResultadosBusqueda({
         <button
           type="button"
           className={`resultado-card__favorito ${
-            tutor.favorito
+            tutoresFavoritos.some((favorito) => favorito.id === tutor.id)
               ? 'resultado-card__favorito--activo'
               : ''
           }`}
-          onClick={() => cambiarFavorito(tutor.id)}
+          onClick={() => onToggleFavorito?.(tutor)}
           aria-label={
-            tutor.favorito
+            tutoresFavoritos.some((favorito) => favorito.id === tutor.id)
               ? 'Quitar de favoritos'
               : 'Agregar a favoritos'
           }
-          aria-pressed={tutor.favorito}
+          aria-pressed={tutoresFavoritos.some(
+            (favorito) => favorito.id === tutor.id
+          )}
         >
-          {tutor.favorito ? '♥' : '♡'}
+          {tutoresFavoritos.some((favorito) => favorito.id === tutor.id) ? '♥' : '♡'}
         </button>
       </div>
 
@@ -300,7 +296,7 @@ export default function ResultadosBusqueda({
       />
 
       <main className="resultados-busqueda__principal">
-        <Navbar titulo="Resultados por búsqueda" />
+        <Navbar titulo="Resultados por búsqueda" onNavegar={onNavegar} />
 
         <div className="resultados-busqueda__contenido">
 

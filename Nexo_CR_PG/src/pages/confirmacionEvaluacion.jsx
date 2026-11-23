@@ -7,12 +7,12 @@ function ConfirmacionEvaluacion({ onNavegar, calificacion = 4 }) {
   return (
     <div className="confirmacion-evaluacion-layout">
       <Sidebar
-        paginaActiva="Mis tutorías"
+        paginaActiva="Mis monitorias"
         onNavegar={onNavegar}
       />
 
       <main className="confirmacion-evaluacion-contenido">
-        <Navbar titulo="Evaluar tutor" />
+        <Navbar titulo="Evaluar tutor" onNavegar={onNavegar} />
 
         <section className="confirmacion-evaluacion-principal">
           <div className="confirmacion-evaluacion-tarjeta">

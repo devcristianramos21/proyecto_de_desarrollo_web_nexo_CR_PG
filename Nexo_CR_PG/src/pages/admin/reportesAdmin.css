@@ -1,0 +1,252 @@
+.reportes-admin {
+  max-width: 1048px;
+  margin: 0 auto;
+}
+
+.reportes-admin__encabezado {
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.reportes-admin__controles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reportes-admin__semestre select {
+  width: 158px;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  font-size: 12px;
+}
+
+.reportes-admin__kpis {
+  margin-bottom: 45px;
+}
+
+.reportes-admin__graficos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.98fr);
+  gap: 28px;
+  margin-bottom: 54px;
+}
+
+.reportes-admin__grafico-meses,
+.reportes-admin__tutores,
+.reportes-admin__materias {
+  padding: 18px 20px;
+}
+
+.reportes-admin__grafico-meses h2,
+.reportes-admin__tutores h2,
+.reportes-admin__materias h2 {
+  margin: 0 0 18px;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.reportes-admin__columnas {
+  height: 164px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+.reportes-admin__mes {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.reportes-admin__mes > strong {
+  color: #6b7280;
+  font-size: 10px;
+}
+
+.reportes-admin__barras {
+  width: 100%;
+  height: 126px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.reportes-admin__barra {
+  width: 100%;
+  min-height: 8px;
+  border-radius: 4px 4px 0 0;
+}
+
+.reportes-admin__barra--tutoria {
+  background: #1d3b6c;
+}
+
+.reportes-admin__barra--monitoria {
+  background: #c99a12;
+}
+
+.reportes-admin__mes small {
+  color: #6b7280;
+  font-size: 10px;
+}
+
+.reportes-admin__leyenda {
+  display: flex;
+  justify-content: center;
+  gap: 17px;
+  margin-top: 12px;
+  color: #374151;
+  font-size: 10px;
+}
+
+.reportes-admin__leyenda span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.reportes-admin__leyenda i {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+
+.reportes-admin__leyenda-tutoria { background: #1d3b6c; }
+.reportes-admin__leyenda-monitoria { background: #c99a12; }
+
+.reportes-admin__tutor {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid #f1f3f6;
+}
+
+.reportes-admin__tutor:first-of-type {
+  border-top: 0;
+}
+
+.reportes-admin__tutor > b {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e8eef7;
+  color: #1d3b6c;
+  font-size: 11px;
+}
+
+.reportes-admin__tutor div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.reportes-admin__tutor div strong {
+  color: #111827;
+  font-size: 12px;
+}
+
+.reportes-admin__tutor div span {
+  color: #6b7280;
+  font-size: 10px;
+}
+
+.reportes-admin__estrellas {
+  color: #ed8a00;
+  font-size: 11px;
+}
+
+.reportes-admin__materias {
+  padding: 22px 20px;
+}
+
+.reportes-admin__materia {
+  min-height: 27px;
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 10px;
+  color: #111827;
+  font-size: 11px;
+}
+
+.reportes-admin__materia > div {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf1f6;
+}
+
+.reportes-admin__demanda {
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: #1d3b6c;
+}
+
+.reportes-admin__demanda--rojo { background: #be123c; }
+.reportes-admin__demanda--oro { background: #c99a12; }
+
+.reportes-admin__materia > strong {
+  color: #6b7280;
+  text-align: right;
+  font-size: 10px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+@media print {
+  .sidebar,
+  .navbar,
+  .reportes-admin__controles {
+    display: none !important;
+  }
+
+  .admin-shell__main {
+    padding: 0;
+    background: #fff;
+  }
+}
+
+@media (max-width: 800px) {
+  .reportes-admin__graficos {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  .reportes-admin__controles {
+    justify-content: space-between;
+  }
+
+  .reportes-admin__materia {
+    grid-template-columns: 115px minmax(0, 1fr) 28px;
+    gap: 7px;
+    font-size: 10px;
+  }
+}

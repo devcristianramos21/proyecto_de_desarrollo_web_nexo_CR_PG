@@ -4,7 +4,7 @@ import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import './MisSolicitudes.css';
 
-const solicitudesIniciales = [
+export const solicitudesIniciales = [
   {
     id: 1,
     materia: 'Cálculo diferencial',
@@ -60,8 +60,13 @@ const pestañas = [
   'Canceladas',
 ];
 
-function MisSolicitudes({ onNavegar, onVerDetalleSolicitud }) {
-  const [solicitudes, setSolicitudes] = useState(solicitudesIniciales);
+function MisSolicitudes({
+  onNavegar,
+  onVerDetalleSolicitud,
+  solicitudes = solicitudesIniciales,
+  onCancelarSolicitud,
+  onNuevaSolicitud,
+}) {
   const [filtroActivo, setFiltroActivo] = useState('Todas');
 
   // FILTRAR SOLICITUDES
@@ -82,32 +87,19 @@ function MisSolicitudes({ onNavegar, onVerDetalleSolicitud }) {
   ).length;
 
   // CANCELAR SOLICITUD
-  const cancelarSolicitud = (id) => {
-    setSolicitudes((actuales) =>
-      actuales.map((solicitud) =>
-        solicitud.id === id
-          ? {
-              ...solicitud,
-              estado: 'Cancelada',
-              propuesta: false,
-            }
-          : solicitud
-      )
-    );
-  };
-
   // VER DETALLE
   const verDetalle = (solicitud) => {
-    if (onVerDetalleSolicitud) {
-      onVerDetalleSolicitud(solicitud);
-    } else {
-      alert('La pantalla de detalle de la solicitud está pendiente de implementar.');
-    }
+    onVerDetalleSolicitud?.(solicitud);
   };
 
   // NUEVA SOLICITUD
   const nuevaSolicitud = () => {
-    alert('La creación de nuevas solicitudes estará disponible próximamente.');
+    if (onNuevaSolicitud) {
+      onNuevaSolicitud();
+      return;
+    }
+
+    onNavegar?.('Solicitar tutoría');
   };
 
   return (
@@ -120,7 +112,7 @@ function MisSolicitudes({ onNavegar, onVerDetalleSolicitud }) {
 
       <div className="solicitudes-contenido">
 
-        <Navbar titulo="Mis solicitudes" />
+        <Navbar titulo="Mis solicitudes" onNavegar={onNavegar} />
 
         <main className="solicitudes-main">
 
@@ -227,7 +219,7 @@ function MisSolicitudes({ onNavegar, onVerDetalleSolicitud }) {
                         <button
                           type="button"
                           className="solicitudes__cancelar"
-                          onClick={() => cancelarSolicitud(solicitud.id)}
+                          onClick={() => onCancelarSolicitud?.(solicitud.id)}
                         >
                           Cancelar
                         </button>

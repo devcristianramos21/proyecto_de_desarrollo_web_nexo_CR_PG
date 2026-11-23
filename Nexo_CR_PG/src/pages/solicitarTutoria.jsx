@@ -14,7 +14,13 @@ const horariosDisponibles = [
   { id: 5, dia: 'Sábado 21 Jun', hora: '9:00 AM — 10:00 AM' },
 ];
 
-export default function SolicitarTutoria({ onNavegar, tutor }) {
+export default function SolicitarTutoria({
+  onNavegar,
+  paginaAnterior = 'Perfil tutor',
+  onVolver,
+  tutor,
+  onCrearSolicitud,
+}) {
   const materiasTutor = tutor?.materias || [];
 
   const [paso, setPaso] = useState(1);
@@ -32,6 +38,11 @@ export default function SolicitarTutoria({ onNavegar, tutor }) {
   const nombreTutor = tutor?.nombre || 'Nombre del tutor';
   const programaTutor =
     tutor?.programa || tutor?.especialidad || 'Programa académico';
+  const etiquetasPagina = {
+    'Resultados búsqueda': 'Resultados',
+    'Detalle solicitud': 'Mis solicitudes',
+    'Mis solicitudes': 'Mis solicitudes',
+  };
 
   const horarioActual = horariosDisponibles.find(
     (horario) => horario.id === horarioSeleccionado
@@ -86,6 +97,31 @@ export default function SolicitarTutoria({ onNavegar, tutor }) {
   };
 
   const confirmarEnvio = () => {
+    const solicitud = {
+      id: Date.now(),
+      tutor: nombreTutor,
+      tutorId: tutor?.id,
+      tutorData: tutor || null,
+      programaTutor,
+      semestreTutor:
+        tutor?.semestreTutor ||
+        (tutor?.semestre ? `${tutor.semestre}° semestre` : 'Programa académico'),
+      calificacion: tutor?.calificacion || '4.9',
+      materia,
+      tema: tema.trim(),
+      modalidad,
+      fecha: new Intl.DateTimeFormat('es-CO', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      }).format(new Date()),
+      estado: 'Pendiente',
+      descripcion: necesidad.trim(),
+      propuesta: false,
+      horario: `${horarioActual?.dia || ''} · ${horarioActual?.hora || ''}`.trim(),
+    };
+
+    onCrearSolicitud?.(solicitud);
     setMostrarModal(false);
     setSolicitudEnviada(true);
   };
@@ -98,7 +134,7 @@ export default function SolicitarTutoria({ onNavegar, tutor }) {
       />
 
       <main className="solicitar-tutoria__principal">
-        <Navbar titulo="Solicitar tutoría" />
+        <Navbar titulo="Solicitar tutoría" onNavegar={onNavegar} />
 
         <div className="solicitar-tutoria__contenido">
 
@@ -184,9 +220,13 @@ export default function SolicitarTutoria({ onNavegar, tutor }) {
               <div className="solicitar-tutoria__breadcrumb">
                 <button
                   type="button"
-                  onClick={() => onNavegar?.('Perfil tutor')}
+                  onClick={() =>
+                    onVolver
+                      ? onVolver()
+                      : onNavegar?.('Perfil tutor')
+                  }
                 >
-                  Perfil del tutor
+                  {etiquetasPagina[paginaAnterior] || paginaAnterior}
                 </button>
 
                 <span>/</span>

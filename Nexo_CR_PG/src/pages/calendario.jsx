@@ -61,7 +61,7 @@ function Calendario({ onNavegar }) {
       return;
     }
 
-    alert(`Solicitud de inscripción a ${parcial.materia} registrada (simulación).`);
+    onNavegar?.('Monitorías');
   };
 
   const renderParcial = (parcial) => (
@@ -120,7 +120,7 @@ function Calendario({ onNavegar }) {
       />
 
       <div className="calendario-contenido">
-        <Navbar titulo="Calendario académico" />
+        <Navbar titulo="Calendario académico" onNavegar={onNavegar} />
 
         <main className="calendario-main">
           <header className="calendario__encabezado">

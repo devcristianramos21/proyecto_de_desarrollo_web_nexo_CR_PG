@@ -61,7 +61,7 @@ export default function BuscarTutores({ onNavegar, onBuscar }) {
       />
 
       <main className="buscar-tutores__principal">
-        <Navbar titulo="Buscar tutores" />
+        <Navbar titulo="Buscar tutores" onNavegar={onNavegar} />
 
         <div className="buscar-tutores__contenido">
           <header className="buscar-tutores__encabezado">

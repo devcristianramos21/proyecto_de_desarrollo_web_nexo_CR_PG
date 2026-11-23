@@ -136,12 +136,12 @@ function MisMonitorias({
   return (
     <div className="mis-tutorias-layout">
       <Sidebar
-        paginaActiva="Mis tutorías"
+        paginaActiva="Mis monitorias"
         onNavegar={onNavegar}
       />
 
       <div className="mis-tutorias-contenido">
-        <Navbar titulo="Mis tutorías" />
+        <Navbar titulo="Mis tutorías" onNavegar={onNavegar} />
 
         <main className="mis-tutorias-main">
 

@@ -1,0 +1,193 @@
+.registrar-tutor-admin {
+  max-width: 1048px;
+  margin: 0 auto;
+}
+
+.registrar-tutor-admin__migas {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 19px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.registrar-tutor-admin__migas button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.registrar-tutor-admin__migas strong {
+  color: #111827;
+}
+
+.registrar-tutor-admin__formulario {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.registrar-tutor-admin__formulario h2 {
+  margin: 1px 0 -2px;
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+.registrar-tutor-admin__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px 15px;
+}
+
+.registrar-tutor-admin__grid label,
+.registrar-tutor-admin__roles legend,
+.registrar-tutor-admin__materias > strong {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #111827;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.registrar-tutor-admin__completo {
+  grid-column: 1 / -1;
+}
+
+.registrar-tutor-admin__roles {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.registrar-tutor-admin__roles legend {
+  margin-bottom: 8px;
+}
+
+.registrar-tutor-admin__roles > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.registrar-tutor-admin__roles label {
+  min-height: 38px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 7px;
+  background: #fff;
+  color: #111827;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.registrar-tutor-admin__roles input {
+  accent-color: #2563eb;
+}
+
+.registrar-tutor-admin__roles small {
+  display: block;
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 10px;
+}
+
+.registrar-tutor-admin__materias {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.registrar-tutor-admin__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.registrar-tutor-admin__chips button {
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: #eef2f8;
+  color: #374151;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.registrar-tutor-admin__chips span {
+  margin-left: 3px;
+  color: #6b7280;
+}
+
+.registrar-tutor-admin__agregar-materia {
+  display: flex;
+  gap: 8px;
+}
+
+.registrar-tutor-admin__agregar-materia .admin-secondary-button {
+  min-width: 90px;
+}
+
+.registrar-tutor-admin__aviso {
+  min-height: 90px;
+  padding: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid #c7d7ff;
+  border-radius: 9px;
+  background: #eaf0ff;
+  color: #2563eb;
+}
+
+.registrar-tutor-admin__aviso > span {
+  font-size: 17px;
+}
+
+.registrar-tutor-admin__aviso p {
+  max-width: 510px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.registrar-tutor-admin__aviso strong {
+  display: block;
+  margin-top: 3px;
+}
+
+.registrar-tutor-admin__acciones {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 4px;
+}
+
+@media (max-width: 620px) {
+  .registrar-tutor-admin__formulario {
+    padding: 20px;
+  }
+
+  .registrar-tutor-admin__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .registrar-tutor-admin__completo {
+    grid-column: auto;
+  }
+
+  .registrar-tutor-admin__roles > div {
+    justify-content: flex-start;
+  }
+}

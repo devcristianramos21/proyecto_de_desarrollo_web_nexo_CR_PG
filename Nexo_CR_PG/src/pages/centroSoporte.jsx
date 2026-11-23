@@ -119,7 +119,7 @@ export default function CentroSoporte({ onNavegar }) {
 
       <main className="centro-soporte__principal">
 
-        <Navbar titulo="Centro de soporte" />
+        <Navbar titulo="Centro de soporte" onNavegar={onNavegar} />
 
         {confirmacionEnviada ? (
 

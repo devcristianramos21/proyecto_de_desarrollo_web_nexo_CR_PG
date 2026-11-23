@@ -1,6 +1,4 @@
 
-import { useState } from 'react';
-
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import StudentStats from '../components/layout/studentStats';
@@ -48,40 +46,25 @@ const tutoresIniciales = [
   },
 ];
 
-const monitorias = [
-  {
-    id: 1,
-    titulo: 'Pre-parcial Cálculo Diferencial',
-    tutor: 'Andrés Moreno',
-    fecha: 'Sáb 20 Sep · 9-11 AM',
-    etiquetas: ['Pre-parcial', 'URGENTE'],
-  },
-  {
-    id: 2,
-    titulo: 'Pre-parcial Álgebra Lineal',
-    tutor: 'Felipe Castro',
-    fecha: 'Dom 21 Sep · 10 AM-12 PM',
-    etiquetas: ['Pre-parcial'],
-  },
-];
-
 export default function HomeEstudiante({
   onNavegar,
   onVerPerfilTutor,
-  onVerDetalleMonitoria,
   onSolicitarTutoria,
+  onInscribirMonitoria,
+  onEnviarMensajeTutor,
+  onVerDetalleTutoria,
+  monitorias = [],
+  tutorias = [],
+  tutoresFavoritos = [],
+  onToggleFavorito,
 }) {
-  const [tutores, setTutores] = useState(tutoresIniciales);
-
-  const cambiarFavorito = (id) => {
-    setTutores((actuales) =>
-      actuales.map((tutor) =>
-        tutor.id === id
-          ? { ...tutor, favorito: !tutor.favorito }
-          : tutor
-      )
-    );
-  };
+  const tutores = tutoresIniciales;
+  const monitoriasDestacadas = monitorias
+    .filter((monitoria) => monitoria.tipo === 'Pre-parcial')
+    .slice(0, 2);
+  const proximaTutoria = tutorias.find(
+    (tutoria) => tutoria.categoria === 'Proximas'
+  );
 
   return (
     <div className="home-estudiante">
@@ -137,32 +120,36 @@ export default function HomeEstudiante({
             </div>
 
             <div className="monitorias-grid">
-              {monitorias.map((monitoria) => (
+              {monitoriasDestacadas.map((monitoria) => (
                 <article
                   className="monitoria-card"
                   key={monitoria.id}
                 >
                   <div className="monitoria-card__etiquetas">
-                    {monitoria.etiquetas.map((etiqueta) => (
-                      <span key={etiqueta}>
-                        {etiqueta}
-                      </span>
-                    ))}
+                    <span>{monitoria.tipo}</span>
                   </div>
 
                   <h3>{monitoria.titulo}</h3>
 
                   <p>
-                    {monitoria.tutor} · {monitoria.fecha}
+                    {monitoria.monitor} · {monitoria.horario}
                   </p>
 
                   <button
                     type="button"
-                    onClick={() =>
-                      onVerDetalleMonitoria?.(monitoria)
+                    disabled={
+                      monitoria.estado === 'Inscrito' ||
+                      monitoria.estado === 'Cupo lleno' ||
+                      monitoria.inscritos >= monitoria.cupo
                     }
+                    onClick={() => onInscribirMonitoria?.(monitoria)}
                   >
-                    Inscribirse
+                    {monitoria.estado === 'Inscrito'
+                      ? 'Inscrito'
+                      : monitoria.estado === 'Cupo lleno' ||
+                          monitoria.inscritos >= monitoria.cupo
+                        ? 'Cupo lleno'
+                        : 'Inscribirse'}
                   </button>
                 </article>
               ))}
@@ -181,12 +168,18 @@ export default function HomeEstudiante({
               </div>
 
               <div className="tutoria-card__informacion">
-                <h3>Nombre del tutor</h3>
+                <h3>{proximaTutoria?.tutor || 'Nombre del tutor'}</h3>
 
-                <p>Cálculo diferencial · Integrales</p>
+                <p>
+                  {proximaTutoria
+                    ? `${proximaTutoria.materia} · ${proximaTutoria.tema}`
+                    : 'Cálculo diferencial · Integrales'}
+                </p>
 
                 <span>
-                  Jueves, 3:00 PM — 4:00 PM · Virtual
+                  {proximaTutoria
+                    ? `${proximaTutoria.fecha} · ${proximaTutoria.hora} · ${proximaTutoria.modalidad}`
+                    : 'Jueves, 3:00 PM — 4:00 PM · Virtual'}
                 </span>
               </div>
 
@@ -197,14 +190,24 @@ export default function HomeEstudiante({
               <div className="tutoria-card__acciones">
                 <button
                   type="button"
-                  onClick={() => onNavegar?.('Mis monitorias')}
+                  onClick={() => {
+                    if (proximaTutoria) onVerDetalleTutoria?.(proximaTutoria);
+                    else onNavegar?.('Mis monitorias');
+                  }}
                 >
                   Ver detalles
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => onNavegar?.('Mensajes')}
+                  onClick={() =>
+                    onEnviarMensajeTutor?.({
+                      nombre: proximaTutoria?.tutor || 'Nombre del tutor',
+                      programa: proximaTutoria?.programaTutor || 'Ingeniería de Sistemas',
+                      semestre: proximaTutoria?.semestreTutor || '7° semestre',
+                      iniciales: 'NT',
+                    })
+                  }
                 >
                   Mensaje
                 </button>
@@ -230,9 +233,10 @@ export default function HomeEstudiante({
                 <TutorCard
                   key={tutor.id}
                   {...tutor}
-                  onToggleFavorito={() =>
-                    cambiarFavorito(tutor.id)
-                  }
+                  favorito={tutoresFavoritos.some(
+                    (favorito) => favorito.id === tutor.id
+                  )}
+                  onToggleFavorito={() => onToggleFavorito?.(tutor)}
                   onVerPerfil={() =>
                     onVerPerfilTutor?.(tutor)
                   }

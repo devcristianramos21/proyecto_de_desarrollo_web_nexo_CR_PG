@@ -1,0 +1,191 @@
+.soporte-admin {
+  max-width: 1048px;
+  margin: 0 auto;
+}
+
+.soporte-admin__kpis {
+  margin: 23px 0 51px;
+}
+
+.soporte-admin__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.soporte-admin__caso {
+  min-height: 80px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.soporte-admin__resumen {
+  flex: 1;
+  min-width: 170px;
+}
+
+.soporte-admin__resumen > strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #111827;
+  font-size: 13px;
+}
+
+.soporte-admin__resumen > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.soporte-admin__rol {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #eef2f8;
+  color: #374151;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.soporte-admin__estado {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #fff3dc;
+  color: #a66300;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.soporte-admin__estado--en-revisión {
+  background: #e7efff;
+  color: #2563eb;
+}
+
+.soporte-admin__estado--resuelto {
+  background: #e8f7ed;
+  color: #15803d;
+}
+
+.soporte-admin__acciones {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.soporte-admin__acciones button {
+  min-height: 32px;
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+.soporte-admin__acciones .admin-primary-button {
+  background: #1d3b6c;
+  border-color: #1d3b6c;
+}
+
+.soporte-admin__acciones .admin-text-button {
+  background: #e7eef8;
+}
+
+.soporte-admin__vacio {
+  padding: 30px;
+  border-radius: 10px;
+  background: #fff;
+  color: #6b7280;
+  text-align: center;
+}
+
+.soporte-admin__overlay {
+  position: fixed;
+  inset: 51px 0 0 239px;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(17 24 39 / 42%);
+}
+
+.soporte-admin__modal {
+  position: relative;
+  width: min(460px, 100%);
+  padding: 24px;
+}
+
+.soporte-admin__modal h2 {
+  margin: 0 28px 20px 0;
+  color: #111827;
+  font-size: 18px;
+}
+
+.soporte-admin__modal dl {
+  margin: 0 0 20px;
+}
+
+.soporte-admin__modal dl div {
+  padding: 10px 0;
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 12px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 12px;
+}
+
+.soporte-admin__modal dt {
+  color: #6b7280;
+}
+
+.soporte-admin__modal dd {
+  margin: 0;
+  color: #111827;
+  font-weight: 600;
+}
+
+.soporte-admin__cerrar {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+@media (max-width: 780px) {
+  .soporte-admin__caso {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .soporte-admin__resumen {
+    flex-basis: calc(100% - 130px);
+  }
+
+  .soporte-admin__acciones {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .soporte-admin__overlay {
+    inset: 51px 0 0 72px;
+  }
+}
+
+@media (max-width: 520px) {
+  .soporte-admin__resumen {
+    flex-basis: 100%;
+  }
+
+  .soporte-admin__acciones {
+    margin-left: 0;
+  }
+}

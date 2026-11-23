@@ -1,6 +1,4 @@
 
-import { useState } from 'react';
-
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 
@@ -39,16 +37,65 @@ const materias = [
 
 export default function PerfilTutor({
   onNavegar,
+  paginaAnterior = 'Resultados búsqueda',
+  onVolver,
   tutor,
   onSolicitar,
   onEnviarMensaje,
+  favoritos = [],
+  onToggleFavorito,
 }) {
   const datosTutor = {
     ...tutorPredeterminado,
     ...(tutor || {}),
+    programa:
+      tutor?.programa ||
+      tutor?.especialidad ||
+      tutor?.programaTutor ||
+      (tutor ? 'Programa académico no disponible' : tutorPredeterminado.programa),
+    disponibilidad: tutor
+      ? tutor.disponibilidad ||
+        (tutor.disponible ? 'Disponible hoy' : 'Disponibilidad por confirmar')
+      : tutorPredeterminado.disponibilidad,
+    calificacion: tutor
+      ? tutor.calificacion ?? null
+      : tutorPredeterminado.calificacion,
+    resenas: tutor
+      ? tutor.resenas ?? tutor.opiniones ?? null
+      : tutorPredeterminado.resenas,
   };
 
-  const [favorito, setFavorito] = useState(false);
+  const calificacion = datosTutor.calificacion == null
+    ? '—'
+    : Number(datosTutor.calificacion).toFixed(1);
+  const resenas = datosTutor.resenas ?? '—';
+  const materiasTutor = tutor
+    ? (tutor.materias || []).map((nombre) => ({ nombre, temas: [] }))
+    : materias;
+  const semestreTexto = datosTutor.semestreTutor ||
+    (tutor?.semestre != null
+      ? `${tutor.semestre}° semestre`
+      : tutor
+        ? 'Semestre no disponible'
+        : `${datosTutor.semestre}° semestre`);
+  const horariosTutor = tutor
+    ? tutor.horarios || []
+    : horarios;
+  const sobreMi = tutor?.sobreMi || (
+    tutor
+      ? `Tutor de ${datosTutor.programa}${tutor.materias?.length ? `, con experiencia en ${tutor.materias.join(', ')}` : ''}.`
+      : tutorPredeterminado.sobreMi
+  );
+  const etiquetasPagina = {
+    'Resultados búsqueda': 'Resultados',
+    'Detalle monitoría': 'Monitorías',
+    'Detalle tutoría': 'Mis tutorías',
+    'Detalle solicitud': 'Mis solicitudes',
+  };
+
+  const favorito = favoritos.some(
+    (item) => item.id != null && item.id === datosTutor.id
+  );
 
   // Solicitar tutoría
   const solicitarTutoria = () => {
@@ -70,7 +117,7 @@ export default function PerfilTutor({
 
   // Guardar o quitar de favoritos
   const cambiarFavorito = () => {
-    setFavorito((actual) => !actual);
+    onToggleFavorito?.(datosTutor);
   };
 
   return (
@@ -81,10 +128,7 @@ export default function PerfilTutor({
       />
 
       <main className="perfil-tutor__principal">
-        <Navbar
-          titulo="Perfil del tutor"
-          onNavegar={onNavegar}
-        />
+        <Navbar titulo="Perfil del tutor" onNavegar={onNavegar} />
 
         <div className="perfil-tutor__contenido">
 
@@ -92,9 +136,13 @@ export default function PerfilTutor({
           <div className="perfil-tutor__breadcrumb">
             <button
               type="button"
-              onClick={() => onNavegar?.('Resultados búsqueda')}
+              onClick={() =>
+                onVolver
+                  ? onVolver()
+                  : onNavegar?.('Resultados búsqueda')
+              }
             >
-              Resultados
+              {etiquetasPagina[paginaAnterior] || paginaAnterior}
             </button>
 
             <span>/</span>
@@ -118,7 +166,7 @@ export default function PerfilTutor({
                   <h1>{datosTutor.nombre}</h1>
 
                   <p>
-                    {datosTutor.programa} · {datosTutor.semestre}° semestre
+                    {datosTutor.programa} · {semestreTexto}
                   </p>
 
                   <div className="perfil-tutor__calificacion">
@@ -127,10 +175,10 @@ export default function PerfilTutor({
                     </span>
 
                     <strong>
-                      {Number(datosTutor.calificacion).toFixed(1)}
+                      {calificacion}
                     </strong>
 
-                    <span>· {datosTutor.resenas} reseñas</span>
+                    <span>· {resenas} reseñas</span>
                   </div>
 
                   <div className="perfil-tutor__estado">
@@ -165,7 +213,7 @@ export default function PerfilTutor({
               <article className="perfil-tutor__tarjeta perfil-tutor__sobre-mi">
                 <h2>Sobre mí</h2>
 
-                <p>{datosTutor.sobreMi}</p>
+                <p>{sobreMi}</p>
               </article>
 
               {/* MATERIAS Y TEMAS */}
@@ -173,7 +221,7 @@ export default function PerfilTutor({
                 <h2>Materias y temas</h2>
 
                 <div className="perfil-tutor__grupos-materias">
-                  {materias.map((materia) => (
+                  {materiasTutor.map((materia) => (
                     <div
                       className="perfil-tutor__grupo-materia"
                       key={materia.nombre}
@@ -199,7 +247,7 @@ export default function PerfilTutor({
                 <h2>DISPONIBILIDAD</h2>
 
                 <div className="perfil-tutor__horarios">
-                  {horarios.map((item) => (
+                  {horariosTutor.map((item) => (
                     <div
                       className="perfil-tutor__fila-horario"
                       key={item.dia}
@@ -228,19 +276,19 @@ export default function PerfilTutor({
 
                   <div className="perfil-tutor__fila-estadistica">
                     <span>Tutorías realizadas</span>
-                    <strong>128</strong>
+                    <strong>{tutor?.tutoriasRealizadas ?? '—'}</strong>
                   </div>
 
                   <div className="perfil-tutor__fila-estadistica">
                     <span>Calificación</span>
                     <strong>
-                      {Number(datosTutor.calificacion).toFixed(1)}
+                      {calificacion}
                     </strong>
                   </div>
 
                   <div className="perfil-tutor__fila-estadistica">
                     <span>Tasa de aceptación</span>
-                    <strong>98%</strong>
+                    <strong>{tutor?.tasaAceptacion ?? '—'}</strong>
                   </div>
                 </article>
 
@@ -273,10 +321,10 @@ export default function PerfilTutor({
                 <span>★★★★★</span>
 
                 <strong>
-                  {Number(datosTutor.calificacion).toFixed(1)}
+                  {calificacion}
                 </strong>
 
-                <small>· {datosTutor.resenas} reseñas</small>
+                <small>· {resenas} reseñas</small>
               </div>
             </div>
 

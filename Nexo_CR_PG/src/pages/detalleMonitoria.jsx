@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
@@ -40,31 +40,17 @@ function DetalleMonitoria({
   monitoria,
   onInscribirse,
   onVerPerfilTutor,
+  modoTutor = false,
 }) {
   const datos = monitoria || monitoriaPredeterminada;
 
   // Estados
   const [modalAbierto, setModalAbierto] = useState(false);
 
-  const [inscripcionConfirmada, setInscripcionConfirmada] = useState(
-    datos.estado === 'Inscrito'
-  );
-
-  const [inscritosActuales, setInscritosActuales] = useState(
-    Number(datos.inscritos) || 0
-  );
-
-  // Reiniciar los estados cuando cambia la monitoría seleccionada
-  useEffect(() => {
-    setModalAbierto(false);
-    setInscripcionConfirmada(datos.estado === 'Inscrito');
-    setInscritosActuales(Number(datos.inscritos) || 0);
-  }, [monitoria]);
-
   // Datos calculados
   const cupo = Number(datos.cupo) || 0;
-
-  const yaInscrito = inscripcionConfirmada;
+  const inscritosActuales = Number(datos.inscritos) || 0;
+  const yaInscrito = datos.estado === 'Inscrito';
 
   const cupoLleno =
     cupo > 0 && inscritosActuales >= cupo;
@@ -75,21 +61,30 @@ function DetalleMonitoria({
       ? 'Cupo lleno'
       : datos.estado || 'Disponible';
 
-  const temas = datos.temas || temasPredeterminados;
+  const temas = datos.temas || (monitoria ? [] : temasPredeterminados);
 
   const porcentaje = cupo > 0
     ? Math.min((inscritosActuales / cupo) * 100, 100)
     : 0;
 
-  const fecha = datos.fecha || 'Dom 21 Sep 2026';
-  const hora = datos.hora || '10:00 AM – 12:00 PM';
+  const horarioSeparado = datos.horario?.split('·') || [];
+  const fecha = datos.fecha || horarioSeparado[0]?.trim() || (
+    monitoria ? 'Por definir' : 'Dom 21 Sep 2026'
+  );
+  const hora = datos.hora ||
+    horarioSeparado.slice(1).join(' · ').trim() ||
+    (monitoria ? '' : '10:00 AM – 12:00 PM');
+  const horarioCompleto = datos.horario ||
+    [fecha, hora].filter(Boolean).join(' · ');
   const nombreMonitor = datos.monitor || 'Felipe Castro';
-  const modalidad = datos.modalidad || 'Presencial';
+  const modalidad = datos.modalidad || (monitoria ? 'Por definir' : 'Presencial');
   const lugar = datos.lugar || 'Por definir';
 
   const descripcion =
     datos.descripcion ||
-    'Sesión de apoyo académico para repasar los temas de la asignatura.';
+    (monitoria
+      ? 'Información de esta monitoría.'
+      : 'Sesión de apoyo académico para repasar los temas de la asignatura.');
 
   const horaInicio = hora.split('–')[0].trim();
 
@@ -109,15 +104,11 @@ function DetalleMonitoria({
   const confirmarInscripcion = () => {
     if (yaInscrito || cupoLleno) return;
 
-    const nuevosInscritos = Math.min(inscritosActuales + 1, cupo);
-
-    setInscritosActuales(nuevosInscritos);
-    setInscripcionConfirmada(true);
     setModalAbierto(false);
 
     onInscribirse?.({
       ...datos,
-      inscritos: nuevosInscritos,
+      inscritos: Math.min(inscritosActuales + 1, cupo),
       estado: 'Inscrito',
     });
   };
@@ -126,14 +117,9 @@ function DetalleMonitoria({
   const cancelarInscripcionConfirmada = () => {
     if (!yaInscrito) return;
 
-    const nuevosInscritos = Math.max(inscritosActuales - 1, 0);
-
-    setInscritosActuales(nuevosInscritos);
-    setInscripcionConfirmada(false);
-
     onInscribirse?.({
       ...datos,
-      inscritos: nuevosInscritos,
+      inscritos: Math.max(inscritosActuales - 1, 0),
       estado: 'Disponible',
     });
   };
@@ -142,14 +128,12 @@ function DetalleMonitoria({
   const abrirPerfilMonitor = () => {
     onVerPerfilTutor?.({
       ...datos,
+      id: datos.tutorId ?? `monitor-${datos.id}`,
       nombre: nombreMonitor,
       iniciales: datos.iniciales || 'FC',
-      especialidad:
-        datos.especialidad ||
-        datos.semestreMonitor ||
-        'Monitor académico',
-      semestre: datos.semestre || '',
-      calificacion: datos.calificacion || 4.8,
+      especialidad: datos.especialidad || datos.programa || 'Monitor académico',
+      semestreTutor: datos.semestreMonitor || datos.semestreTutor || '',
+      calificacion: datos.calificacion ?? null,
     });
   };
 
@@ -158,7 +142,7 @@ function DetalleMonitoria({
 
       {/* SIDEBAR */}
       <Sidebar
-        paginaActiva="Monitorías"
+        paginaActiva={modoTutor ? 'Monitorías asignadas' : 'Monitorías'}
         onNavegar={onNavegar}
       />
 
@@ -177,7 +161,9 @@ function DetalleMonitoria({
           <div className="detalle-migas">
             <button
               type="button"
-              onClick={() => onNavegar?.('Monitorías')}
+              onClick={() =>
+                onNavegar?.(modoTutor ? 'Monitorías asignadas' : 'Monitorías')
+              }
             >
               Monitorías
             </button>
@@ -207,12 +193,12 @@ function DetalleMonitoria({
               </div>
 
               <p>
-                {fecha} · {hora} · {modalidad}
+                {horarioCompleto} · {modalidad}
               </p>
 
             </div>
 
-            {yaInscrito ? (
+            {!modoTutor && yaInscrito ? (
               <button
                 className="detalle-boton-cancelar-inscripcion"
                 type="button"
@@ -220,7 +206,7 @@ function DetalleMonitoria({
               >
                 Cancelar inscripción
               </button>
-            ) : (
+            ) : !modoTutor ? (
               <button
                 className="detalle-boton-inscribir"
                 type="button"
@@ -229,7 +215,7 @@ function DetalleMonitoria({
               >
                 {cupoLleno ? 'Cupo lleno' : 'Inscribirse'}
               </button>
-            )}
+            ) : null}
 
           </section>
 
@@ -249,8 +235,8 @@ function DetalleMonitoria({
 
                 <p>
                   Ya estás inscrito en esta monitoría.
-                  Te esperamos el <b>{fecha}</b> a las{' '}
-                  <b>{horaInicio}</b>.
+                  Te esperamos el <b>{fecha}</b>
+                  {horaInicio && <> a las <b>{horaInicio}</b></>}.
                 </p>
               </div>
 
@@ -328,8 +314,7 @@ function DetalleMonitoria({
                     <strong>{nombreMonitor}</strong>
 
                     <p>
-                      {datos.semestreMonitor ||
-                        'Matemáticas · 10° semestre'}
+                      {datos.semestreMonitor || datos.semestreTutor || 'Monitor académico'}
                     </p>
 
                     <div className="detalle-puntuacion">
@@ -338,7 +323,7 @@ function DetalleMonitoria({
                         ★★★★★
                       </span>
 
-                      <b>{datos.calificacion || '4.8'}</b>
+                      <b>{datos.calificacion ?? '—'}</b>
 
                     </div>
 
@@ -375,7 +360,7 @@ function DetalleMonitoria({
 
                 <div>
                   <span>Hora</span>
-                  <strong>{hora}</strong>
+                  <strong>{hora || 'Por definir'}</strong>
                 </div>
 
                 <div>
@@ -429,7 +414,7 @@ function DetalleMonitoria({
         </main>
 
         {/* MODAL DE CONFIRMACIÓN */}
-        {modalAbierto && (
+        {!modoTutor && modalAbierto && (
           <div
             className="detalle-modal-overlay"
             onClick={cerrarModal}
@@ -449,7 +434,7 @@ function DetalleMonitoria({
               <p>
                 ¿Deseas inscribirte en la{' '}
                 <strong>{datos.titulo}</strong> del{' '}
-                <strong>{fecha} · {horaInicio}</strong>?
+                <strong>{horarioCompleto}</strong>?
                 Esta monitoría es {modalidad.toLowerCase()} en{' '}
                 <strong>{lugar}</strong>.
               </p>

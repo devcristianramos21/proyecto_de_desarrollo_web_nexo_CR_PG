@@ -3,7 +3,13 @@ import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import './detalleSolicitud.css';
 
-function DetalleSolicitud({ onNavegar, solicitud, onVerPropuesta }) {
+function DetalleSolicitud({
+  onNavegar,
+  solicitud,
+  onVerPropuesta,
+  onVerPerfilTutor,
+  onEnviarMensajeTutor,
+}) {
   // Datos de ejemplo para completar los campos
   // que todavía no existen en el listado de solicitudes.
   const datosBase = {
@@ -31,6 +37,15 @@ function DetalleSolicitud({ onNavegar, solicitud, onVerPropuesta }) {
 
   const estado = datos.estado || 'Pendiente';
   const tienePropuesta = Boolean(datos.propuesta);
+  const datosTutor = datos.tutorData || {
+    id: datos.tutorId ?? `solicitud-${datos.id}`,
+    nombre: datos.tutor,
+    programa: datos.programaTutor,
+    semestreTutor: datos.semestreTutor,
+    calificacion: datos.calificacion,
+    iniciales: datos.iniciales || 'NT',
+    materias: [datos.materia].filter(Boolean),
+  };
 
   // ========================================
   // NAVEGACIÓN
@@ -41,6 +56,11 @@ function DetalleSolicitud({ onNavegar, solicitud, onVerPropuesta }) {
   };
 
   const enviarMensaje = () => {
+    if (onEnviarMensajeTutor) {
+      onEnviarMensajeTutor(datosTutor);
+      return;
+    }
+
     onNavegar?.('Mensajes');
   };
 
@@ -60,7 +80,7 @@ function DetalleSolicitud({ onNavegar, solicitud, onVerPropuesta }) {
       />
 
       <div className="detalle-solicitud-contenido">
-        <Navbar titulo="Detalle de solicitud" />
+        <Navbar titulo="Detalle de solicitud" onNavegar={onNavegar} />
 
         <main className="detalle-solicitud-main">
 
@@ -113,9 +133,7 @@ function DetalleSolicitud({ onNavegar, solicitud, onVerPropuesta }) {
               <button
                 type="button"
                 className="detalle-solicitud__boton detalle-solicitud__boton--secundario"
-                onClick={() =>
-                  alert('El perfil del tutor estará disponible próximamente.')
-                }
+                onClick={() => onVerPerfilTutor?.(datosTutor)}
               >
                 Ver perfil
               </button>

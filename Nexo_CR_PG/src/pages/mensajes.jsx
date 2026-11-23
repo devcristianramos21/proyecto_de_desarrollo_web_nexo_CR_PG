@@ -4,7 +4,7 @@ import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import './mensajes.css';
 
-const conversacionesIniciales = [
+export const conversacionesIniciales = [
   {
     id: 1,
     tutor: 'Nombre del tutor',
@@ -111,11 +111,17 @@ function obtenerHora() {
   }).format(new Date());
 }
 
-function Mensajes({ onNavegar }) {
-  const [conversaciones, setConversaciones] = useState(
-    conversacionesIniciales
-  );
-  const [conversacionActiva, setConversacionActiva] = useState(1);
+function Mensajes({
+  onNavegar,
+  conversaciones,
+  setConversaciones,
+  conversacionActiva,
+  setConversacionActiva,
+  tutorias = [],
+  onVerPerfilTutor,
+  onVerDetalleTutoria,
+  onVerMonitoriaTutor,
+}) {
   const [busqueda, setBusqueda] = useState('');
   const [mensajeNuevo, setMensajeNuevo] = useState('');
 
@@ -173,12 +179,51 @@ function Mensajes({ onNavegar }) {
     setMensajeNuevo('');
   };
 
+  const verPerfilTutor = () => {
+    if (!chatActivo || chatActivo.tipo === 'estudiante' || chatActivo.tipo === 'monitoria') {
+      return;
+    }
+
+    onVerPerfilTutor?.(
+      chatActivo.tutorInfo || {
+        nombre: chatActivo.tutor,
+        iniciales: 'NT',
+      }
+    );
+  };
+
+  const verTutoria = () => {
+    if (!chatActivo) return;
+
+    if (chatActivo.tipo === 'monitoria') {
+      onVerMonitoriaTutor?.(chatActivo.monitoriaInfo);
+      return;
+    }
+
+    if (chatActivo.tipo === 'estudiante') return;
+
+    const tutorId = chatActivo.tutorInfo?.id;
+    const tutoriasCoincidentes = tutorId != null
+      ? tutorias.filter((item) => item.tutorId === tutorId)
+      : tutorias.filter((item) => item.tutor === chatActivo.tutor);
+    const tutoria = tutoriasCoincidentes.length === 1
+      ? tutoriasCoincidentes[0]
+      : null;
+
+    if (tutoria) {
+      onVerDetalleTutoria?.(tutoria);
+      return;
+    }
+
+    onNavegar?.('Mis monitorias');
+  };
+
   return (
     <div className="mensajes-layout">
       <Sidebar paginaActiva="Mensajes" onNavegar={onNavegar} />
 
       <div className="mensajes-contenido">
-        <Navbar titulo="Mensajes" />
+        <Navbar titulo="Mensajes" onNavegar={onNavegar} />
 
         <main className="mensajes-main">
           {/* Panel de conversaciones */}
@@ -209,7 +254,9 @@ function Mensajes({ onNavegar }) {
                   }`}
                   onClick={() => seleccionarConversacion(conversacion.id)}
                 >
-                  <span className="mensajes__avatar">NT</span>
+                  <span className="mensajes__avatar">
+                    {conversacion.iniciales || conversacion.tutorInfo?.iniciales || 'NT'}
+                  </span>
 
                   <span className="mensajes__resumen">
                     <span className="mensajes__resumen-superior">
@@ -242,7 +289,9 @@ function Mensajes({ onNavegar }) {
               <>
                 <header className="mensajes__chat-encabezado">
                   <div className="mensajes__tutor">
-                    <span className="mensajes__avatar">NT</span>
+                    <span className="mensajes__avatar">
+                      {chatActivo.iniciales || chatActivo.tutorInfo?.iniciales || 'NT'}
+                    </span>
 
                     <div>
                       <h2>{chatActivo.tutor}</h2>
@@ -254,23 +303,27 @@ function Mensajes({ onNavegar }) {
                   </div>
 
                   <div className="mensajes__chat-acciones">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        alert('El perfil del tutor estará disponible próximamente.')
-                      }
-                    >
-                      Ver perfil
-                    </button>
+                    {chatActivo.tipo === 'monitoria' ? (
+                      <button type="button" onClick={verTutoria}>
+                        Ver monitoría
+                      </button>
+                    ) : chatActivo.tipo !== 'estudiante' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={verPerfilTutor}
+                        >
+                          Ver perfil
+                        </button>
 
-                    <button
-                      type="button"
-                      onClick={() =>
-                        alert('La información de la tutoría estará disponible próximamente.')
-                      }
-                    >
-                      Ver tutoría
-                    </button>
+                        <button
+                          type="button"
+                          onClick={verTutoria}
+                        >
+                          Ver tutoría
+                        </button>
+                      </>
+                    )}
                   </div>
                 </header>
 

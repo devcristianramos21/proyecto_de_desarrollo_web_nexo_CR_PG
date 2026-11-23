@@ -16,7 +16,7 @@ function HorarioConfirmado({ onNavegar, solicitud, horario }) {
       />
 
       <div className="horario-confirmado-contenido">
-        <Navbar titulo="Propuesta de horario" />
+        <Navbar titulo="Horario confirmado" onNavegar={onNavegar} />
 
         <main className="horario-confirmado-main">
           <section className="horario-confirmado__contenido">

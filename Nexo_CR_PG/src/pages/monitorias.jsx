@@ -6,7 +6,7 @@ import Navbar from '../components/layout/navbar';
 
 import './monitorias.css';
 
-const monitoriasIniciales = [
+export const monitoriasIniciales = [
   {
     id: 1,
     titulo: 'Monitoría Cálculo Diferencial',
@@ -89,9 +89,13 @@ const monitoriasIniciales = [
 
 const categorias = ['Todas', 'Obligatoria', 'Par', 'Pre-parcial'];
 
-function Monitorias({ onVerDetalle, onNavegar }) {
+function Monitorias({
+  onVerDetalle,
+  onNavegar,
+  monitorias = monitoriasIniciales,
+  onActualizarMonitoria,
+}) {
   const [categoria, setCategoria] = useState('Todas');
-  const [monitorias, setMonitorias] = useState(monitoriasIniciales);
 
   // Monitoría seleccionada para confirmar una acción
   const [monitoriaSeleccionada, setMonitoriaSeleccionada] = useState(null);
@@ -133,35 +137,28 @@ function Monitorias({ onVerDetalle, onNavegar }) {
   const confirmarAccion = () => {
     if (!monitoriaSeleccionada || !accionPendiente) return;
 
-    const id = monitoriaSeleccionada.id;
+    if (accionPendiente === 'inscribir') {
+      if (
+        monitoriaSeleccionada.estado === 'Inscrito' ||
+        monitoriaSeleccionada.estado === 'Cupo lleno' ||
+        monitoriaSeleccionada.inscritos >= monitoriaSeleccionada.cupo
+      ) {
+        cerrarModal();
+        return;
+      }
 
-    setMonitorias((actuales) =>
-      actuales.map((monitoria) => {
-        if (monitoria.id !== id) return monitoria;
-
-        if (accionPendiente === 'inscribir') {
-          if (
-            monitoria.estado === 'Inscrito' ||
-            monitoria.estado === 'Cupo lleno' ||
-            monitoria.inscritos >= monitoria.cupo
-          ) {
-            return monitoria;
-          }
-
-          return {
-            ...monitoria,
-            estado: 'Inscrito',
-            inscritos: monitoria.inscritos + 1,
-          };
-        }
-
-        return {
-          ...monitoria,
-          estado: 'Disponible',
-          inscritos: Math.max(0, monitoria.inscritos - 1),
-        };
-      })
-    );
+      onActualizarMonitoria?.({
+        ...monitoriaSeleccionada,
+        estado: 'Inscrito',
+        inscritos: monitoriaSeleccionada.inscritos + 1,
+      });
+    } else {
+      onActualizarMonitoria?.({
+        ...monitoriaSeleccionada,
+        estado: 'Disponible',
+        inscritos: Math.max(0, monitoriaSeleccionada.inscritos - 1),
+      });
+    }
 
     cerrarModal();
   };
@@ -182,7 +179,7 @@ function Monitorias({ onVerDetalle, onNavegar }) {
       <div className="monitorias-contenido">
 
         {/* NAVBAR */}
-        <Navbar titulo="Monitorías disponibles" />
+        <Navbar titulo="Monitorías disponibles" onNavegar={onNavegar} />
 
         <main className="monitorias-main">
 

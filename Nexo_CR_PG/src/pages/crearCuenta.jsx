@@ -34,11 +34,6 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
       return;
     }
 
-    if (!formulario.aceptaTerminos) {
-      alert('Debes aceptar los términos y condiciones.');
-      return;
-    }
-
     if (onCrearCuenta) {
       onCrearCuenta(formulario);
     } else {
@@ -208,26 +203,6 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
               </label>
             </div>
           </fieldset>
-
-          <label className="crear-cuenta-terminos">
-            <input
-              type="checkbox"
-              checked={formulario.aceptaTerminos}
-              onChange={(e) => actualizarCampo('aceptaTerminos', e.target.checked)}
-              required
-            />
-            <span>
-              Acepto los{' '}
-              <button
-                type="button"
-                onClick={() => alert('Los términos y condiciones estarán disponibles próximamente.')}
-              >
-                términos y condiciones
-              </button>{' '}
-              de uso de la plataforma
-            </span>
-          </label>
-
           <button type="submit" className="crear-cuenta-submit">
             Crear cuenta
           </button>

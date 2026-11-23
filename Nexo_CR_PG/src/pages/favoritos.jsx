@@ -1,14 +1,15 @@
 
-import { useState } from 'react';
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import './Favoritos.css';
 
-const tutoresIniciales = [
+export const tutoresIniciales = [
   {
     id: 1,
     nombre: 'Nombre del tutor',
-    programa: 'Ing. de Sistemas · 7° sem',
+    programa: 'Ing. de Sistemas',
+    programaLabel: 'Ing. de Sistemas · 7° sem',
+    semestreTutor: '7° semestre',
     calificacion: '5.0',
     opiniones: 32,
     materias: ['Cálculo diferencial', 'Álgebra lineal'],
@@ -18,7 +19,9 @@ const tutoresIniciales = [
   {
     id: 2,
     nombre: 'Nombre del tutor',
-    programa: 'Matemáticas · 9° sem',
+    programa: 'Matemáticas',
+    programaLabel: 'Matemáticas · 9° sem',
+    semestreTutor: '9° semestre',
     calificacion: '4.0',
     opiniones: 18,
     materias: ['Estadística', 'Ecuaciones diferenciales'],
@@ -28,7 +31,9 @@ const tutoresIniciales = [
   {
     id: 3,
     nombre: 'Nombre del tutor',
-    programa: 'Física · 7° sem',
+    programa: 'Física',
+    programaLabel: 'Física · 7° sem',
+    semestreTutor: '7° semestre',
     calificacion: '4.0',
     opiniones: 8,
     materias: ['Física I', 'Física II'],
@@ -38,7 +43,9 @@ const tutoresIniciales = [
   {
     id: 4,
     nombre: 'Nombre del tutor',
-    programa: 'Matemáticas · 10° sem',
+    programa: 'Matemáticas',
+    programaLabel: 'Matemáticas · 10° sem',
+    semestreTutor: '10° semestre',
     calificacion: '5.0',
     opiniones: 45,
     materias: ['Álgebra lineal', 'Cálculo integral'],
@@ -47,21 +54,19 @@ const tutoresIniciales = [
   },
 ];
 
-function Favoritos({ onNavegar }) {
-  const [tutores, setTutores] = useState(tutoresIniciales);
-
-  const quitarFavorito = (id) => {
-    setTutores((actuales) =>
-      actuales.filter((tutor) => tutor.id !== id)
-    );
-  };
-
+function Favoritos({
+  onNavegar,
+  tutores = [],
+  onToggleFavorito,
+  onVerPerfilTutor,
+  onSolicitarTutoria,
+}) {
   const verPerfil = (tutor) => {
-    alert(`Próximamente podrás consultar el perfil de ${tutor.nombre}.`);
+    onVerPerfilTutor?.(tutor);
   };
 
   const solicitarTutoria = (tutor) => {
-    alert(`Próximamente podrás solicitar una tutoría con ${tutor.nombre}.`);
+    onSolicitarTutoria?.(tutor);
   };
 
   return (
@@ -69,7 +74,7 @@ function Favoritos({ onNavegar }) {
       <Sidebar paginaActiva="Favoritos" onNavegar={onNavegar} />
 
       <div className="favoritos-contenido">
-        <Navbar titulo="Favoritos" />
+        <Navbar titulo="Favoritos" onNavegar={onNavegar} />
 
         <main className="favoritos-main">
           <section className="favoritos-encabezado">
@@ -92,18 +97,26 @@ function Favoritos({ onNavegar }) {
               {tutores.map((tutor) => (
                 <article className="favorito-card" key={tutor.id}>
                   <div className="favorito-superior">
-                    <div className="favorito-avatar">NT</div>
+                    <div className="favorito-avatar">
+                      {tutor.iniciales || 'NT'}
+                    </div>
 
                     <div className="favorito-informacion">
                       <h2>{tutor.nombre}</h2>
-                      <p>{tutor.programa}</p>
+                      <p>
+                        {tutor.programaLabel || tutor.programa || tutor.especialidad || tutor.programaTutor || 'Programa académico'}
+                      </p>
 
                       <div className="favorito-calificacion">
                         <span className="favorito-estrellas">
                           ★★★★★
                         </span>
-                        <strong>{tutor.calificacion}</strong>
-                        <span>({tutor.opiniones})</span>
+                        <strong>
+                          {tutor.calificacion == null
+                            ? '—'
+                            : Number(tutor.calificacion).toFixed(1)}
+                        </strong>
+                        <span>({tutor.opiniones ?? tutor.resenas ?? 0})</span>
                       </div>
                     </div>
 
@@ -112,23 +125,25 @@ function Favoritos({ onNavegar }) {
                       className="favorito-corazon"
                       aria-label="Quitar de favoritos"
                       title="Quitar de favoritos"
-                      onClick={() => quitarFavorito(tutor.id)}
+                      onClick={() => onToggleFavorito?.(tutor)}
                     >
                       ♥
                     </button>
                   </div>
 
                   <div className="favorito-materias">
-                    {tutor.materias.map((materia) => (
+                    {(tutor.materias || []).map((materia) => (
                       <span key={materia}>{materia}</span>
                     ))}
                   </div>
 
                   <div className="favorito-disponibilidad">
                     <span
-                      className={`favorito-punto favorito-punto--${tutor.estado}`}
+                      className={`favorito-punto favorito-punto--${tutor.estado || (tutor.disponible ? 'disponible' : 'ocupado')}`}
                     />
-                    <span>{tutor.disponibilidad}</span>
+                    <span>
+                      {tutor.disponibilidad || (tutor.disponible ? 'Disponible hoy' : 'Disponibilidad por confirmar')}
+                    </span>
                   </div>
 
                   <div className="favorito-acciones">

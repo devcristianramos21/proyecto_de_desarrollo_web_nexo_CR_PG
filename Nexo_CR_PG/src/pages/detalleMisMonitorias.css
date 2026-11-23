@@ -231,6 +231,11 @@
   background: #F9FAFB;
 }
 
+.btn-reprogramar:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .btn-cancelar-tutoria {
   border: 1px solid #DC2626;
   background: #FFFFFF;

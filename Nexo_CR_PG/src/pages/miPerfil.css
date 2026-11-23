@@ -172,6 +172,11 @@
   transition: background 0.2s ease;
 }
 
+.perfil-estudiante__boton-editar:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .perfil-estudiante__boton-editar:hover {
   background: #F9FAFB;
 }

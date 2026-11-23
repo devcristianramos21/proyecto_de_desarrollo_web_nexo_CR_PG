@@ -1,0 +1,244 @@
+.admin-shell {
+  min-height: 100vh;
+  display: flex;
+  background: #fcf1f1;
+  color: #111827;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.admin-shell__contenido {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-shell__main {
+  flex: 1;
+  min-height: calc(100vh - 51px);
+  padding: 38px 52px 56px;
+  background: #fcf1f1;
+}
+
+.admin-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 27px;
+}
+
+.admin-page-header h1 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 23px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.admin-page-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.admin-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgb(17 24 39 / 6%);
+}
+
+.admin-primary-button,
+.admin-secondary-button,
+.admin-text-button {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-primary-button {
+  border: 1px solid #98111e;
+  background: #98111e;
+  color: #fff;
+}
+
+.admin-primary-button:hover {
+  border-color: #7e0e19;
+  background: #7e0e19;
+}
+
+.admin-secondary-button {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #111827;
+}
+
+.admin-secondary-button:hover {
+  background: #f9fafb;
+}
+
+.admin-text-button {
+  border: 0;
+  background: transparent;
+  color: #1d3765;
+}
+
+.admin-text-button:hover {
+  background: #eef2f8;
+}
+
+.admin-field,
+.admin-select,
+.admin-textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 39px;
+  padding: 9px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 7px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  font-size: 13px;
+}
+
+.admin-field::placeholder,
+.admin-textarea::placeholder {
+  color: #9ca3af;
+}
+
+.admin-field:focus,
+.admin-select:focus,
+.admin-textarea:focus {
+  border-color: #98111e;
+  outline: 2px solid rgb(152 17 30 / 12%);
+}
+
+.admin-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-kpi {
+  min-height: 80px;
+  padding: 13px 17px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.admin-kpi strong {
+  color: #1d3b6c;
+  font-size: 27px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.admin-kpi span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.admin-kpi--green strong { color: #16a34a; }
+.admin-kpi--gold strong { color: #d29100; }
+.admin-kpi--blue strong { color: #2563eb; }
+.admin-kpi--orange strong { color: #ed8a00; }
+.admin-kpi--red strong { color: #be123c; }
+
+.admin-alert {
+  padding: 13px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid #f4d59a;
+  border-radius: 10px;
+  background: #fff5e3;
+  color: #9a5c00;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.admin-alert strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.admin-alert p {
+  margin: 0;
+  color: #9a5c00;
+}
+
+.admin-error {
+  margin: 10px 0 0;
+  color: #b42332;
+  font-size: 13px;
+}
+
+.admin-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #166534;
+  color: #fff;
+  font-size: 13px;
+  box-shadow: 0 8px 24px rgb(17 24 39 / 18%);
+}
+
+@media (max-width: 1100px) {
+  .admin-shell__main {
+    padding-right: 28px;
+    padding-left: 28px;
+  }
+}
+
+@media (max-width: 800px) {
+  .admin-shell__main {
+    padding: 26px 20px 40px;
+  }
+
+  .admin-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-shell__main {
+    padding: 20px 14px 32px;
+  }
+
+  .admin-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-kpis {
+    gap: 10px;
+  }
+
+  .admin-kpi {
+    min-height: 72px;
+    padding: 12px;
+  }
+
+  .admin-kpi strong {
+    font-size: 23px;
+  }
+}

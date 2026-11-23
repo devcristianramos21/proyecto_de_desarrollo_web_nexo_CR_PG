@@ -4,8 +4,18 @@ import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import './propuestaHorario.css';
 
-function PropuestaHorario({ onNavegar, solicitud, onConfirmar }) {
-  const [estado, setEstado] = useState('Por confirmar');
+function PropuestaHorario({
+  onNavegar,
+  solicitud,
+  onConfirmar,
+  onRechazar,
+}) {
+  const [estado, setEstado] = useState(
+    solicitud?.estadoPropuesta === 'Aceptado' ||
+      solicitud?.estadoPropuesta === 'Rechazado'
+      ? solicitud.estadoPropuesta
+      : 'Por confirmar'
+  );
   const [horarioSeleccionado, setHorarioSeleccionado] = useState('principal');
 
   const datos = {
@@ -47,11 +57,7 @@ function PropuestaHorario({ onNavegar, solicitud, onConfirmar }) {
     if (estado !== 'Por confirmar') return;
 
     setEstado('Rechazado');
-  };
-
-  // PROPONER OTRO HORARIO
-  const proponerOtro = () => {
-    alert('La opción para proponer otro horario estará disponible próximamente.');
+    onRechazar?.(datos);
   };
 
   // SELECCIONAR HORARIO
@@ -69,7 +75,7 @@ function PropuestaHorario({ onNavegar, solicitud, onConfirmar }) {
       />
 
       <div className="propuesta-horario-contenido">
-        <Navbar titulo="Propuesta de horario" />
+        <Navbar titulo="Propuesta de horario" onNavegar={onNavegar} />
 
         <main className="propuesta-horario-main">
 
@@ -198,8 +204,8 @@ function PropuestaHorario({ onNavegar, solicitud, onConfirmar }) {
             <button
               type="button"
               className="propuesta-horario__boton propuesta-horario__boton--proponer"
-              onClick={proponerOtro}
-              disabled={estado !== 'Por confirmar'}
+              disabled
+              title="No hay un frame para proponer otro horario en la referencia Figma."
             >
               Proponer otro horario
             </button>

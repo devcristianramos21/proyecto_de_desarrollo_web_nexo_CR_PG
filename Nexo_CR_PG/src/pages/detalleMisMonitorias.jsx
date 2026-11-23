@@ -8,6 +8,9 @@ function DetalleTutoria({
   onNavegar,
   tutoria,
   onCancelarTutoria,
+  onVerPerfilTutor,
+  onEnviarMensajeTutor,
+  modoTutor = false,
 }) {
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
 
@@ -37,22 +40,43 @@ function DetalleTutoria({
     onNavegar('Mis monitorias');
   };
 
+  const tutorActual = {
+    id: datos.tutorId ?? `tutoria-${datos.id}`,
+    nombre: datos.tutor,
+    programa: datos.programaTutor,
+    semestreTutor: datos.semestreTutor,
+    calificacion: datos.calificacion,
+    iniciales: datos.iniciales || 'NT',
+  };
+
+  const enviarMensaje = () => {
+    if (onEnviarMensajeTutor) {
+      onEnviarMensajeTutor(tutorActual);
+      return;
+    }
+
+    onNavegar('Mensajes');
+  };
+
   return (
     <div className="detalle-tutoria-layout">
       <Sidebar
-        paginaActiva="Mis tutorías"
+        paginaActiva={modoTutor ? 'Monitorías asignadas' : 'Mis monitorias'}
         onNavegar={onNavegar}
       />
 
       <main className="detalle-tutoria-contenido">
-        <Navbar titulo="Detalle de tutoría" />
+        <Navbar
+          titulo="Detalle de tutoría"
+          onNavegar={onNavegar}
+        />
 
         <div className="detalle-tutoria-principal">
 
           {/* MIGAS DE PAN */}
           <div className="detalle-tutoria-migas">
-            <button onClick={() => onNavegar('Mis monitorias')}>
-              Mis tutorías
+            <button onClick={() => onNavegar(modoTutor ? 'Monitorías asignadas' : 'Mis monitorias')}>
+              {modoTutor ? 'Mis monitorías' : 'Mis tutorías'}
             </button>
             <span>/</span>
             <span>Detalle de tutoría</span>
@@ -79,7 +103,7 @@ function DetalleTutoria({
 
             <button
               className="btn-ver-perfil"
-              onClick={() => alert('Ver perfil del tutor próximamente.')}
+              onClick={() => onVerPerfilTutor?.(tutorActual)}
             >
               Ver perfil
             </button>
@@ -149,16 +173,15 @@ function DetalleTutoria({
           <div className="detalle-tutoria-acciones">
             <button
               className="btn-mensaje"
-              onClick={() => onNavegar('Mensajes')}
+              onClick={enviarMensaje}
             >
               Enviar mensaje
             </button>
 
             <button
               className="btn-reprogramar"
-              onClick={() =>
-                alert('La reprogramación estará disponible próximamente.')
-              }
+              disabled
+              title="No hay un frame de reprogramación de tutoría en la referencia Figma."
             >
               Reprogramar
             </button>
