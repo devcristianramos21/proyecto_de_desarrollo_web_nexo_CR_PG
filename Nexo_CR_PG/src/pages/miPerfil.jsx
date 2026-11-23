@@ -2,7 +2,7 @@
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 import { useUsuario } from '../components/layout/usuarioContext';
-import './MiPerfil.css';
+import './miPerfil.css';
 
 const estadisticas = [
   {

@@ -1,5 +1,5 @@
 
-import './ConfirmarCerrarSesion.css';
+import './confirmarCerrarSesion.css';
 
 export default function ConfirmarCerrarSesion({
   onCancelar,

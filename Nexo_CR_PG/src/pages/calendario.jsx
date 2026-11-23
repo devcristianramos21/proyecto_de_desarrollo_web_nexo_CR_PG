@@ -1,7 +1,7 @@
 
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
-import './Calendario.css';
+import './calendario.css';
 
 const parciales = [
   {

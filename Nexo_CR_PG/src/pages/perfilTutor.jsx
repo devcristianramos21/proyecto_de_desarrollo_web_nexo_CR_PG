@@ -2,7 +2,7 @@
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
 
-import './PerfilTutor.css';
+import './perfilTutor.css';
 
 const NOMBRES_DIAS = {
   lunes: 'Lunes',
