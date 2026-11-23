@@ -1395,7 +1395,7 @@
           }
         },
         {
-          "name": "22. Buscar tutores por materia",
+          "name": "22. Buscar tutores por materia (sin tilde)",
           "event": [
             {
               "listen": "test",
@@ -1404,7 +1404,7 @@
                 "exec": [
                   "pm.test('Responde 200', () => pm.response.to.have.status(200));",
                   "const tutor = pm.response.json().find((t) => t._id === pm.collectionVariables.get('tutorId'));",
-                  "pm.test('Encuentra al tutor sin distinguir mayúsculas', () => pm.expect(tutor).to.be.an('object'));",
+                  "pm.test('Encuentra al tutor aunque se escriba sin tilde', () => pm.expect(tutor).to.be.an('object'));",
                   "pm.test('No expone correo ni contraseña', () => {",
                   "  pm.expect(tutor).to.not.have.property('correo');",
                   "  pm.expect(tutor).to.not.have.property('password');",
@@ -1421,7 +1421,7 @@
                 "value": "Bearer {{tokenEstudiante2}}"
               }
             ],
-            "url": "{{baseUrl}}/api/tutores?materia=cálculo"
+            "url": "{{baseUrl}}/api/tutores?materia=calculo"
           }
         },
         {

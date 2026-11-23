@@ -129,7 +129,8 @@ try {
       console.log('No había datos demo.');
     }
   } else if (existentes.length) {
-    console.log('Ya hay datos demo cargados. Usa "npm run seed -- --reiniciar" para recargarlos con fechas nuevas.');
+    console.log('Los datos demo ya estaban cargados (no es un error; no se modificó nada).');
+    console.log('Para recargarlos con fechas nuevas: npm run seed -- --reiniciar');
   }
 
   if (!soloBorrar && (reiniciar || !existentes.length)) {

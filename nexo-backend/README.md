@@ -161,7 +161,7 @@ Leyenda de acceso: 🌐 público · 👤 cualquier usuario con sesión · 🎓 e
 
 | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|
-| GET | `/api/tutores?materia=&nombre=` | 👤 | Buscar tutores (búsqueda parcial, sin distinguir mayúsculas) |
+| GET | `/api/tutores?materia=&nombre=` | 👤 | Buscar tutores (búsqueda parcial, sin distinguir mayúsculas ni tildes: "calculo" encuentra "Cálculo") |
 | GET | `/api/tutores/:id` | 👤 | Perfil público de un tutor |
 | GET | `/api/tutores/:id/disponibilidad` | 👤 | Franjas semanales del tutor |
 | GET | `/api/disponibilidad/mia` | 🧑‍🏫 | Mis franjas (de lunes a domingo) |
@@ -350,11 +350,31 @@ La colección `pruebas-api/NEXO.postman_collection.json` cubre todos los endpoin
 
 **Con Postman:** importa el archivo, escribe `adminCorreo` y `adminPassword` en la pestaña *Variables* de la colección y usa **Run**.
 
-**Desde la terminal:** pon `PRUEBAS_ADMIN_CORREO` y `PRUEBAS_ADMIN_PASSWORD` en `.env`, deja el servidor corriendo y ejecuta:
+**Desde la terminal** (se necesitan **dos terminales**):
 
-```powershell
-npm run probar-api            # Toda la colección
-npm run probar-api -- "Chat"  # Solo las carpetas que contengan "Chat"
-```
+1. Agrega a `nexo-backend/.env` las credenciales de un administrador. Lo más fácil es usar el admin de los datos demo (requiere haber corrido `npm run seed`):
+
+   ```env
+   PRUEBAS_ADMIN_CORREO=demo.admin@urosario.edu.co
+   PRUEBAS_ADMIN_PASSWORD=Nexo12345
+   ```
+
+2. **Terminal 1** — deja el servidor corriendo:
+
+   ```powershell
+   cd nexo-backend
+   npm run dev
+   ```
+
+3. **Terminal 2** — ejecuta las pruebas:
+
+   ```powershell
+   cd nexo-backend
+   npm run probar-api            # Toda la colección
+   npm run probar-api -- "Chat"  # Solo las carpetas que contengan "Chat"
+   npm run probar-api -- "Auth"  # Solo autenticación (no necesita admin)
+   ```
+
+Antes de empezar, el script comprueba que el servidor responde y que el admin puede iniciar sesión; si algo falta, se detiene y explica qué hacer.
 
 Cada ejecución deja usuarios `prueba.postman.*` en la base. Para borrarlos: `npm run limpiar-pruebas -- --confirmar`.

@@ -12,7 +12,7 @@ import {
 import { Usuario } from '../models/Usuario.js';
 import { AppError } from '../utils/AppError.js';
 import { elegirCampos } from '../utils/elegirCampos.js';
-import { escaparRegex } from '../utils/escaparRegex.js';
+import { regexBusqueda } from '../utils/escaparRegex.js';
 import {
   aTextoFecha,
   diaSemanaDe,
@@ -513,7 +513,7 @@ export async function listarTodas(admin, { tipo, estado, materia, tutor } = {}) 
   const filtro = {};
   if (tipo) filtro.tipo = tipo;
   if (estado) filtro.estado = estado;
-  if (materia) filtro.materia = new RegExp(escaparRegex(materia), 'i');
+  if (materia) filtro.materia = regexBusqueda(materia);
   if (tutor) {
     if (!mongoose.isValidObjectId(tutor)) throw new AppError(400, 'Identificador de tutor no válido');
     filtro.tutor = tutor;
@@ -531,7 +531,7 @@ export async function listarDisponibles(usuario, { tipo, materia } = {}) {
     estado: 'programada',
     fecha: { $gte: hoyEnColombia() },
   };
-  if (materia) filtro.materia = new RegExp(escaparRegex(materia), 'i');
+  if (materia) filtro.materia = regexBusqueda(materia);
 
   const monitorias = await Monitoria.find(filtro).populate(POBLAR).sort(ORDEN);
   return monitorias.filter((monitoria) => !yaEmpezo(monitoria)).map((monitoria) => presentar(monitoria, usuario));

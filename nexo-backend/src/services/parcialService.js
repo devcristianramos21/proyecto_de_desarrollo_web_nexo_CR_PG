@@ -3,7 +3,7 @@ import { ESTADOS_ACTIVOS, Monitoria } from '../models/Monitoria.js';
 import { Parcial } from '../models/Parcial.js';
 import { AppError } from '../utils/AppError.js';
 import { elegirCampos } from '../utils/elegirCampos.js';
-import { escaparRegex } from '../utils/escaparRegex.js';
+import { regexBusqueda } from '../utils/escaparRegex.js';
 import { aTextoFecha, hoyEnColombia, momentoEnColombia, parsearFecha } from '../utils/fechas.js';
 import { esHoraValida } from '../utils/horas.js';
 
@@ -70,7 +70,7 @@ function preparcialesActivas(idParcial) {
 export async function listar({ materia, desde, hasta } = {}) {
   const filtro = {};
 
-  if (materia) filtro.materia = new RegExp(escaparRegex(materia), 'i');
+  if (materia) filtro.materia = regexBusqueda(materia);
   for (const [valor, operador, nombre] of [[desde, '$gte', 'desde'], [hasta, '$lte', 'hasta']]) {
     if (valor === undefined) continue;
     const fecha = parsearFecha(valor);

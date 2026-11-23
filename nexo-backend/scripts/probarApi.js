@@ -3,14 +3,16 @@
  * sin necesidad de tener Postman. Implementa solo la parte de "pm" que usa esta colección.
  *
  * Requisitos:
- *   - El servidor corriendo (npm run dev)
- *   - En .env: PRUEBAS_ADMIN_CORREO y PRUEBAS_ADMIN_PASSWORD (un admin creado con npm run crear-admin)
+ *   - El servidor corriendo EN OTRA TERMINAL (npm run dev)
+ *   - En .env: PRUEBAS_ADMIN_CORREO y PRUEBAS_ADMIN_PASSWORD (un admin creado con npm run crear-admin,
+ *     o el admin de los datos demo: demo.admin@urosario.edu.co / Nexo12345)
  *   - Opcional en .env: PRUEBAS_API_URL (por defecto http://localhost:<PORT o 3001>)
  *
  * Uso (desde nexo-backend):
  *   npm run probar-api
  *   npm run probar-api -- "Chat"     Ejecuta solo las carpetas cuyo nombre contenga ese texto
  *
+ * Antes de empezar verifica el servidor y el admin; si algo falta, se detiene y explica qué hacer.
  * Cada ejecución crea usuarios prueba.*; se borran con: npm run limpiar-pruebas -- --confirmar
  */
 import 'dotenv/config';
@@ -25,8 +27,95 @@ vars.baseUrl = process.env.PRUEBAS_API_URL || `http://localhost:${process.env.PO
 vars.adminCorreo = process.env.PRUEBAS_ADMIN_CORREO ?? '';
 vars.adminPassword = process.env.PRUEBAS_ADMIN_PASSWORD ?? '';
 
-if (!vars.adminCorreo || !vars.adminPassword) {
-  console.warn('Aviso: faltan PRUEBAS_ADMIN_CORREO / PRUEBAS_ADMIN_PASSWORD en .env; fallarán las pruebas de administrador.\n');
+const carpetas = coleccion.item.filter(
+  (c) => !filtroCarpeta || c.name.toLowerCase().includes(filtroCarpeta.toLowerCase()),
+);
+// Todas las carpetas, salvo "Auth y perfil", necesitan un administrador
+const necesitaAdmin = carpetas.some((c) => c.name !== 'Auth y perfil');
+
+// ───────────── Verificaciones previas ─────────────
+
+// Error que detiene el script antes de ejecutar las pruebas, con instrucciones para el usuario.
+// No se usa process.exit(): en Windows, salir mientras se cierra una conexión HTTP hace fallar a Node.
+class Detencion extends Error {}
+
+function detener(...lineas) {
+  throw new Detencion(['', ...lineas, ''].join('\n'));
+}
+
+async function verificarServidor() {
+  let respuesta;
+  try {
+    respuesta = await fetch(`${vars.baseUrl}/`, { signal: AbortSignal.timeout(5000) });
+  } catch {
+    detener(
+      `✗ No hay ningún servidor respondiendo en ${vars.baseUrl}`,
+      '',
+      'Estas pruebas necesitan el backend corriendo en OTRA terminal:',
+      '  1. Abre una terminal nueva (en VS Code: Terminal → New Terminal)',
+      '  2. Ejecuta:  cd nexo-backend   y luego   npm run dev',
+      '  3. Espera el mensaje "Servidor escuchando en http://localhost:3001"',
+      '  4. Deja esa terminal abierta y, en esta, vuelve a ejecutar:  npm run probar-api',
+    );
+  }
+
+  const cuerpo = await respuesta.json().catch(() => ({}));
+  if (cuerpo.mensaje !== 'API de NEXO funcionando') {
+    detener(
+      `✗ En ${vars.baseUrl} responde algo, pero no es la API de NEXO.`,
+      '  ¿Otra aplicación está usando ese puerto? Revisa PORT o PRUEBAS_API_URL en .env.',
+    );
+  }
+}
+
+async function verificarAdmin() {
+  if (!vars.adminCorreo || !vars.adminPassword) {
+    detener(
+      '✗ Faltan las credenciales del administrador de pruebas.',
+      '',
+      'Agrega estas dos líneas a tu archivo nexo-backend/.env:',
+      '  PRUEBAS_ADMIN_CORREO=correo.del.admin@urosario.edu.co',
+      '  PRUEBAS_ADMIN_PASSWORD=su_contraseña',
+      '',
+      'Puedes usar el admin de los datos demo (npm run seed): demo.admin@urosario.edu.co / Nexo12345',
+      'o crear uno propio con: npm run crear-admin -- "Nombre" correo@urosario.edu.co "contraseña"',
+      '',
+      'Para probar solo lo que no necesita admin:  npm run probar-api -- "Auth"',
+    );
+  }
+
+  const respuesta = await fetch(`${vars.baseUrl}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ correo: vars.adminCorreo, password: vars.adminPassword }),
+  });
+  const cuerpo = await respuesta.json().catch(() => ({}));
+
+  if (respuesta.status !== 200) {
+    detener(
+      `✗ El administrador de pruebas no pudo iniciar sesión: ${cuerpo.mensaje ?? respuesta.status}`,
+      `  Revisa PRUEBAS_ADMIN_CORREO (${vars.adminCorreo}) y PRUEBAS_ADMIN_PASSWORD en .env.`,
+      '  Si usas el admin demo y borraste los datos demo, recárgalos con: npm run seed',
+    );
+  }
+  if (cuerpo.usuario?.rol !== 'admin') {
+    detener(
+      `✗ La cuenta ${vars.adminCorreo} existe pero no es administrador (rol: ${cuerpo.usuario?.rol}).`,
+      `  Dale el rol con: npm run crear-admin -- "Nombre" ${vars.adminCorreo}`,
+    );
+  }
+}
+
+async function verificarTodo() {
+  if (!carpetas.length) {
+    detener(
+      `✗ Ninguna carpeta de la colección contiene "${filtroCarpeta}".`,
+      `  Carpetas disponibles: ${coleccion.item.map((c) => c.name).join(', ')}`,
+    );
+  }
+  await verificarServidor();
+  if (necesitaAdmin) await verificarAdmin();
+  console.log(`Servidor OK en ${vars.baseUrl}${necesitaAdmin ? ` · admin OK (${vars.adminCorreo})` : ''}\n`);
 }
 
 // ───────────── Mini implementación de pm.* ─────────────
@@ -125,8 +214,14 @@ async function ejecutar(item, ruta) {
   }
 }
 
-const carpetas = coleccion.item.filter((c) => !filtroCarpeta || c.name.toLowerCase().includes(filtroCarpeta.toLowerCase()));
-for (const carpeta of carpetas) await ejecutar(carpeta, '');
+try {
+  await verificarTodo();
+  for (const carpeta of carpetas) await ejecutar(carpeta, '');
 
-console.log(`\n${peticiones} peticiones: ${pasan} pruebas pasaron, ${fallan} fallaron`);
-process.exitCode = fallan ? 1 : 0;
+  console.log(`\n${peticiones} peticiones: ${pasan} pruebas pasaron, ${fallan} fallaron`);
+  process.exitCode = fallan ? 1 : 0;
+} catch (error) {
+  if (!(error instanceof Detencion)) throw error;
+  console.error(error.message);
+  process.exitCode = 1;
+}

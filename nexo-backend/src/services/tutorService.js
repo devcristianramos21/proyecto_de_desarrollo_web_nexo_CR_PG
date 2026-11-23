@@ -1,18 +1,18 @@
 import { CAMPOS_PUBLICOS_TUTOR, Usuario } from '../models/Usuario.js';
 import { AppError } from '../utils/AppError.js';
-import { escaparRegex } from '../utils/escaparRegex.js';
+import { regexBusqueda } from '../utils/escaparRegex.js';
 import * as disponibilidadService from './disponibilidadService.js';
 
 /**
- * Busca tutores. Filtros opcionales (sin distinguir mayúsculas):
- * - materia: parte del nombre de una materia que dicta ("cálculo" encuentra "Cálculo Diferencial")
+ * Busca tutores. Filtros opcionales (sin distinguir mayúsculas ni tildes):
+ * - materia: parte del nombre de una materia que dicta ("calculo" encuentra "Cálculo Diferencial")
  * - nombre: parte del nombre del tutor
  */
 export async function buscar({ materia, nombre } = {}) {
   const filtro = { rol: 'tutor' };
 
-  if (materia) filtro.materias = new RegExp(escaparRegex(materia), 'i');
-  if (nombre) filtro.nombre = new RegExp(escaparRegex(nombre), 'i');
+  if (materia) filtro.materias = regexBusqueda(materia);
+  if (nombre) filtro.nombre = regexBusqueda(nombre);
 
   return Usuario.find(filtro).select(CAMPOS_PUBLICOS_TUTOR).sort({ nombre: 1 });
 }
