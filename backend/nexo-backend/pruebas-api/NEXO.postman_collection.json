@@ -1,0 +1,5139 @@
+{
+  "info": {
+    "name": "NEXO - API de monitorías",
+    "description": "Pruebas del backend de NEXO, organizadas por carpeta. Ejecutar en orden con Run collection.\n\nANTES DE EJECUTAR: crea un administrador (npm run crear-admin) y escribe su correo y contraseña en las variables adminCorreo y adminPassword (pestaña Variables de la colección).\n\n- Auth y perfil: registra un usuario de prueba con correo único (prueba.postman.<número>@urosario.edu.co), inicia sesión, edita el perfil y cambia la contraseña.\n- Tutores, disponibilidad y favoritos: el usuario anterior solicita ser tutor, el admin lo aprueba, gestiona su disponibilidad y un segundo estudiante lo marca como favorito. También prueba un rechazo.\n- Monitorías: el tutor publica disponibilidad; el segundo estudiante solicita monitorías par (una aceptada, una rechazada); el admin crea una Saber Pro (mínimo 7, máximo 20) y dos grupos de obligatoria; inscripción, cambio de grupo, calendario y cancelaciones.\n- Parciales: el admin publica un parcial, crea una preparcial ligada a él (debe terminar antes del parcial), aparece en el calendario y se valida que no se borre un parcial con preparciales activas.\n- Chat: mensajes directos solo con monitoría vigente, chat de grupo por monitoría grupal, no leídos, paginación e historial de solo lectura.\n\nCada ejecución deja tres usuarios de prueba en la base.\n\nRequiere el servidor corriendo (npm run dev en nexo-backend).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001"
+    },
+    {
+      "key": "correoPrueba",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tokenInvalido",
+      "value": "no-es-un-token-real"
+    },
+    {
+      "key": "adminCorreo",
+      "value": ""
+    },
+    {
+      "key": "adminPassword",
+      "value": ""
+    },
+    {
+      "key": "tokenAdmin",
+      "value": ""
+    },
+    {
+      "key": "adminId",
+      "value": ""
+    },
+    {
+      "key": "correoEstudiante2",
+      "value": ""
+    },
+    {
+      "key": "tokenEstudiante2",
+      "value": ""
+    },
+    {
+      "key": "estudiante2Id",
+      "value": ""
+    },
+    {
+      "key": "solicitudId",
+      "value": ""
+    },
+    {
+      "key": "solicitud2Id",
+      "value": ""
+    },
+    {
+      "key": "tutorId",
+      "value": ""
+    },
+    {
+      "key": "franjaId",
+      "value": ""
+    },
+    {
+      "key": "franja2Id",
+      "value": ""
+    },
+    {
+      "key": "fechaLunes",
+      "value": ""
+    },
+    {
+      "key": "fechaMartes",
+      "value": ""
+    },
+    {
+      "key": "fechaMiercoles",
+      "value": ""
+    },
+    {
+      "key": "fechaJueves",
+      "value": ""
+    },
+    {
+      "key": "calDesde",
+      "value": ""
+    },
+    {
+      "key": "calHasta",
+      "value": ""
+    },
+    {
+      "key": "franjaMonId",
+      "value": ""
+    },
+    {
+      "key": "monParId",
+      "value": ""
+    },
+    {
+      "key": "monPar2Id",
+      "value": ""
+    },
+    {
+      "key": "monSaberId",
+      "value": ""
+    },
+    {
+      "key": "monOblAId",
+      "value": ""
+    },
+    {
+      "key": "monOblBId",
+      "value": ""
+    },
+    {
+      "key": "parcialId",
+      "value": ""
+    },
+    {
+      "key": "preparcialId",
+      "value": ""
+    },
+    {
+      "key": "correoEstudiante3",
+      "value": ""
+    },
+    {
+      "key": "tokenEstudiante3",
+      "value": ""
+    },
+    {
+      "key": "estudiante3Id",
+      "value": ""
+    },
+    {
+      "key": "franjaChatId",
+      "value": ""
+    },
+    {
+      "key": "monChatParId",
+      "value": ""
+    },
+    {
+      "key": "monChatGrupoId",
+      "value": ""
+    },
+    {
+      "key": "convDirectaId",
+      "value": ""
+    },
+    {
+      "key": "convGrupoId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth y perfil",
+      "item": [
+        {
+          "name": "1. Registro",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Correo único en cada ejecución para que el registro no choque con uno anterior",
+                  "pm.collectionVariables.set('correoPrueba', `prueba.postman.${Date.now()}@urosario.edu.co`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "const { token, usuario } = pm.response.json();",
+                  "pm.test('Devuelve un token', () => pm.expect(token).to.be.a('string'));",
+                  "pm.test('Ignora el rol enviado: siempre crea un estudiante', () => {",
+                  "  pm.expect(usuario.rol).to.eql('estudiante');",
+                  "});",
+                  "pm.test('No devuelve la contraseña', () => pm.expect(usuario).to.not.have.property('password'));",
+                  "pm.collectionVariables.set('token', token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario de Prueba\",\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"secreta123\",\n  \"carrera\": \"Ingeniería de Sistemas\",\n  \"semestre\": 6,\n  \"rol\": \"admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "2. Error: correo no institucional",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala el campo correo', () => {",
+                  "  pm.expect(pm.response.json().errores.correo).to.include('urosario.edu.co');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Externo\",\n  \"correo\": \"alguien@gmail.com\",\n  \"password\": \"secreta123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "3. Error: correo ya registrado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Indica que el correo ya existe', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('Ya existe una cuenta con ese correo');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Otro Usuario\",\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"secreta123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "4. Error: contraseña muy corta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala el campo password', () => {",
+                  "  pm.expect(pm.response.json().errores).to.have.property('password');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Corto\",\n  \"correo\": \"corta.{{$timestamp}}@urosario.edu.co\",\n  \"password\": \"123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "5. Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const { token, usuario } = pm.response.json();",
+                  "pm.test('Devuelve token y usuario', () => {",
+                  "  pm.expect(token).to.be.a('string');",
+                  "  pm.expect(usuario.correo).to.eql(pm.collectionVariables.get('correoPrueba'));",
+                  "});",
+                  "pm.collectionVariables.set('token', token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"secreta123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "6. Error: login con contraseña incorrecta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Mensaje genérico (no revela si el correo existe)', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('Correo o contraseña incorrectos');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"incorrecta1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "7. Error: perfil sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Pide iniciar sesión', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('Debes iniciar sesión');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "8. Error: perfil con token inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));",
+                  "pm.test('Indica token no válido', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('Token no válido');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenInvalido}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "9. Ver mi perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const usuario = pm.response.json();",
+                  "pm.test('Es el usuario que inició sesión', () => {",
+                  "  pm.expect(usuario.correo).to.eql(pm.collectionVariables.get('correoPrueba'));",
+                  "});",
+                  "pm.test('No devuelve la contraseña', () => pm.expect(usuario).to.not.have.property('password'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "10. Actualizar mi perfil",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const usuario = pm.response.json();",
+                  "pm.test('Aplica los cambios permitidos', () => {",
+                  "  pm.expect(usuario.nombre).to.eql('Nombre Actualizado');",
+                  "  pm.expect(usuario.semestre).to.eql(7);",
+                  "  pm.expect(usuario.biografia).to.eql('Me gustan las matemáticas');",
+                  "});",
+                  "pm.test('Ignora rol y correo', () => {",
+                  "  pm.expect(usuario.rol).to.eql('estudiante');",
+                  "  pm.expect(usuario.correo).to.eql(pm.collectionVariables.get('correoPrueba'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nombre Actualizado\",\n  \"semestre\": 7,\n  \"biografia\": \"Me gustan las matemáticas\",\n  \"rol\": \"admin\",\n  \"correo\": \"otro@urosario.edu.co\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "11. Error: semestre fuera de rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala el campo semestre', () => {",
+                  "  pm.expect(pm.response.json().errores).to.have.property('semestre');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"semestre\": 20\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "12. Error: cambiar contraseña con la actual incorrecta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Indica que la actual no es correcta', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('La contraseña actual no es correcta');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordActual\": \"incorrecta1\",\n  \"passwordNueva\": \"nueva12345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/usuarios/me/password"
+          }
+        },
+        {
+          "name": "13. Cambiar contraseña",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Confirma el cambio', () => {",
+                  "  pm.expect(pm.response.json().mensaje).to.eql('Contraseña actualizada');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"passwordActual\": \"secreta123\",\n  \"passwordNueva\": \"nueva12345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/usuarios/me/password"
+          }
+        },
+        {
+          "name": "14. Login con la contraseña nueva",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve un token', () => pm.expect(pm.response.json().token).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correoPrueba}}\",\n  \"password\": \"nueva12345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tutores, disponibilidad y favoritos",
+      "item": [
+        {
+          "name": "1. Login administrador",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 (si falla: llena adminCorreo y adminPassword en la pestaña Variables)', () => pm.response.to.have.status(200));",
+                  "const { token, usuario } = pm.response.json();",
+                  "pm.test('La cuenta es administrador', () => pm.expect(usuario.rol).to.eql('admin'));",
+                  "pm.collectionVariables.set('tokenAdmin', token);",
+                  "pm.collectionVariables.set('adminId', usuario._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{adminCorreo}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        },
+        {
+          "name": "2. Registrar un segundo estudiante",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('correoEstudiante2', `prueba.postman.${Date.now()}.b@urosario.edu.co`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "const { token, usuario } = pm.response.json();",
+                  "pm.collectionVariables.set('tokenEstudiante2', token);",
+                  "pm.collectionVariables.set('estudiante2Id', usuario._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Estudiante Dos\",\n  \"correo\": \"{{correoEstudiante2}}\",\n  \"password\": \"secreta123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "3. Error: solicitud sin materias",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala el campo materias', () => pm.expect(pm.response.json().errores).to.have.property('materias'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivacion\": \"Quiero ayudar\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/solicitudes-tutor"
+          }
+        },
+        {
+          "name": "4. Solicitar ser tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "const solicitud = pm.response.json();",
+                  "pm.test('Queda pendiente', () => pm.expect(solicitud.estado).to.eql('pendiente'));",
+                  "pm.collectionVariables.set('solicitudId', solicitud._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materias\": [\n    \"Cálculo Diferencial\",\n    \"Álgebra Lineal\"\n  ],\n  \"motivacion\": \"Me fue muy bien en estas materias y quiero ayudar a otros.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/solicitudes-tutor"
+          }
+        },
+        {
+          "name": "5. Error: segunda solicitud pendiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: Ya tienes una solicitud pendiente de revisión', () => pm.expect(pm.response.json().mensaje).to.eql('Ya tienes una solicitud pendiente de revisión'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materias\": [\n    \"Física\"\n  ],\n  \"motivacion\": \"Otra solicitud\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/solicitudes-tutor"
+          }
+        },
+        {
+          "name": "6. Error: un administrador no puede solicitar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materias\": [\n    \"Física\"\n  ],\n  \"motivacion\": \"No aplica\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/solicitudes-tutor"
+          }
+        },
+        {
+          "name": "7. Ver mis solicitudes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la solicitud creada', () => {",
+                  "  const id = pm.collectionVariables.get('solicitudId');",
+                  "  pm.expect(pm.response.json().some((s) => s._id === id)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/solicitudes-tutor/mias"
+          }
+        },
+        {
+          "name": "8. Error: un estudiante no ve todas las solicitudes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/solicitudes-tutor"
+          }
+        },
+        {
+          "name": "9. Admin: listar solicitudes pendientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const solicitud = pm.response.json().find((s) => s._id === pm.collectionVariables.get('solicitudId'));",
+                  "pm.test('Incluye la solicitud con los datos del estudiante', () => {",
+                  "  pm.expect(solicitud.estudiante.correo).to.eql(pm.collectionVariables.get('correoPrueba'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/solicitudes-tutor?estado=pendiente"
+          }
+        },
+        {
+          "name": "10. Error: filtro de estado no válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/solicitudes-tutor?estado=inventado"
+          }
+        },
+        {
+          "name": "11. Error: un estudiante aún no puede crear disponibilidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"lunes\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"16:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/disponibilidad"
+          }
+        },
+        {
+          "name": "12. Admin: aprobar solicitud",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const solicitud = pm.response.json();",
+                  "pm.test('Queda aprobada y registra quién la revisó', () => {",
+                  "  pm.expect(solicitud.estado).to.eql('aprobada');",
+                  "  pm.expect(solicitud.revisadaPor).to.eql(pm.collectionVariables.get('adminId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/solicitudes-tutor/{{solicitudId}}/aprobar"
+          }
+        },
+        {
+          "name": "13. Error: aprobar dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: La solicitud ya fue aprobada', () => pm.expect(pm.response.json().mensaje).to.eql('La solicitud ya fue aprobada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/solicitudes-tutor/{{solicitudId}}/aprobar"
+          }
+        },
+        {
+          "name": "14. Ahora el estudiante es tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const usuario = pm.response.json();",
+                  "pm.test('Su rol cambió a tutor sin volver a iniciar sesión', () => pm.expect(usuario.rol).to.eql('tutor'));",
+                  "pm.test('Recibió las materias de la solicitud', () => pm.expect(usuario.materias).to.include('Cálculo Diferencial'));",
+                  "pm.collectionVariables.set('tutorId', usuario._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        },
+        {
+          "name": "15. Tutor: crear franja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('franjaId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"lunes\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"16:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/disponibilidad"
+          }
+        },
+        {
+          "name": "16. Error: franja que se cruza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: Esta franja se cruza con otra de tus franjas ese mismo día', () => pm.expect(pm.response.json().mensaje).to.eql('Esta franja se cruza con otra de tus franjas ese mismo día'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"lunes\",\n  \"horaInicio\": \"15:00\",\n  \"horaFin\": \"17:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/disponibilidad"
+          }
+        },
+        {
+          "name": "17. Error: hora de fin antes de la de inicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala horaFin', () => pm.expect(pm.response.json().errores).to.have.property('horaFin'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"martes\",\n  \"horaInicio\": \"16:00\",\n  \"horaFin\": \"14:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/disponibilidad"
+          }
+        },
+        {
+          "name": "18. Error: día no válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala diaSemana', () => pm.expect(pm.response.json().errores).to.have.property('diaSemana'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"feriado\",\n  \"horaInicio\": \"08:00\",\n  \"horaFin\": \"10:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/disponibilidad"
+          }
+        },
+        {
+          "name": "19. Tutor: crear segunda franja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('franja2Id', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"miercoles\",\n  \"horaInicio\": \"08:00\",\n  \"horaFin\": \"10:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/disponibilidad"
+          }
+        },
+        {
+          "name": "20. Tutor: ampliar franja (sin cruzarse consigo misma)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Nueva hora de fin', () => pm.expect(pm.response.json().horaFin).to.eql('17:00'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"horaFin\": \"17:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/disponibilidad/{{franjaId}}"
+          }
+        },
+        {
+          "name": "21. Tutor: ver mi disponibilidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const franjas = pm.response.json();",
+                  "pm.test('Tiene 2 franjas, de lunes a domingo', () => {",
+                  "  pm.expect(franjas).to.have.lengthOf(2);",
+                  "  pm.expect(franjas[0].diaSemana).to.eql('lunes');",
+                  "  pm.expect(franjas[1].diaSemana).to.eql('miercoles');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/disponibilidad/mia"
+          }
+        },
+        {
+          "name": "22. Buscar tutores por materia (sin tilde)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const tutor = pm.response.json().find((t) => t._id === pm.collectionVariables.get('tutorId'));",
+                  "pm.test('Encuentra al tutor aunque se escriba sin tilde', () => pm.expect(tutor).to.be.an('object'));",
+                  "pm.test('No expone correo ni contraseña', () => {",
+                  "  pm.expect(tutor).to.not.have.property('correo');",
+                  "  pm.expect(tutor).to.not.have.property('password');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tutores?materia=calculo"
+          }
+        },
+        {
+          "name": "23. Buscar tutores sin resultados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Lista vacía', () => pm.expect(pm.response.json()).to.have.lengthOf(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tutores?materia=materia-que-no-existe"
+          }
+        },
+        {
+          "name": "24. Ver perfil de un tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es el tutor pedido', () => pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('tutorId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tutores/{{tutorId}}"
+          }
+        },
+        {
+          "name": "25. Error: ver como tutor a quien no lo es",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Mensaje: Tutor no encontrado', () => pm.expect(pm.response.json().mensaje).to.eql('Tutor no encontrado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tutores/{{estudiante2Id}}"
+          }
+        },
+        {
+          "name": "26. Ver disponibilidad de un tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Muestra sus 2 franjas', () => pm.expect(pm.response.json()).to.have.lengthOf(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/tutores/{{tutorId}}/disponibilidad"
+          }
+        },
+        {
+          "name": "27. Agregar tutor a favoritos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('El tutor aparece en favoritos', () => {",
+                  "  pm.expect(pm.response.json().map((t) => t._id)).to.include(pm.collectionVariables.get('tutorId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/me/favoritos/{{tutorId}}"
+          }
+        },
+        {
+          "name": "28. Agregarlo otra vez no lo duplica",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Sigue habiendo 1 favorito', () => pm.expect(pm.response.json()).to.have.lengthOf(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/me/favoritos/{{tutorId}}"
+          }
+        },
+        {
+          "name": "29. Error: favorito que no es tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Mensaje: Tutor no encontrado', () => pm.expect(pm.response.json().mensaje).to.eql('Tutor no encontrado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/me/favoritos/{{adminId}}"
+          }
+        },
+        {
+          "name": "30. Error: un tutor no puede ser su propio favorito",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: No puedes agregarte a ti mismo como favorito', () => pm.expect(pm.response.json().mensaje).to.eql('No puedes agregarte a ti mismo como favorito'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/me/favoritos/{{tutorId}}"
+          }
+        },
+        {
+          "name": "31. Ver mis favoritos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye los datos del tutor', () => pm.expect(pm.response.json()[0].nombre).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/me/favoritos"
+          }
+        },
+        {
+          "name": "32. Quitar tutor de favoritos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Ya no hay favoritos', () => pm.expect(pm.response.json()).to.have.lengthOf(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/me/favoritos/{{tutorId}}"
+          }
+        },
+        {
+          "name": "33. Tutor: eliminar franja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Mensaje: Franja eliminada', () => pm.expect(pm.response.json().mensaje).to.eql('Franja eliminada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/disponibilidad/{{franjaId}}"
+          }
+        },
+        {
+          "name": "34. Tutor: eliminar segunda franja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/disponibilidad/{{franja2Id}}"
+          }
+        },
+        {
+          "name": "35. Segundo estudiante solicita ser tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('solicitud2Id', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materias\": [\n    \"Física\"\n  ],\n  \"motivacion\": \"Quiero ser monitor de física.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/solicitudes-tutor"
+          }
+        },
+        {
+          "name": "36. Admin: rechazar solicitud",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const solicitud = pm.response.json();",
+                  "pm.test('Queda rechazada con el comentario', () => {",
+                  "  pm.expect(solicitud.estado).to.eql('rechazada');",
+                  "  pm.expect(solicitud.comentarioRevision).to.eql('Necesitas haber cursado la materia.');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comentario\": \"Necesitas haber cursado la materia.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/solicitudes-tutor/{{solicitud2Id}}/rechazar"
+          }
+        },
+        {
+          "name": "37. El estudiante rechazado sigue siendo estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Rol estudiante', () => pm.expect(pm.response.json().rol).to.eql('estudiante'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Monitorías",
+      "item": [
+        {
+          "name": "1. Estado de la API",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Fechas futuras para que la colección funcione cualquier día que se ejecute",
+                  "const texto = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, \"0\")}-${String(d.getDate()).padStart(2, \"0\")}`;",
+                  "const lunes = new Date();",
+                  "lunes.setDate(lunes.getDate() + 7);",
+                  "while (lunes.getDay() !== 1) lunes.setDate(lunes.getDate() + 1);",
+                  "const dia = (n) => { const d = new Date(lunes); d.setDate(d.getDate() + n); return texto(d); };",
+                  "pm.collectionVariables.set('fechaLunes', dia(0));",
+                  "pm.collectionVariables.set('fechaMartes', dia(1));",
+                  "pm.collectionVariables.set('fechaMiercoles', dia(2));",
+                  "pm.collectionVariables.set('fechaJueves', dia(3));",
+                  "pm.collectionVariables.set('calDesde', texto(new Date()));",
+                  "pm.collectionVariables.set('calHasta', dia(30));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Mensaje: API de NEXO funcionando', () => pm.expect(pm.response.json().mensaje).to.eql('API de NEXO funcionando'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/"
+          }
+        },
+        {
+          "name": "2. Preparación: el tutor publica disponibilidad el lunes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('franjaMonId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"lunes\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"18:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/disponibilidad"
+          }
+        },
+        {
+          "name": "3. Error: sin sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/monitorias/mis-tutorias"
+          }
+        },
+        {
+          "name": "4. Error: par fuera de la disponibilidad del tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: El horario no está dentro de la disponibilidad del tutor', () => pm.expect(pm.response.json().mensaje).to.eql('El horario no está dentro de la disponibilidad del tutor'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"08:00\",\n  \"horaFin\": \"09:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "5. Error: par de una materia que el tutor no dicta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Química Orgánica\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"15:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "6. Error: par en una fecha pasada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: La monitoría debe programarse para una fecha y hora futuras', () => pm.expect(pm.response.json().mensaje).to.eql('La monitoría debe programarse para una fecha y hora futuras'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"2020-01-06\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"15:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "7. Error: solicitarse una par a sí mismo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: No puedes solicitarte una monitoría a ti mismo', () => pm.expect(pm.response.json().mensaje).to.eql('No puedes solicitarte una monitoría a ti mismo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"15:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "8. Solicitar monitoría par",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('estado = solicitada', () => pm.expect(pm.response.json().estado).to.eql(\"solicitada\"));",
+                  "pm.test('tipo = par', () => pm.expect(pm.response.json().tipo).to.eql(\"par\"));",
+                  "pm.test('El estudiante queda inscrito', () => pm.expect(pm.response.json().inscrito).to.be.true);",
+                  "pm.test('El estudiante no ve la lista de inscritos', () => pm.expect(pm.response.json()).to.not.have.property('estudiantes'));",
+                  "pm.collectionVariables.set('monParId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"calculo diferencial\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"15:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "9. Error: otra par que se cruza",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Derivadas\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"14:30\",\n  \"horaFin\": \"15:30\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "10. Tutor: ver solicitudes pendientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la solicitud', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.include(pm.collectionVariables.get('monParId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/como-tutor?estado=solicitada"
+          }
+        },
+        {
+          "name": "11. Error: un estudiante no puede aceptar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/aceptar"
+          }
+        },
+        {
+          "name": "12. Tutor: aceptar solicitud",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('estado = programada', () => pm.expect(pm.response.json().estado).to.eql(\"programada\"));",
+                  "pm.test('El tutor sí ve a los inscritos', () => pm.expect(pm.response.json().estudiantes).to.have.lengthOf(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/aceptar"
+          }
+        },
+        {
+          "name": "13. Error: aceptar dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: La monitoría ya está programada', () => pm.expect(pm.response.json().mensaje).to.eql('La monitoría ya está programada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/aceptar"
+          }
+        },
+        {
+          "name": "14. Estudiante: mis tutorías",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la monitoría par', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.include(pm.collectionVariables.get('monParId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/mis-tutorias"
+          }
+        },
+        {
+          "name": "15. Solicitar una segunda par",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('monPar2Id', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"tema\": \"Integrales\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"16:00\",\n  \"horaFin\": \"17:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "16. Tutor: rechazar con motivo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('estado = rechazada', () => pm.expect(pm.response.json().estado).to.eql(\"rechazada\"));",
+                  "pm.test('motivo = Tengo un compromiso a esa hora', () => pm.expect(pm.response.json().motivo).to.eql(\"Tengo un compromiso a esa hora\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Tengo un compromiso a esa hora\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monPar2Id}}/rechazar"
+          }
+        },
+        {
+          "name": "17. Error: Saber Pro con cupo menor a 7",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala cupoMaximo', () => pm.expect(pm.response.json().errores).to.have.property('cupoMaximo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Saber Pro: Razonamiento cuantitativo\",\n  \"fecha\": \"{{fechaMartes}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"saber_pro\",\n  \"cupoMaximo\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "18. Error: Saber Pro con cupo mayor a 20",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala cupoMaximo', () => pm.expect(pm.response.json().errores).to.have.property('cupoMaximo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Saber Pro: Razonamiento cuantitativo\",\n  \"fecha\": \"{{fechaMartes}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"saber_pro\",\n  \"cupoMaximo\": 25\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "19. Error: un estudiante no crea grupales",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"fecha\": \"{{fechaMartes}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"preparcial\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "20. Error: asignar como tutor a quien no lo es",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Mensaje: Tutor no encontrado', () => pm.expect(pm.response.json().mensaje).to.eql('Tutor no encontrado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{estudiante2Id}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"fecha\": \"{{fechaMartes}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"preparcial\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "21. Admin: crear Saber Pro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('cupoMaximo = 20', () => pm.expect(pm.response.json().cupoMaximo).to.eql(20));",
+                  "pm.test('cupoMinimo = 7', () => pm.expect(pm.response.json().cupoMinimo).to.eql(7));",
+                  "pm.test('cupoMinimoAlcanzado = false', () => pm.expect(pm.response.json().cupoMinimoAlcanzado).to.eql(false));",
+                  "pm.collectionVariables.set('monSaberId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Saber Pro: Razonamiento cuantitativo\",\n  \"fecha\": \"{{fechaMartes}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"saber_pro\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "22. Catálogo: monitorías Saber Pro disponibles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la Saber Pro creada', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.include(pm.collectionVariables.get('monSaberId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/disponibles?tipo=saber_pro"
+          }
+        },
+        {
+          "name": "23. Inscribirse en Saber Pro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('inscrito = true', () => pm.expect(pm.response.json().inscrito).to.eql(true));",
+                  "pm.test('inscritos = 1', () => pm.expect(pm.response.json().inscritos).to.eql(1));",
+                  "pm.test('cuposDisponibles = 19', () => pm.expect(pm.response.json().cuposDisponibles).to.eql(19));",
+                  "pm.test('Aún no alcanza el mínimo de 7', () => pm.expect(pm.response.json().cupoMinimoAlcanzado).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monSaberId}}/inscripcion"
+          }
+        },
+        {
+          "name": "24. Error: inscribirse dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: Ya estás inscrito en esta monitoría', () => pm.expect(pm.response.json().mensaje).to.eql('Ya estás inscrito en esta monitoría'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monSaberId}}/inscripcion"
+          }
+        },
+        {
+          "name": "25. Error: el tutor no se inscribe en su propia monitoría",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: Eres el tutor de esta monitoría', () => pm.expect(pm.response.json().mensaje).to.eql('Eres el tutor de esta monitoría'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monSaberId}}/inscripcion"
+          }
+        },
+        {
+          "name": "26. Cancelar mi inscripción",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('inscrito = false', () => pm.expect(pm.response.json().inscrito).to.eql(false));",
+                  "pm.test('inscritos = 0', () => pm.expect(pm.response.json().inscritos).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monSaberId}}/inscripcion"
+          }
+        },
+        {
+          "name": "27. Admin: crear obligatoria grupo A con un estudiante asignado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('inscritos = 1', () => pm.expect(pm.response.json().inscritos).to.eql(1));",
+                  "pm.collectionVariables.set('monOblAId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"fecha\": \"{{fechaMiercoles}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"obligatoria\",\n  \"grupo\": \"A\",\n  \"cupoMaximo\": 2,\n  \"estudiantes\": [\n    \"{{estudiante2Id}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "28. Admin: crear obligatoria grupo B (cupo 1)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('inscritos = 0', () => pm.expect(pm.response.json().inscritos).to.eql(0));",
+                  "pm.collectionVariables.set('monOblBId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"fecha\": \"{{fechaJueves}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"presencial\",\n  \"lugar\": \"Salón 301\",\n  \"tipo\": \"obligatoria\",\n  \"grupo\": \"B\",\n  \"cupoMaximo\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "29. Error: inscribirse por su cuenta en una obligatoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: En las monitorías obligatorias te asigna la administración; puedes cambiarte de grupo', () => pm.expect(pm.response.json().mensaje).to.eql('En las monitorías obligatorias te asigna la administración; puedes cambiarte de grupo'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monOblBId}}/inscripcion"
+          }
+        },
+        {
+          "name": "30. Error: salirse de una obligatoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monOblAId}}/inscripcion"
+          }
+        },
+        {
+          "name": "31. Cambiarse del grupo A al grupo B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Ahora está en el grupo B', () => {",
+                  "  pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('monOblBId'));",
+                  "  pm.expect(pm.response.json().inscrito).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"{{monOblBId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblAId}}/cambio-grupo"
+          }
+        },
+        {
+          "name": "32. Ya no está en el grupo A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('inscrito = false', () => pm.expect(pm.response.json().inscrito).to.eql(false));",
+                  "pm.test('inscritos = 0', () => pm.expect(pm.response.json().inscritos).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monOblAId}}"
+          }
+        },
+        {
+          "name": "33. Error: cambiarse a un grupo de otro tipo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"destino\": \"{{monSaberId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblBId}}/cambio-grupo"
+          }
+        },
+        {
+          "name": "34. Error: cupo máximo menor que los inscritos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cupoMaximo\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblBId}}"
+          }
+        },
+        {
+          "name": "35. Admin: ampliar el cupo de un grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('cupoMaximo = 30', () => pm.expect(pm.response.json().cupoMaximo).to.eql(30));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cupoMaximo\": 30\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblAId}}"
+          }
+        },
+        {
+          "name": "36. Calendario del estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const ids = pm.response.json().monitorias.map((m) => m._id);",
+                  "pm.test('Incluye la par aceptada y el grupo B', () => {",
+                  "  pm.expect(ids).to.include(pm.collectionVariables.get('monParId'));",
+                  "  pm.expect(ids).to.include(pm.collectionVariables.get('monOblBId'));",
+                  "});",
+                  "pm.test('No incluye la par rechazada', () => pm.expect(ids).to.not.include(pm.collectionVariables.get('monPar2Id')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/calendario?desde={{calDesde}}&hasta={{calHasta}}"
+          }
+        },
+        {
+          "name": "37. Error: calendario sin rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/calendario"
+          }
+        },
+        {
+          "name": "38. Error: finalizar una monitoría que no ha comenzado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: La monitoría aún no ha comenzado', () => pm.expect(pm.response.json().mensaje).to.eql('La monitoría aún no ha comenzado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/finalizar"
+          }
+        },
+        {
+          "name": "39. Error: un estudiante no cancela una grupal",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblBId}}/cancelar"
+          }
+        },
+        {
+          "name": "40. Estudiante: cancelar su monitoría par",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('estado = cancelada', () => pm.expect(pm.response.json().estado).to.eql(\"cancelada\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Ya entendí el tema\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/cancelar"
+          }
+        },
+        {
+          "name": "41. Error: cancelar dos veces",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje: La monitoría ya está cancelada', () => pm.expect(pm.response.json().mensaje).to.eql('La monitoría ya está cancelada'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monParId}}/cancelar"
+          }
+        },
+        {
+          "name": "42. Admin: listar obligatorias",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el grupo A', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.include(pm.collectionVariables.get('monOblAId'));",
+                  "});",
+                  "pm.test('Incluye el grupo B', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.include(pm.collectionVariables.get('monOblBId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias?tipo=obligatoria"
+          }
+        },
+        {
+          "name": "43. Error: un estudiante no lista todas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias"
+          }
+        },
+        {
+          "name": "44. Limpieza: admin cancela la Saber Pro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba automática\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monSaberId}}/cancelar"
+          }
+        },
+        {
+          "name": "45. Limpieza: admin cancela el grupo A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba automática\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblAId}}/cancelar"
+          }
+        },
+        {
+          "name": "46. Limpieza: admin cancela el grupo B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba automática\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monOblBId}}/cancelar"
+          }
+        },
+        {
+          "name": "47. Ya no aparecen en el catálogo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('No incluye la Saber Pro cancelada', () => {",
+                  "  pm.expect(pm.response.json().map((m) => m._id)).to.not.include(pm.collectionVariables.get('monSaberId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/disponibles"
+          }
+        },
+        {
+          "name": "48. Limpieza: el tutor elimina su franja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/disponibilidad/{{franjaMonId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Parciales",
+      "item": [
+        {
+          "name": "1. Error: un estudiante no publica parciales",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materia\": \"Cálculo Diferencial\",\n  \"nombre\": \"Primer parcial\",\n  \"fecha\": \"{{fechaJueves}}\",\n  \"hora\": \"08:00\",\n  \"descripcion\": \"Temas: límites y derivadas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales"
+          }
+        },
+        {
+          "name": "2. Error: parcial sin fecha",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala fecha', () => pm.expect(pm.response.json().errores).to.have.property('fecha'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materia\": \"Cálculo Diferencial\",\n  \"nombre\": \"Primer parcial\",\n  \"hora\": \"08:00\",\n  \"descripcion\": \"Temas: límites y derivadas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales"
+          }
+        },
+        {
+          "name": "3. Error: parcial en el pasado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala fecha', () => pm.expect(pm.response.json().errores).to.have.property('fecha'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materia\": \"Cálculo Diferencial\",\n  \"nombre\": \"Primer parcial\",\n  \"fecha\": \"2020-03-10\",\n  \"hora\": \"08:00\",\n  \"descripcion\": \"Temas: límites y derivadas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales"
+          }
+        },
+        {
+          "name": "4. Admin: publicar parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('nombre = Primer parcial', () => pm.expect(pm.response.json().nombre).to.eql(\"Primer parcial\"));",
+                  "pm.test('hora = 08:00', () => pm.expect(pm.response.json().hora).to.eql(\"08:00\"));",
+                  "pm.collectionVariables.set('parcialId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materia\": \"Cálculo Diferencial\",\n  \"nombre\": \"Primer parcial\",\n  \"fecha\": \"{{fechaJueves}}\",\n  \"hora\": \"08:00\",\n  \"descripcion\": \"Temas: límites y derivadas\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales"
+          }
+        },
+        {
+          "name": "5. Buscar parciales por materia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el parcial publicado', () => {",
+                  "  pm.expect(pm.response.json().map((x) => x._id)).to.include(pm.collectionVariables.get('parcialId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parciales?materia=cálculo"
+          }
+        },
+        {
+          "name": "6. Error: preparcial sin parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Señala parcial', () => pm.expect(pm.response.json().errores).to.have.property('parcial'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"preparcial\",\n  \"tutor\": \"{{tutorId}}\",\n  \"fecha\": \"{{fechaMiercoles}}\",\n  \"horaInicio\": \"16:00\",\n  \"horaFin\": \"18:00\",\n  \"modalidad\": \"virtual\",\n  \"lugar\": \"Enlace de Teams\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "7. Error: preparcial después del parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje: La monitoría preparcial debe terminar antes de que empiece el parcial', () => pm.expect(pm.response.json().mensaje).to.eql('La monitoría preparcial debe terminar antes de que empiece el parcial'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"preparcial\",\n  \"parcial\": \"{{parcialId}}\",\n  \"tutor\": \"{{tutorId}}\",\n  \"fecha\": \"{{fechaJueves}}\",\n  \"horaInicio\": \"10:00\",\n  \"horaFin\": \"12:00\",\n  \"modalidad\": \"virtual\",\n  \"lugar\": \"Enlace de Teams\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "8. Admin: crear preparcial ligada al parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Toma la materia del parcial', () => pm.expect(pm.response.json().materia).to.eql('Cálculo Diferencial'));",
+                  "pm.test('Trae los datos del parcial', () => pm.expect(pm.response.json().parcial.nombre).to.eql('Primer parcial'));",
+                  "pm.collectionVariables.set('preparcialId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"preparcial\",\n  \"parcial\": \"{{parcialId}}\",\n  \"tutor\": \"{{tutorId}}\",\n  \"fecha\": \"{{fechaMiercoles}}\",\n  \"horaInicio\": \"16:00\",\n  \"horaFin\": \"18:00\",\n  \"modalidad\": \"virtual\",\n  \"lugar\": \"Enlace de Teams\",\n  \"materia\": \"Otra materia (se ignora)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "9. Ver las preparciales de un parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye la preparcial', () => {",
+                  "  pm.expect(pm.response.json().map((x) => x._id)).to.include(pm.collectionVariables.get('preparcialId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}/preparciales"
+          }
+        },
+        {
+          "name": "10. Inscribirse en la preparcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('inscrito = true', () => pm.expect(pm.response.json().inscrito).to.eql(true));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{preparcialId}}/inscripcion"
+          }
+        },
+        {
+          "name": "11. Error: adelantar el parcial antes de su preparcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"{{fechaLunes}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}"
+          }
+        },
+        {
+          "name": "12. Admin: cambiar la hora del parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('hora = 09:00', () => pm.expect(pm.response.json().hora).to.eql(\"09:00\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hora\": \"09:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}"
+          }
+        },
+        {
+          "name": "13. El calendario muestra el parcial y la preparcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye el parcial', () => {",
+                  "  pm.expect(pm.response.json().parciales.map((x) => x._id)).to.include(pm.collectionVariables.get('parcialId'));",
+                  "});",
+                  "pm.test('Incluye la preparcial inscrita', () => {",
+                  "  pm.expect(pm.response.json().monitorias.map((x) => x._id)).to.include(pm.collectionVariables.get('preparcialId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/calendario?desde={{calDesde}}&hasta={{calHasta}}"
+          }
+        },
+        {
+          "name": "14. Error: eliminar un parcial con preparcial programada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}"
+          }
+        },
+        {
+          "name": "15. Admin: cancelar la preparcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('estado = cancelada', () => pm.expect(pm.response.json().estado).to.eql(\"cancelada\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba automática\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{preparcialId}}/cancelar"
+          }
+        },
+        {
+          "name": "16. Admin: eliminar el parcial",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Mensaje: Parcial eliminado', () => pm.expect(pm.response.json().mensaje).to.eql('Parcial eliminado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}"
+          }
+        },
+        {
+          "name": "17. El parcial ya no existe",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('Mensaje: Parcial no encontrado', () => pm.expect(pm.response.json().mensaje).to.eql('Parcial no encontrado'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/parciales/{{parcialId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "1. Preparación: registrar un tercer estudiante",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const texto = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, \"0\")}-${String(d.getDate()).padStart(2, \"0\")}`;",
+                  "const lunes = new Date();",
+                  "lunes.setDate(lunes.getDate() + 7);",
+                  "while (lunes.getDay() !== 1) lunes.setDate(lunes.getDate() + 1);",
+                  "const dia = (n) => { const d = new Date(lunes); d.setDate(d.getDate() + n); return texto(d); };",
+                  "pm.collectionVariables.set('fechaLunes', dia(0));",
+                  "pm.collectionVariables.set('fechaMiercoles', dia(2));",
+                  "pm.collectionVariables.set('correoEstudiante3', `prueba.postman.${Date.now()}.c@urosario.edu.co`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('tokenEstudiante3', pm.response.json().token);",
+                  "pm.collectionVariables.set('estudiante3Id', pm.response.json().usuario._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Estudiante Tres\",\n  \"correo\": \"{{correoEstudiante3}}\",\n  \"password\": \"secreta123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/auth/registro"
+          }
+        },
+        {
+          "name": "2. Preparación: el tutor publica disponibilidad",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('franjaChatId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diaSemana\": \"lunes\",\n  \"horaInicio\": \"14:00\",\n  \"horaFin\": \"18:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/disponibilidad"
+          }
+        },
+        {
+          "name": "3. Error: chat directo sin monitoría vigente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));",
+                  "pm.test('Mensaje: Solo puedes escribirle a personas con las que tienes o tuviste una monitoría', () => pm.expect(pm.response.json().mensaje).to.eql('Solo puedes escribirle a personas con las que tienes o tuviste una monitoría'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{tutorId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "4. Preparación: solicitar monitoría par",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('monChatParId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"fecha\": \"{{fechaLunes}}\",\n  \"horaInicio\": \"15:00\",\n  \"horaFin\": \"16:00\",\n  \"modalidad\": \"virtual\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/par"
+          }
+        },
+        {
+          "name": "5. Error: una solicitud sin aceptar no habilita el chat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{tutorId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "6. Preparación: el tutor acepta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/monitorias/{{monChatParId}}/aceptar"
+          }
+        },
+        {
+          "name": "7. Contactos del estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Incluye a su tutor', () => pm.expect(pm.response.json().map((u) => u._id)).to.include(pm.collectionVariables.get('tutorId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/contactos"
+          }
+        },
+        {
+          "name": "8. Abrir chat directo con el tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('tipo = directa', () => pm.expect(pm.response.json().tipo).to.eql(\"directa\"));",
+                  "pm.test('El otro participante es el tutor', () => pm.expect(pm.response.json().otroParticipante._id).to.eql(pm.collectionVariables.get('tutorId')));",
+                  "pm.collectionVariables.set('convDirectaId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{tutorId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "9. Abrirlo desde el otro lado no lo duplica",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es la misma conversación', () => pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('convDirectaId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{estudiante2Id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "10. Error: chat consigo mismo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{estudiante2Id}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "11. Error: un estudiante sin relación no puede escribirle al tutor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante3}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": \"{{tutorId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/directa"
+          }
+        },
+        {
+          "name": "12. Error: el administrador no usa el chat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones"
+          }
+        },
+        {
+          "name": "13. Enviar mensaje",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.test('texto = Hola, ¿qué temas vemos el lunes?', () => pm.expect(pm.response.json().texto).to.eql(\"Hola, ¿qué temas vemos el lunes?\"));",
+                  "pm.test('Trae el nombre del autor', () => pm.expect(pm.response.json().autor.nombre).to.be.a('string'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Hola, ¿qué temas vemos el lunes?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "14. Error: mensaje vacío",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"   \"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "15. Error: escribir en una conversación ajena",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante3}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Intruso\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "16. Bandeja del tutor: 1 mensaje sin leer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const conv = pm.response.json().find((c) => c._id === pm.collectionVariables.get('convDirectaId'));",
+                  "pm.test('Tiene 1 no leído y muestra el último mensaje', () => {",
+                  "  pm.expect(conv.noLeidos).to.eql(1);",
+                  "  pm.expect(conv.ultimoMensaje.texto).to.eql('Hola, ¿qué temas vemos el lunes?');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones"
+          }
+        },
+        {
+          "name": "17. El tutor responde",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Derivadas e integrales. ¡Nos vemos!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "18. Leer la conversación",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const { mensajes, hayMas } = pm.response.json();",
+                  "pm.test('2 mensajes en orden cronológico', () => {",
+                  "  pm.expect(mensajes).to.have.lengthOf(2);",
+                  "  pm.expect(mensajes[0].texto).to.eql('Hola, ¿qué temas vemos el lunes?');",
+                  "});",
+                  "pm.test('No hay más páginas', () => pm.expect(hayMas).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "19. Al leer, se marcan como leídos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const conv = pm.response.json().find((c) => c._id === pm.collectionVariables.get('convDirectaId'));",
+                  "pm.test('0 no leídos', () => pm.expect(conv.noLeidos).to.eql(0));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones"
+          }
+        },
+        {
+          "name": "20. Paginación: solo el último mensaje",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const { mensajes, hayMas } = pm.response.json();",
+                  "pm.test('1 mensaje, el más reciente, y hay más', () => {",
+                  "  pm.expect(mensajes).to.have.lengthOf(1);",
+                  "  pm.expect(mensajes[0].texto).to.eql('Derivadas e integrales. ¡Nos vemos!');",
+                  "  pm.expect(hayMas).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes?limite=1"
+          }
+        },
+        {
+          "name": "21. Error: límite fuera de rango",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes?limite=500"
+          }
+        },
+        {
+          "name": "22. Preparación: admin crea una obligatoria con el estudiante",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set('monChatGrupoId', pm.response.json()._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"obligatoria\",\n  \"tutor\": \"{{tutorId}}\",\n  \"materia\": \"Cálculo Diferencial\",\n  \"grupo\": \"C\",\n  \"fecha\": \"{{fechaMiercoles}}\",\n  \"horaInicio\": \"07:00\",\n  \"horaFin\": \"09:00\",\n  \"modalidad\": \"presencial\",\n  \"estudiantes\": [\n    \"{{estudiante2Id}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/grupales"
+          }
+        },
+        {
+          "name": "23. El chat del grupo aparece en la bandeja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "const grupo = pm.response.json().find((c) => c.tipo === 'grupo' && c.monitoria._id === pm.collectionVariables.get('monChatGrupoId'));",
+                  "pm.test('Existe el chat del grupo C', () => {",
+                  "  pm.expect(grupo).to.be.an('object');",
+                  "  pm.expect(grupo.titulo).to.eql('Cálculo Diferencial - Grupo C');",
+                  "});",
+                  "if (grupo) pm.collectionVariables.set('convGrupoId', grupo._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones"
+          }
+        },
+        {
+          "name": "24. El tutor abre el mismo chat de grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Es la misma conversación', () => pm.expect(pm.response.json()._id).to.eql(pm.collectionVariables.get('convGrupoId')));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monitoria\": \"{{monChatGrupoId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/grupo"
+          }
+        },
+        {
+          "name": "25. Error: entrar al chat de un grupo ajeno",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante3}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monitoria\": \"{{monChatGrupoId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/grupo"
+          }
+        },
+        {
+          "name": "26. Error: una monitoría par no tiene chat de grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"monitoria\": \"{{monChatParId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/grupo"
+          }
+        },
+        {
+          "name": "27. El tutor escribe en el grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Recuerden traer calculadora.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convGrupoId}}/mensajes"
+          }
+        },
+        {
+          "name": "28. El estudiante lee el grupo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Ve el mensaje del tutor', () => pm.expect(pm.response.json().mensajes[0].texto).to.eql('Recuerden traer calculadora.'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convGrupoId}}/mensajes"
+          }
+        },
+        {
+          "name": "29. Preparación: el estudiante cancela la par",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monChatParId}}/cancelar"
+          }
+        },
+        {
+          "name": "30. Preparación: el admin cancela la obligatoria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenAdmin}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Prueba automática\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/monitorias/{{monChatGrupoId}}/cancelar"
+          }
+        },
+        {
+          "name": "31. Error: sin monitoría vigente ya no se puede escribir",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"¿Sigues ahí?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "32. Pero el historial sigue disponible",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('2 mensajes', () => pm.expect(pm.response.json().mensajes).to.have.lengthOf(2));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{tokenEstudiante2}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convDirectaId}}/mensajes"
+          }
+        },
+        {
+          "name": "33. Error: el chat de un grupo cancelado es solo de lectura",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409', () => pm.response.to.have.status(409));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texto\": \"Hola\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/chat/conversaciones/{{convGrupoId}}/mensajes"
+          }
+        },
+        {
+          "name": "34. Limpieza: el tutor elimina su franja",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/disponibilidad/{{franjaChatId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

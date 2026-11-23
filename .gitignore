@@ -1,0 +1,26 @@
+# Dependencias de todos los proyectos
+**/node_modules/
+
+# Variables de entorno
+**/.env
+**/.env.*
+!**/.env.example
+
+# Archivos de compilación
+**/dist/
+**/dist-ssr/
+
+# Logs
+**/*.log
+npm-debug.log*
+
+# Archivos temporales
+*.local
+
+# Editores
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
