@@ -17,8 +17,8 @@ try {
   const servidor = createServer(app);
   configurarSockets(servidor);
 
-  servidor.listen(PUERTO, () => {
-    console.log(`Servidor escuchando en http://localhost:${PUERTO}`);
+  servidor.listen(PUERTO, '0.0.0.0', () => {
+    console.log(`Servidor escuchando en el puerto ${PUERTO}`);
   });
 } catch (error) {
   console.error(`No se pudo iniciar el servidor: ${error.message}`);
