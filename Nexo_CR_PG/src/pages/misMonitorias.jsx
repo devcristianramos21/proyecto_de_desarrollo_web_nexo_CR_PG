@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Sidebar from '../components/layout/sidebar';
 import Navbar from '../components/layout/navbar';
-import './MisMonitorias.css';
+import './misMonitorias.css';
 
 export const tutoriasIniciales = [
   // TUTORÍAS PRÓXIMAS
