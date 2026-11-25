@@ -6,7 +6,7 @@ import Navbar from '../components/layout/navbar';
 
 import './monitorias.css';
 
-const categorias = ['Todas', 'Obligatoria', 'Par', 'Pre-parcial'];
+const categorias = ['Todas', 'Obligatoria', 'Par', 'Pre-parcial', 'Saber Pro'];
 
 function Monitorias({
   onVerDetalle,
@@ -33,7 +33,16 @@ function Monitorias({
   const monitoriasFiltradas =
     categoria === 'Todas'
       ? monitorias
-      : monitorias.filter((monitoria) => monitoria.tipo === categoria);
+      : monitorias.filter((monitoria) => {
+          const tipos = {
+            Obligatoria: 'obligatoria',
+            Par: 'par',
+            'Pre-parcial': 'preparcial',
+            'Saber Pro': 'saber_pro',
+          };
+
+          return monitoria.tipoBackend === tipos[categoria];
+        });
 
   const calcularProgreso = (inscritos, cupo) =>
     cupo > 0 ? Math.min((inscritos / cupo) * 100, 100) : 0;
@@ -231,9 +240,11 @@ function Monitorias({
               return (
                 <article
                   className={`monitoria-card ${
-                    monitoria.tipo === 'Pre-parcial'
+                    monitoria.tipoBackend === 'preparcial'
                       ? 'monitoria-card--preparcial'
-                      : ''
+                      : monitoria.tipoBackend === 'saber_pro'
+                        ? 'monitoria-card--saberpro'
+                        : ''
                   }`}
                   key={monitoria.id}
                 >
@@ -246,9 +257,7 @@ function Monitorias({
                       <h2>{monitoria.titulo}</h2>
 
                       <span
-                        className={`monitoria-tipo tipo-${monitoria.tipo
-                          .toLowerCase()
-                          .replaceAll('-', '')}`}
+                        className={`monitoria-tipo tipo-${monitoria.tipoBackend.replaceAll('_', '')}`}
                       >
                         {monitoria.tipo}
                       </span>
