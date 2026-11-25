@@ -75,6 +75,26 @@
   line-height: 1.4;
 }
 
+.calendario__error {
+  padding: 12px 14px;
+  margin: 0 0 20px;
+  color: #B91C1C;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.calendario__estado-vacio {
+  padding: 24px;
+  color: #6B7280;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  font-size: 13px;
+  text-align: center;
+}
+
 /* Resumen */
 
 .calendario__resumen {
@@ -274,6 +294,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 8px;
   flex-shrink: 0;
   margin-left: auto;

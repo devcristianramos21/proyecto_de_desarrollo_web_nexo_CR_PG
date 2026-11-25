@@ -6,54 +6,43 @@ import Navbar from '../components/layout/navbar';
 
 import './detalleMonitoria.css';
 
-const temasPredeterminados = [
-  'Espacios vectoriales',
-  'Transformaciones lineales',
-  'Valores propios',
-  'Sistemas de ecuaciones',
-];
-
-const monitoriaPredeterminada = {
-  titulo: 'Pre-parcial Álgebra Lineal',
-  tipo: 'Pre-parcial',
-  estado: 'Disponible',
-  monitor: 'Felipe Castro',
-  fecha: 'Dom 21 Sep 2026',
-  hora: '10:00 AM – 12:00 PM',
-  horario: 'Dom 21 Sep 2026 · 10:00 AM – 12:00 PM',
-  modalidad: 'Presencial',
-  lugar: 'Edificio G, Sala 2',
-  inscritos: 14,
-  cupo: 20,
-  descripcion:
-    'Sesión de repaso intensivo. Se cubrirán: espacios vectoriales, transformaciones lineales, valores y vectores propios, sistemas de ecuaciones.',
-  preparacion:
-    'Parcial de Álgebra Lineal — Martes 24 Sep a las 10:00 AM',
-  temas: temasPredeterminados,
-  semestreMonitor: 'Matemáticas · 10° semestre',
-  calificacion: 4.8,
-  iniciales: 'FC',
-};
-
 function DetalleMonitoria({
   onNavegar,
   monitoria,
   onInscribirse,
+  onCancelarInscripcion,
   onVerPerfilTutor,
   modoTutor = false,
 }) {
-  const datos = monitoria || monitoriaPredeterminada;
+  const datos = monitoria || {};
 
   // Estados
   const [modalAbierto, setModalAbierto] = useState(false);
+  const [accionPendiente, setAccionPendiente] = useState(null);
+  const [procesando, setProcesando] = useState(false);
+  const [errorAccion, setErrorAccion] = useState('');
 
-  // Datos calculados
+  // Identificación del tipo de monitoría
+  const tipoBackend = datos.tipoBackend || '';
+  const permiteInscripcion = ['preparcial', 'saber_pro'].includes(
+    tipoBackend
+  );
+
+  // Datos de la monitoría
   const cupo = Number(datos.cupo) || 0;
   const inscritosActuales = Number(datos.inscritos) || 0;
-  const yaInscrito = datos.estado === 'Inscrito';
+
+  const yaInscrito = Boolean(datos.inscrito) ||
+    datos.estado === 'Inscrito';
 
   const cupoLleno =
     cupo > 0 && inscritosActuales >= cupo;
+
+  const cupoMinimo = Number(datos.cupoMinimo ?? 1);
+
+  const cupoMinimoAlcanzado =
+    datos.cupoMinimoAlcanzado ??
+    inscritosActuales >= cupoMinimo;
 
   const estadoActual = yaInscrito
     ? 'Inscrito'
@@ -61,81 +50,165 @@ function DetalleMonitoria({
       ? 'Cupo lleno'
       : datos.estado || 'Disponible';
 
-  const temas = datos.temas || (monitoria ? [] : temasPredeterminados);
+  const temas = Array.isArray(datos.temas)
+    ? datos.temas
+    : [];
 
   const porcentaje = cupo > 0
     ? Math.min((inscritosActuales / cupo) * 100, 100)
     : 0;
 
+  // Fecha y horario
   const horarioSeparado = datos.horario?.split('·') || [];
-  const fecha = datos.fecha || horarioSeparado[0]?.trim() || (
-    monitoria ? 'Por definir' : 'Dom 21 Sep 2026'
-  );
-  const hora = datos.hora ||
+
+  const fecha =
+    datos.fecha ||
+    horarioSeparado[0]?.trim() ||
+    'Por definir';
+
+  const hora =
+    datos.hora ||
     horarioSeparado.slice(1).join(' · ').trim() ||
-    (monitoria ? '' : '10:00 AM – 12:00 PM');
+    '';
+
   const horarioCompleto = datos.horario ||
     [fecha, hora].filter(Boolean).join(' · ');
-  const nombreMonitor = datos.monitor || 'Felipe Castro';
-  const modalidad = datos.modalidad || (monitoria ? 'Por definir' : 'Presencial');
+
+  const horaInicio = hora.split(/[–—]/)[0]?.trim() || '';
+
+  // Información del tutor
+  const nombreMonitor = datos.monitor || 'Tutor no asignado';
+  const iniciales = datos.iniciales || 'TU';
+  const modalidad = datos.modalidad || 'Por definir';
   const lugar = datos.lugar || 'Por definir';
 
   const descripcion =
     datos.descripcion ||
-    (monitoria
-      ? 'Información de esta monitoría.'
-      : 'Sesión de apoyo académico para repasar los temas de la asignatura.');
-
-  const horaInicio = hora.split('–')[0].trim();
+    'No hay una descripción adicional registrada para esta monitoría.';
 
   // Abrir modal de inscripción
   const abrirConfirmacion = () => {
-    if (!yaInscrito && !cupoLleno) {
-      setModalAbierto(true);
+    if (
+      !permiteInscripcion ||
+      yaInscrito ||
+      cupoLleno ||
+      modoTutor
+    ) {
+      return;
     }
+
+    setAccionPendiente('inscribir');
+    setErrorAccion('');
+    setModalAbierto(true);
+  };
+
+  // Abrir modal de cancelación
+  const abrirConfirmacionCancelacion = () => {
+    if (
+      !permiteInscripcion ||
+      !yaInscrito ||
+      modoTutor
+    ) {
+      return;
+    }
+
+    setAccionPendiente('cancelar');
+    setErrorAccion('');
+    setModalAbierto(true);
   };
 
   // Cerrar modal
   const cerrarModal = () => {
-    setModalAbierto(false);
-  };
-
-  // Confirmar inscripción
-  const confirmarInscripcion = () => {
-    if (yaInscrito || cupoLleno) return;
+    if (procesando) return;
 
     setModalAbierto(false);
-
-    onInscribirse?.({
-      ...datos,
-      inscritos: Math.min(inscritosActuales + 1, cupo),
-      estado: 'Inscrito',
-    });
+    setAccionPendiente(null);
+    setErrorAccion('');
   };
 
-  // Cancelar una inscripción ya confirmada
-  const cancelarInscripcionConfirmada = () => {
-    if (!yaInscrito) return;
+  // Confirmar inscripción o cancelación
+  const confirmarAccion = async () => {
+    if (!datos.id || !accionPendiente || procesando) {
+      return;
+    }
 
-    onInscribirse?.({
-      ...datos,
-      inscritos: Math.max(inscritosActuales - 1, 0),
-      estado: 'Disponible',
-    });
+    setProcesando(true);
+    setErrorAccion('');
+
+    try {
+      if (accionPendiente === 'inscribir') {
+        if (typeof onInscribirse !== 'function') {
+          throw new Error('El servicio de inscripción no está disponible.');
+        }
+
+        await onInscribirse(datos);
+      } else {
+        if (typeof onCancelarInscripcion !== 'function') {
+          throw new Error('El servicio de cancelación no está disponible.');
+        }
+
+        await onCancelarInscripcion(datos);
+      }
+
+      setModalAbierto(false);
+      setAccionPendiente(null);
+    } catch (error) {
+      setErrorAccion(
+        error.message || 'No se pudo completar la operación.'
+      );
+    } finally {
+      setProcesando(false);
+    }
   };
 
   // Abrir perfil del monitor
   const abrirPerfilMonitor = () => {
+    if (!datos.tutorId) return;
+
     onVerPerfilTutor?.({
       ...datos,
-      id: datos.tutorId ?? `monitor-${datos.id}`,
+      id: datos.tutorId,
       nombre: nombreMonitor,
-      iniciales: datos.iniciales || 'FC',
+      iniciales,
       especialidad: datos.especialidad || datos.programa || 'Monitor académico',
       semestreTutor: datos.semestreMonitor || datos.semestreTutor || '',
       calificacion: datos.calificacion ?? null,
     });
   };
+
+  // Si no existe una monitoría seleccionada
+  if (!monitoria) {
+    return (
+      <div className="detalle-layout">
+        <Sidebar
+          paginaActiva={modoTutor ? 'Monitorías asignadas' : 'Monitorías'}
+          onNavegar={onNavegar}
+        />
+
+        <div className="detalle-contenido">
+          <Navbar
+            titulo="Detalle monitoría"
+            onNavegar={onNavegar}
+          />
+
+          <main className="detalle-main">
+            <p className="monitorias-vacio">
+              No se encontró la información de esta monitoría.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => onNavegar?.(
+                modoTutor ? 'Monitorías asignadas' : 'Monitorías'
+              )}
+            >
+              Volver a monitorías
+            </button>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="detalle-layout">
@@ -162,7 +235,9 @@ function DetalleMonitoria({
             <button
               type="button"
               onClick={() =>
-                onNavegar?.(modoTutor ? 'Monitorías asignadas' : 'Monitorías')
+                onNavegar?.(
+                  modoTutor ? 'Monitorías asignadas' : 'Monitorías'
+                )
               }
             >
               Monitorías
@@ -170,7 +245,7 @@ function DetalleMonitoria({
 
             <span>/</span>
 
-            <strong>{datos.titulo}</strong>
+            <strong>{datos.titulo || 'Detalle de monitoría'}</strong>
           </div>
 
           {/* ENCABEZADO */}
@@ -179,16 +254,14 @@ function DetalleMonitoria({
             <div className="detalle-encabezado-info">
 
               <div className="detalle-titulo-fila">
-                <h1>{datos.titulo}</h1>
+                <h1>{datos.titulo || 'Monitoría'}</h1>
 
                 <span className="detalle-tipo">
-                  {datos.tipo}
+                  {datos.tipo || 'Monitoría'}
                 </span>
 
                 <span className="detalle-estado">
-                  {estadoActual === 'Inscrito'
-                    ? 'Disponible'
-                    : estadoActual}
+                  {estadoActual}
                 </span>
               </div>
 
@@ -198,15 +271,15 @@ function DetalleMonitoria({
 
             </div>
 
-            {!modoTutor && yaInscrito ? (
+            {!modoTutor && permiteInscripcion && yaInscrito ? (
               <button
                 className="detalle-boton-cancelar-inscripcion"
                 type="button"
-                onClick={cancelarInscripcionConfirmada}
+                onClick={abrirConfirmacionCancelacion}
               >
                 Cancelar inscripción
               </button>
-            ) : !modoTutor ? (
+            ) : !modoTutor && permiteInscripcion ? (
               <button
                 className="detalle-boton-inscribir"
                 type="button"
@@ -219,7 +292,7 @@ function DetalleMonitoria({
 
           </section>
 
-          {/* AVISO VERDE: INSCRIPCIÓN CONFIRMADA */}
+          {/* AVISO: INSCRIPCIÓN CONFIRMADA */}
           {yaInscrito && (
             <section className="detalle-aviso detalle-aviso-exito">
 
@@ -236,15 +309,17 @@ function DetalleMonitoria({
                 <p>
                   Ya estás inscrito en esta monitoría.
                   Te esperamos el <b>{fecha}</b>
-                  {horaInicio && <> a las <b>{horaInicio}</b></>}.
+                  {horaInicio && (
+                    <> a las <b>{horaInicio}</b></>
+                  )}.
                 </p>
               </div>
 
             </section>
           )}
 
-          {/* AVISO AZUL: PREPARACIÓN PARA PARCIAL */}
-          {datos.tipo === 'Pre-parcial' && (
+          {/* AVISO: PREPARACIÓN PARA PARCIAL */}
+          {['Pre-parcial', 'Saber Pro'].includes(datos.tipo) && (
             <section className="detalle-aviso">
 
               <span
@@ -255,14 +330,14 @@ function DetalleMonitoria({
               </span>
 
               <div>
-                <strong>Preparación para parcial</strong>
+                <strong>Preparación académica</strong>
 
                 <p>
-                  Esta monitoría es la sesión de repaso antes del{' '}
+                  Esta monitoría está orientada a la preparación de{' '}
                   <b>
                     {datos.preparacion ||
-                      'próximo parcial de la asignatura'}
-                  </b>
+                      'las evaluaciones de la asignatura'}
+                  </b>.
                 </p>
               </div>
 
@@ -306,7 +381,7 @@ function DetalleMonitoria({
                 <div className="detalle-monitor-info">
 
                   <div className="detalle-avatar">
-                    {datos.iniciales || 'FC'}
+                    {iniciales}
                   </div>
 
                   <div className="detalle-monitor-datos">
@@ -314,17 +389,23 @@ function DetalleMonitoria({
                     <strong>{nombreMonitor}</strong>
 
                     <p>
-                      {datos.semestreMonitor || datos.semestreTutor || 'Monitor académico'}
+                      {datos.semestreMonitor ||
+                        datos.semestreTutor ||
+                        'Información académica no disponible'}
                     </p>
 
                     <div className="detalle-puntuacion">
+                      {datos.calificacion != null ? (
+                        <>
+                          <span className="detalle-estrellas">
+                            ★★★★★
+                          </span>
 
-                      <span className="detalle-estrellas">
-                        ★★★★★
-                      </span>
-
-                      <b>{datos.calificacion ?? '—'}</b>
-
+                          <b>{datos.calificacion}</b>
+                        </>
+                      ) : (
+                        <b>Calificación no disponible</b>
+                      )}
                     </div>
 
                   </div>
@@ -332,6 +413,7 @@ function DetalleMonitoria({
                   <button
                     type="button"
                     onClick={abrirPerfilMonitor}
+                    disabled={!datos.tutorId}
                   >
                     Ver perfil
                   </button>
@@ -350,7 +432,7 @@ function DetalleMonitoria({
 
                 <div>
                   <span>Tipo</span>
-                  <strong>{datos.tipo}</strong>
+                  <strong>{datos.tipo || 'No definido'}</strong>
                 </div>
 
                 <div>
@@ -395,14 +477,15 @@ function DetalleMonitoria({
                   <span style={{ width: `${porcentaje}%` }} />
                 </div>
 
-                {inscritosActuales >= 10 ? (
+                {cupoMinimoAlcanzado ? (
                   <p>
-                    ✓ Monitoría confirmada (superó umbral de 10)
+                    ✓ Se alcanzó el mínimo de inscritos.
                   </p>
                 ) : (
                   <p className="detalle-inscripciones-pendientes">
-                    Necesita {10 - inscritosActuales} inscripciones
-                    más para confirmarse.
+                    Necesita{' '}
+                    {Math.max(0, cupoMinimo - inscritosActuales)}
+                    {' '}inscripciones más para alcanzar el mínimo.
                   </p>
                 )}
 
@@ -428,16 +511,50 @@ function DetalleMonitoria({
             >
 
               <h2 id="detalle-modal-titulo">
-                Confirmar inscripción
+                {accionPendiente === 'inscribir'
+                  ? 'Confirmar inscripción'
+                  : 'Cancelar inscripción'}
               </h2>
 
-              <p>
-                ¿Deseas inscribirte en la{' '}
-                <strong>{datos.titulo}</strong> del{' '}
-                <strong>{horarioCompleto}</strong>?
-                Esta monitoría es {modalidad.toLowerCase()} en{' '}
-                <strong>{lugar}</strong>.
-              </p>
+              {accionPendiente === 'inscribir' ? (
+                <p>
+                  ¿Deseas inscribirte en la{' '}
+                  <strong>{datos.titulo}</strong> del{' '}
+                  <strong>{horarioCompleto}</strong>?
+
+                  {' '}
+
+                  Esta monitoría es {modalidad.toLowerCase()} en{' '}
+                  <strong>{lugar}</strong>.
+
+                  {!cupoMinimoAlcanzado && (
+                    <>
+                      {' '}Actualmente faltan{' '}
+                      <strong>
+                        {Math.max(0, cupoMinimo - inscritosActuales)}
+                      </strong>{' '}
+                      inscripciones para alcanzar el mínimo requerido.
+                    </>
+                  )}
+                </p>
+              ) : (
+                <p>
+                  ¿Estás seguro de que deseas cancelar tu inscripción
+                  en la monitoría{' '}
+                  <strong>{datos.titulo}</strong>?
+                  Tu cupo quedará disponible para otro estudiante.
+                </p>
+              )}
+
+              {/* ERROR */}
+              {errorAccion && (
+                <p
+                  role="alert"
+                  className="monitorias-error"
+                >
+                  {errorAccion}
+                </p>
+              )}
 
               <div className="detalle-modal-acciones">
 
@@ -445,16 +562,22 @@ function DetalleMonitoria({
                   type="button"
                   className="detalle-modal-cancelar"
                   onClick={cerrarModal}
+                  disabled={procesando}
                 >
-                  Cancelar
+                  Volver
                 </button>
 
                 <button
                   type="button"
                   className="detalle-modal-confirmar"
-                  onClick={confirmarInscripcion}
+                  onClick={confirmarAccion}
+                  disabled={procesando}
                 >
-                  Confirmar inscripción
+                  {procesando
+                    ? 'Procesando...'
+                    : accionPendiente === 'inscribir'
+                      ? 'Confirmar inscripción'
+                      : 'Sí, cancelar inscripción'}
                 </button>
 
               </div>

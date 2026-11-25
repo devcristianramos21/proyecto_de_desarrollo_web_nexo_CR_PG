@@ -180,6 +180,13 @@
   text-align: center;
 }
 
+.mensajes__estado-error {
+  padding: 16px;
+  color: #B91C1C;
+  font-size: 12px;
+  text-align: center;
+}
+
 /* Panel del chat */
 
 .mensajes__chat {
@@ -233,6 +240,23 @@
   border-radius: 50%;
 }
 
+.mensajes__estado-conexion--desconectado {
+  color: #B91C1C;
+}
+
+.mensajes__estado-conexion--desconectado > span {
+  background: #B91C1C;
+}
+
+.mensajes__alerta-conexion {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 8px 14px;
+  color: #92400E;
+  background: #FFFBEB;
+  font-size: 11px;
+}
+
 .mensajes__chat-acciones {
   display: flex;
   align-items: center;
@@ -276,6 +300,38 @@
   color: #9CA3AF;
   font-size: 11px;
   font-weight: 600;
+}
+
+.mensajes__estado-chat {
+  align-self: center;
+  margin: auto;
+  color: #6B7280;
+  font-size: 12px;
+  text-align: center;
+}
+
+.mensajes__mensajes-anteriores,
+.mensajes__escribiendo {
+  align-self: center;
+  margin: 0;
+  color: #6B7280;
+  font-size: 11px;
+}
+
+.mensajes__cargar-anteriores {
+  align-self: center;
+  padding: 5px 9px;
+  color: #6B7280;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.mensajes__cargar-anteriores:disabled {
+  cursor: wait;
 }
 
 /* Alineación de mensajes */

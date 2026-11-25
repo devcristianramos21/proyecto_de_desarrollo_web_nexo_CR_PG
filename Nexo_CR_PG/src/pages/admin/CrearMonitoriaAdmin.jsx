@@ -28,6 +28,10 @@ export default function CrearMonitoriaAdmin({
   onNavegar,
   onCrear,
   tipoInicial = 'Obligatoria',
+  parciales = [],
+  tutoresDisponibles = [],
+  cargandoReferencias = false,
+  errorReferencias = '',
 }) {
   const [formulario, setFormulario] = useState({
     tipo: tipoInicial,
@@ -38,16 +42,58 @@ export default function CrearMonitoriaAdmin({
     minimo: '15',
     horario: '',
     modalidad: 'Presencial',
+    parcialId: '',
+    tutorId: '',
+    fecha: '',
+    horaInicio: '',
+    horaFin: '',
+    descripcion: '',
   });
   const [error, setError] = useState('');
+  const [guardando, setGuardando] = useState(false);
+  const esPreParcial = tipoInicial === 'Pre-parcial';
 
   const cambiar = (campo, valor) => {
     setFormulario((actual) => ({ ...actual, [campo]: valor }));
     setError('');
   };
 
-  const crear = (evento) => {
+  const crear = async (evento) => {
     evento.preventDefault();
+
+    if (esPreParcial) {
+      if (
+        !formulario.parcialId ||
+        !formulario.tutorId ||
+        !formulario.fecha ||
+        !formulario.horaInicio ||
+        !formulario.horaFin
+      ) {
+        setError('Selecciona el parcial, el tutor y el horario de la monitoría.');
+        return;
+      }
+
+      try {
+        setGuardando(true);
+        await onCrear?.({
+          tipo: 'preparcial',
+          tutor: formulario.tutorId,
+          parcial: formulario.parcialId,
+          fecha: formulario.fecha,
+          horaInicio: formulario.horaInicio,
+          horaFin: formulario.horaFin,
+          modalidad: formulario.modalidad.toLowerCase(),
+          cupoMaximo: Number(formulario.cupo),
+          descripcion: formulario.descripcion.trim(),
+        });
+      } catch (err) {
+        setError(err.message || 'No se pudo crear la monitoría pre-parcial.');
+      } finally {
+        setGuardando(false);
+      }
+      return;
+    }
+
     const cupo = Number(formulario.cupo);
     const minimo = Number(formulario.minimo);
     if (!formulario.titulo.trim() || !formulario.horario.trim() || cupo < 1 || minimo < 1 || minimo > cupo) {
@@ -88,67 +134,203 @@ export default function CrearMonitoriaAdmin({
         </header>
 
         <form className="crear-monitoria-admin__formulario admin-card" onSubmit={crear}>
-          <fieldset className="crear-monitoria-admin__tipos">
-            <legend>Tipo de monitoría</legend>
-            <div>
-              {tipos.map((tipo) => (
-                <label className={formulario.tipo === tipo.valor ? 'crear-monitoria-admin__tipo crear-monitoria-admin__tipo--activo' : 'crear-monitoria-admin__tipo'} key={tipo.valor}>
-                  <input type="radio" name="tipo-monitoria" value={tipo.valor} checked={formulario.tipo === tipo.valor} onChange={() => cambiar('tipo', tipo.valor)} />
-                  <span>
-                    <strong>{tipo.valor}</strong>
-                    <small>{tipo.descripcion}</small>
-                  </span>
+          {esPreParcial ? (
+            <>
+              <label className="crear-monitoria-admin__campo crear-monitoria-admin__campo--completo">
+                Parcial relacionado
+                <select
+                  className="admin-select"
+                  value={formulario.parcialId}
+                  onChange={(evento) => cambiar('parcialId', evento.target.value)}
+                  disabled={cargandoReferencias || parciales.length === 0}
+                  required
+                >
+                  <option value="">
+                    {cargandoReferencias
+                      ? 'Cargando parciales…'
+                      : 'Selecciona un parcial'}
+                  </option>
+                  {parciales.map((parcial) => (
+                    <option key={parcial._id} value={parcial._id}>
+                      {parcial.materia} · {parcial.nombre} · {parcial.fecha}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="crear-monitoria-admin__dos-columnas">
+                <label className="crear-monitoria-admin__campo crear-monitoria-admin__campo--completo">
+                  Tutor asignado
+                  <select
+                    className="admin-select"
+                    value={formulario.tutorId}
+                    onChange={(evento) => cambiar('tutorId', evento.target.value)}
+                    disabled={cargandoReferencias || tutoresDisponibles.length === 0}
+                    required
+                  >
+                    <option value="">
+                      {cargandoReferencias
+                        ? 'Cargando tutores…'
+                        : 'Selecciona un tutor'}
+                    </option>
+                    {tutoresDisponibles.map((tutor) => (
+                      <option key={tutor._id} value={tutor._id}>
+                        {tutor.nombre}
+                        {tutor.carrera ? ` · ${tutor.carrera}` : ''}
+                      </option>
+                    ))}
+                  </select>
                 </label>
-              ))}
-            </div>
-          </fieldset>
 
-          <label className="crear-monitoria-admin__campo crear-monitoria-admin__campo--completo">
-            Nombre de la monitoría
-            <input className="admin-field" value={formulario.titulo} onChange={(evento) => cambiar('titulo', evento.target.value)} placeholder="Ej. Monitoría Cálculo Diferencial — Grupo A" required />
-          </label>
+                <label className="crear-monitoria-admin__campo">
+                  Capacidad máxima
+                  <input
+                    className="admin-field"
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={formulario.cupo}
+                    onChange={(evento) => cambiar('cupo', evento.target.value)}
+                    required
+                  />
+                </label>
+                <label className="crear-monitoria-admin__campo">
+                  Modalidad
+                  <select
+                    className="admin-select"
+                    value={formulario.modalidad}
+                    onChange={(evento) => cambiar('modalidad', evento.target.value)}
+                  >
+                    <option>Presencial</option>
+                    <option>Virtual</option>
+                  </select>
+                </label>
+                <label className="crear-monitoria-admin__campo">
+                  Fecha
+                  <input
+                    className="admin-field"
+                    type="date"
+                    value={formulario.fecha}
+                    onChange={(evento) => cambiar('fecha', evento.target.value)}
+                    required
+                  />
+                </label>
+                <label className="crear-monitoria-admin__campo">
+                  Hora de inicio
+                  <input
+                    className="admin-field"
+                    type="time"
+                    value={formulario.horaInicio}
+                    onChange={(evento) => cambiar('horaInicio', evento.target.value)}
+                    required
+                  />
+                </label>
+                <label className="crear-monitoria-admin__campo">
+                  Hora de fin
+                  <input
+                    className="admin-field"
+                    type="time"
+                    value={formulario.horaFin}
+                    onChange={(evento) => cambiar('horaFin', evento.target.value)}
+                    required
+                  />
+                </label>
+                <label className="crear-monitoria-admin__campo crear-monitoria-admin__campo--completo">
+                  Descripción
+                  <textarea
+                    className="admin-textarea"
+                    value={formulario.descripcion}
+                    onChange={(evento) => cambiar('descripcion', evento.target.value)}
+                    maxLength={500}
+                    rows="3"
+                  />
+                </label>
+              </div>
+              {errorReferencias && (
+                <p className="admin-error" role="alert">
+                  {errorReferencias}
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              <fieldset className="crear-monitoria-admin__tipos">
+                <legend>Tipo de monitoría</legend>
+                <div>
+                  {tipos.map((tipo) => (
+                    <label className={formulario.tipo === tipo.valor ? 'crear-monitoria-admin__tipo crear-monitoria-admin__tipo--activo' : 'crear-monitoria-admin__tipo'} key={tipo.valor}>
+                      <input
+                        type="radio"
+                        name="tipo-monitoria"
+                        value={tipo.valor}
+                        checked={formulario.tipo === tipo.valor}
+                        onChange={() => tipo.valor === 'Pre-parcial'
+                          ? onNavegar?.('Crear monitoria pre-parcial Admin')
+                          : cambiar('tipo', tipo.valor)}
+                      />
+                      <span>
+                        <strong>{tipo.valor}</strong>
+                        <small>{tipo.descripcion}</small>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
 
-          <div className="crear-monitoria-admin__dos-columnas">
-            <label className="crear-monitoria-admin__campo">
-              Asignatura
-              <select className="admin-select" value={formulario.asignatura} onChange={(evento) => cambiar('asignatura', evento.target.value)}>
-                {asignaturas.map((asignatura) => <option key={asignatura}>{asignatura}</option>)}
-              </select>
-            </label>
-            <label className="crear-monitoria-admin__campo">
-              Tutor / Monitor asignado
-              <select className="admin-select" value={formulario.tutor} onChange={(evento) => cambiar('tutor', evento.target.value)}>
-                {tutores.map((tutor) => <option key={tutor}>{tutor}</option>)}
-              </select>
-            </label>
-            <label className="crear-monitoria-admin__campo">
-              Capacidad máxima
-              <input className="admin-field" type="number" min="1" value={formulario.cupo} onChange={(evento) => cambiar('cupo', evento.target.value)} required />
-            </label>
-            <label className="crear-monitoria-admin__campo">
-              Umbral mínimo para confirmar
-              <input className="admin-field" type="number" min="1" value={formulario.minimo} onChange={(evento) => cambiar('minimo', evento.target.value)} required />
-              <small>La monitoría se cancela si no llega a este número.</small>
-            </label>
-          </div>
+              <label className="crear-monitoria-admin__campo crear-monitoria-admin__campo--completo">
+                Nombre de la monitoría
+                <input className="admin-field" value={formulario.titulo} onChange={(evento) => cambiar('titulo', evento.target.value)} placeholder="Ej. Monitoría Cálculo Diferencial — Grupo A" required />
+              </label>
 
-          <label className="crear-monitoria-admin__campo crear-monitoria-admin__campo--completo">
-            Fecha y horario
-            <input className="admin-field" value={formulario.horario} onChange={(evento) => cambiar('horario', evento.target.value)} placeholder="Ej. Sábado 20 Sep · 9:00 AM – 11:00 AM" required />
-          </label>
+              <div className="crear-monitoria-admin__dos-columnas">
+                <label className="crear-monitoria-admin__campo">
+                  Asignatura
+                  <select className="admin-select" value={formulario.asignatura} onChange={(evento) => cambiar('asignatura', evento.target.value)}>
+                    {asignaturas.map((asignatura) => <option key={asignatura}>{asignatura}</option>)}
+                  </select>
+                </label>
+                <label className="crear-monitoria-admin__campo">
+                  Tutor / Monitor asignado
+                  <select className="admin-select" value={formulario.tutor} onChange={(evento) => cambiar('tutor', evento.target.value)}>
+                    {tutores.map((tutor) => <option key={tutor}>{tutor}</option>)}
+                  </select>
+                </label>
+                <label className="crear-monitoria-admin__campo">
+                  Capacidad máxima
+                  <input className="admin-field" type="number" min="1" value={formulario.cupo} onChange={(evento) => cambiar('cupo', evento.target.value)} required />
+                </label>
+                <label className="crear-monitoria-admin__campo">
+                  Umbral mínimo para confirmar
+                  <input className="admin-field" type="number" min="1" value={formulario.minimo} onChange={(evento) => cambiar('minimo', evento.target.value)} required />
+                  <small>La monitoría se cancela si no llega a este número.</small>
+                </label>
+              </div>
 
-          <label className="crear-monitoria-admin__campo crear-monitoria-admin__campo--completo">
-            Modalidad
-            <select className="admin-select" value={formulario.modalidad} onChange={(evento) => cambiar('modalidad', evento.target.value)}>
-              <option>Presencial</option>
-              <option>Virtual</option>
-            </select>
-          </label>
+              <label className="crear-monitoria-admin__campo crear-monitoria-admin__campo--completo">
+                Fecha y horario
+                <input className="admin-field" value={formulario.horario} onChange={(evento) => cambiar('horario', evento.target.value)} placeholder="Ej. Sábado 20 Sep · 9:00 AM – 11:00 AM" required />
+              </label>
+
+              <label className="crear-monitoria-admin__campo crear-monitoria-admin__campo--completo">
+                Modalidad
+                <select className="admin-select" value={formulario.modalidad} onChange={(evento) => cambiar('modalidad', evento.target.value)}>
+                  <option>Presencial</option>
+                  <option>Virtual</option>
+                </select>
+              </label>
+            </>
+          )}
 
           {error && <p className="admin-error crear-monitoria-admin__error" role="alert">{error}</p>}
           <div className="crear-monitoria-admin__acciones">
             <button type="button" className="admin-text-button" onClick={() => onNavegar?.('Monitorias admin')}>Cancelar</button>
-            <button type="submit" className="admin-primary-button">Crear monitoría</button>
+            <button
+              type="submit"
+              className="admin-primary-button"
+              disabled={guardando || (esPreParcial && (cargandoReferencias || parciales.length === 0 || tutoresDisponibles.length === 0))}
+            >
+              {guardando ? 'Guardando…' : 'Crear monitoría'}
+            </button>
           </div>
         </form>
       </div>

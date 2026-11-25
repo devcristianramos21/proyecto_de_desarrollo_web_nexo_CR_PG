@@ -137,6 +137,47 @@ export function listarMonitoriasComoTutor() {
   return apiRequest('/api/monitorias/como-tutor');
 }
 
+export function listarMonitoriasDisponibles(filtros = {}) {
+  const parametros = new URLSearchParams();
+  if (filtros.tipo) parametros.set('tipo', filtros.tipo);
+  if (filtros.materia) parametros.set('materia', filtros.materia);
+  const query = parametros.toString();
+  return apiRequest(`/api/monitorias/disponibles${query ? `?${query}` : ''}`);
+}
+
+export function inscribirEnMonitoria(id) {
+  return apiRequest(`/api/monitorias/${encodeURIComponent(id)}/inscripcion`, {
+    method: 'POST',
+  });
+}
+
+
+export function cancelarInscripcionMonitoria(id) {
+  return apiRequest(`/api/monitorias/${encodeURIComponent(id)}/inscripcion`, {
+    method: 'DELETE',
+  });
+}
+
+export function listarMonitoriasAdministrativas(filtros = {}) {
+  const parametros = new URLSearchParams();
+  if (filtros.tipo) parametros.set('tipo', filtros.tipo);
+  if (filtros.estado) parametros.set('estado', filtros.estado);
+  const query = parametros.toString();
+  return apiRequest(`/api/monitorias${query ? `?${query}` : ''}`);
+}
+
+export function crearMonitoriaGrupal(datos) {
+  return apiRequest('/api/monitorias/grupales', {
+    method: 'POST',
+    body: datos,
+  });
+}
+
+export function obtenerCalendario(desde, hasta) {
+  const parametros = new URLSearchParams({ desde, hasta });
+  return apiRequest(`/api/calendario?${parametros}`);
+}
+
 export function aceptarSolicitudMonitoria(id) {
   return apiRequest(`/api/monitorias/${encodeURIComponent(id)}/aceptar`, {
     method: 'PATCH',

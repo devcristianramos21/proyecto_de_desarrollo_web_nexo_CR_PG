@@ -5,7 +5,7 @@ import { UsuarioContext } from './components/layout/usuarioContext';
 import HomeEstudiante from './pages/homeEstudiantes';
 import BuscarTutores from './pages/buscarTutores';
 import ResultadosBusqueda from './pages/resultadosBusqueda';
-import Monitorias, { monitoriasIniciales } from './pages/monitorias';
+import Monitorias from './pages/monitorias';
 import DetalleMonitoria from './pages/detalleMonitoria';
 import Calendario from './pages/calendario';
 import MisSolicitudes from './pages/misSolicitudes';
@@ -16,7 +16,7 @@ import MisMonitorias from './pages/misMonitorias';
 import DetalleTutoria from './pages/detalleMisMonitorias';
 import EvaluarTutoria from './pages/evaluarTutoria';
 import ConfirmacionEvaluacion from './pages/confirmacionEvaluacion';
-import Mensajes, { conversacionesIniciales } from './pages/mensajes';
+import Mensajes from './pages/mensajes';
 import Favoritos from './pages/favoritos';
 import MiPerfil from './pages/miPerfil';
 import Notificaciones from './pages/notificaciones';
@@ -70,13 +70,22 @@ import {
   listarMiDisponibilidad,
   listarMisEvaluaciones,
   listarMisMonitorias,
+  listarMonitoriasAdministrativas,
   listarMonitoriasComoTutor,
+  inscribirEnMonitoria as inscribirMonitoriaApi,
+  crearMonitoriaGrupal,
   proponerHorario as proponerHorarioApi,
   rechazarSolicitudMonitoria,
   responderPropuestaHorario as responderPropuestaHorarioApi,
   solicitarMonitoria as solicitarMonitoriaApi,
   quitarTutorFavorito,
+  listarMonitoriasDisponibles,
+  cancelarInscripcionMonitoria,
 } from './services/modulosIntegrados';
+import {
+  abrirConversacionDirecta,
+  abrirConversacionGrupo,
+} from './services/chatService';
 import {
   DEMO_ESTUDIANTES_ADMIN,
   DEMO_TUTORES_ADMIN,
@@ -158,6 +167,13 @@ function formatoFecha(fecha) {
       month: 'long',
       year: 'numeric',
     });
+}
+
+function fechaActualLocal() {
+    const hoy = new Date();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    return `${hoy.getFullYear()}-${mes}-${dia}`;
 }
 
 function formatoHora(hora) {
@@ -245,6 +261,10 @@ function adaptarMonitoriaTutorBackend(monitoria) {
 
   return {
     id: String(monitoria._id),
+    tipoBackend: monitoria.tipo,
+    estudianteIds: (monitoria.estudiantes || []).map((estudiante) =>
+      String(estudiante._id || estudiante)
+    ),
     titulo: `${tipos[monitoria.tipo] || 'Monitoría'} ${monitoria.materia}`,
     tipo: tipos[monitoria.tipo] || monitoria.tipo,
     estado: estados[monitoria.estado] || monitoria.estado,
@@ -266,6 +286,69 @@ function adaptarMonitoriaTutorBackend(monitoria) {
     descripcion: monitoria.descripcion || '',
     preparacion: monitoria.parcial?.nombre || '',
     temas: monitoria.tema ? [monitoria.tema] : [],
+  };
+}
+
+function adaptarMonitoriaCatalogoBackend(monitoria) {
+  const tutor = monitoria.tutor && typeof monitoria.tutor === 'object'
+    ? monitoria.tutor
+    : {};
+
+  const tipos = {
+    obligatoria: 'Obligatoria',
+    preparcial: 'Pre-parcial',
+    saber_pro: 'Saber Pro',
+  };
+
+  const inscritos = Number(monitoria.inscritos ?? 0);
+  const cupo = Number(monitoria.cupoMaximo ?? 0);
+  const inscrito = Boolean(monitoria.inscrito);
+
+  let estado = 'Disponible';
+
+  if (inscrito) {
+    estado = 'Inscrito';
+  } else if (cupo > 0 && inscritos >= cupo) {
+    estado = 'Cupo lleno';
+  }
+
+  const fecha = formatoFecha(monitoria.fecha);
+  const hora = `${formatoHora(monitoria.horaInicio)} — ${formatoHora(monitoria.horaFin)}`;
+
+  const iniciales = tutor.nombre
+    ?.split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((parte) => parte[0])
+    .join('')
+    .toUpperCase() || 'TU';
+
+  return {
+    id: String(monitoria._id),
+    titulo: `${tipos[monitoria.tipo] || 'Monitoría'} ${monitoria.materia}`,
+    tipo: tipos[monitoria.tipo] || monitoria.tipo,
+    tipoBackend: monitoria.tipo,
+    estado,
+    inscrito,
+    monitor: tutor.nombre || 'Tutor',
+    tutorId: tutor._id ? String(tutor._id) : '',
+    iniciales,
+    semestreMonitor: tutor.semestre
+      ? `${tutor.carrera || ''} · ${tutor.semestre}° semestre`
+      : '',
+    fecha,
+    hora,
+    horario: `${fecha} · ${hora}`,
+    modalidad: monitoria.modalidad === 'virtual' ? 'Virtual' : 'Presencial',
+    lugar: monitoria.lugar || '',
+    inscritos,
+    cupo,
+    cupoMinimo: Number(monitoria.cupoMinimo ?? 1),
+    cupoMinimoAlcanzado: Boolean(monitoria.cupoMinimoAlcanzado),
+    descripcion: monitoria.descripcion || '',
+    preparacion: monitoria.parcial?.nombre || '',
+    temas: monitoria.tema ? [monitoria.tema] : [],
+    parcial: monitoria.parcial || null,
   };
 }
 
@@ -443,7 +526,10 @@ function App() {
   const [tutorParaSolicitud, setTutorParaSolicitud] = useState(null);
   const [paginaAnteriorSolicitud, setPaginaAnteriorSolicitud] = useState('Perfil tutor');
   const [tutoresFavoritos, setTutoresFavoritos] = useState([]);
-  const [monitorias, setMonitorias] = useState(monitoriasIniciales);
+  const [monitorias, setMonitorias] = useState([]);
+  const [cargandoMonitorias, setCargandoMonitorias] = useState(false);
+  const [errorMonitorias, setErrorMonitorias] = useState('');
+
 
   // Monitorías
   const [monitoriaSeleccionada, setMonitoriaSeleccionada] = useState(null);
@@ -466,14 +552,18 @@ function App() {
   const [tutoriaSeleccionada, setTutoriaSeleccionada] = useState(null);
 
   // Mensajes
-  const [conversaciones, setConversaciones] = useState(conversacionesIniciales);
-  const [conversacionActiva, setConversacionActiva] = useState(1);
+  const [conversacionActiva, setConversacionActiva] = useState(null);
 
   const [correoRecuperacion, setCorreoRecuperacion] = useState('');
   const [estudiantesAdmin] = useState(DEMO_ESTUDIANTES_ADMIN);
   const [tutoresAdmin, setTutoresAdmin] = useState(DEMO_TUTORES_ADMIN);
   const [monitoriasAdmin, setMonitoriasAdmin] = useState(DEMO_MONITORIAS_ADMIN);
   const [examenesAdmin, setExamenesAdmin] = useState([]);
+  const [monitoriasCalendarioAdmin, setMonitoriasCalendarioAdmin] = useState([]);
+  const [parcialesParaMonitoriaAdmin, setParcialesParaMonitoriaAdmin] = useState([]);
+  const [tutoresParaMonitoriaAdmin, setTutoresParaMonitoriaAdmin] = useState([]);
+  const [cargandoReferenciasMonitoriaAdmin, setCargandoReferenciasMonitoriaAdmin] =
+    useState(true);
 
 
   // ========================================
@@ -762,6 +852,50 @@ function App() {
 
   useEffect(() => {
     if (
+      !sesionActiva ||
+      !['estudiante', 'tutor'].includes(usuario.rol) ||
+      !['Inicio', 'Monitorías'].includes(pantalla)
+    ) {
+      return undefined;
+    }
+
+    let vigente = true;
+
+    const cargarMonitorias = async () => {
+      setCargandoMonitorias(true);
+      setErrorMonitorias('');
+
+      try {
+        const monitoriasBackend = await listarMonitoriasDisponibles();
+
+        if (!vigente) return;
+
+        setMonitorias(
+          monitoriasBackend.map(adaptarMonitoriaCatalogoBackend)
+        );
+      } catch (error) {
+        if (!vigente) return;
+
+        setMonitorias([]);
+        setErrorMonitorias(
+          error.message || 'No se pudieron cargar las monitorías.'
+        );
+      } finally {
+        if (vigente) {
+          setCargandoMonitorias(false);
+        }
+      }
+    };
+
+    cargarMonitorias();
+
+    return () => {
+      vigente = false;
+    };
+  }, [sesionActiva, usuario.rol, pantalla]);
+
+  useEffect(() => {
+    if (
       !sesionActiva
       || usuario.rol !== 'tutor'
       || !['Solicitudes recibidas', 'Detalle solicitud tutor'].includes(pantalla)
@@ -807,10 +941,14 @@ function App() {
 
     const cargarParciales = async () => {
       try {
-        const parcialesBackend = await listarParciales();
+        const [parcialesBackend, monitoriasBackend] = await Promise.all([
+          listarParciales(),
+          listarMonitoriasAdministrativas({ tipo: 'preparcial' }),
+        ]);
 
         if (vigente) {
           setExamenesAdmin(parcialesBackend);
+          setMonitoriasCalendarioAdmin(monitoriasBackend);
           setErrorSesion('');
         }
       } catch (error) {
@@ -821,6 +959,35 @@ function App() {
     };
 
     cargarParciales();
+
+    return () => {
+      vigente = false;
+    };
+  }, [sesionActiva, usuario.rol, pantalla]);
+
+  useEffect(() => {
+    if (
+      !sesionActiva ||
+      usuario.rol !== 'admin' ||
+      pantalla !== 'Crear monitoria pre-parcial Admin'
+    ) {
+      return undefined;
+    }
+
+    let vigente = true;
+    Promise.all([listarParciales(), buscarTutoresApi()])
+      .then(([parcialesBackend, tutoresBackend]) => {
+        if (!vigente) return;
+        setParcialesParaMonitoriaAdmin(parcialesBackend);
+        setTutoresParaMonitoriaAdmin(tutoresBackend);
+        setErrorSesion('');
+      })
+      .catch((error) => {
+        if (vigente) setErrorSesion(error.message);
+      })
+      .finally(() => {
+        if (vigente) setCargandoReferenciasMonitoriaAdmin(false);
+      });
 
     return () => {
       vigente = false;
@@ -913,58 +1080,29 @@ function App() {
     }
   };
 
+  const abrirChatEnMensajes = async (abrirConversacion) => {
+    setErrorSesion('');
+    setConversacionActiva(null);
+    setPantalla('Mensajes');
+
+    try {
+      const conversacion = await abrirConversacion();
+      setConversacionActiva(String(conversacion._id));
+    } catch (error) {
+      setErrorSesion(error.message);
+    }
+  };
+
   const abrirMensajesTutor = (tutor) => {
-    const datosTutor = tutor ? {
-      ...tutor,
-      programa: tutor.programa || tutor.especialidad || tutor.programaTutor,
-    } : null;
-
-    if (datosTutor) {
-      const conversacionPorId = datosTutor.id == null
-        ? null
-        : conversaciones.find((item) => item.tutorId === datosTutor.id);
-      const coincidenciasPorNombre = conversaciones.filter(
-        (item) => item.tutor === datosTutor.nombre
-      );
-      const conversacion = conversacionPorId || (
-        coincidenciasPorNombre.length === 1
-          ? coincidenciasPorNombre[0]
-          : null
-      );
-
-      if (conversacion) {
-        setConversacionActiva(conversacion.id);
-        setConversaciones((actuales) =>
-          actuales.map((item) =>
-            item.id === conversacion.id
-              ? {
-                  ...item,
-                  tutorId: datosTutor.id ?? item.tutorId,
-                  tutorInfo: datosTutor,
-                }
-              : item
-          )
-        );
-      } else {
-        const id = Date.now();
-        setConversaciones((actuales) => [
-          ...actuales,
-          {
-            id,
-            tutorId: datosTutor.id,
-            tutor: datosTutor.nombre || 'Tutor',
-            tutorInfo: datosTutor,
-            hora: 'Ahora',
-            ultimoMensaje: 'Inicia la conversación',
-            noLeidos: false,
-            mensajes: [],
-          },
-        ]);
-        setConversacionActiva(id);
-      }
+    const usuarioId = tutor?.id || tutor?._id;
+    if (!usuarioId) {
+      setConversacionActiva(null);
+      setErrorSesion('No se pudo identificar al usuario para abrir el chat.');
+      setPantalla('Mensajes');
+      return;
     }
 
-    setPantalla('Mensajes');
+    return abrirChatEnMensajes(() => abrirConversacionDirecta(usuarioId));
   };
 
   // ========================================
@@ -983,34 +1121,26 @@ function App() {
     setPantalla('Detalle monitoría');
   };
 
-  const abrirMensajeMonitoria = (monitoria) => {
-    const conversacionExistente = conversaciones.find(
-      (item) => item.monitoriaId === monitoria.id
-    );
+  const abrirDetalleMonitoriaCalendario = (monitoria) => {
+    setMonitoriaSeleccionada(adaptarMonitoriaBackend(monitoria));
+    setOrigenMonitoria(usuario.rol === 'tutor' ? 'tutor' : 'estudiante');
+    setPantalla('Detalle monitoría');
+  };
 
-    if (conversacionExistente) {
-      setConversacionActiva(conversacionExistente.id);
-    } else {
-      const id = Date.now();
-      setConversaciones((actuales) => [
-        ...actuales,
-        {
-          id,
-          tipo: 'monitoria',
-          monitoriaId: monitoria.id,
-          monitoriaInfo: monitoria,
-          tutor: `Estudiantes de ${monitoria.titulo}`,
-          iniciales: 'ES',
-          hora: 'Ahora',
-          ultimoMensaje: 'Inicia la conversación',
-          noLeidos: false,
-          mensajes: [],
-        },
-      ]);
-      setConversacionActiva(id);
+  const abrirMensajeMonitoria = (monitoria) => {
+    if (monitoria.tipoBackend === 'par') {
+      const estudianteId = monitoria.estudianteIds?.[0];
+      if (!estudianteId) {
+        setConversacionActiva(null);
+        setErrorSesion('La monitoría no contiene un estudiante válido para el chat.');
+        setPantalla('Mensajes');
+        return;
+      }
+
+      return abrirChatEnMensajes(() => abrirConversacionDirecta(estudianteId));
     }
 
-    setPantalla('Mensajes');
+    return abrirChatEnMensajes(() => abrirConversacionGrupo(monitoria.id));
   };
 
   const actualizarMonitoria = (monitoriaActualizada) => {
@@ -1030,23 +1160,42 @@ function App() {
     );
   };
 
-  const inscribirEnMonitoria = (monitoria) => {
-    const actual = monitorias.find((item) => item.id === monitoria?.id);
-
-    if (
-      !actual ||
-      actual.estado === 'Inscrito' ||
-      actual.estado === 'Cupo lleno' ||
-      actual.inscritos >= actual.cupo
-    ) {
-      return;
+  const inscribirEnMonitoria = async (monitoria) => {
+    if (!monitoria?.id) {
+      throw new Error('No se pudo identificar la monitoría.');
     }
 
-    actualizarMonitoria({
-      ...actual,
-      estado: 'Inscrito',
-      inscritos: actual.inscritos + 1,
-    });
+    try {
+      const resultado = await inscribirMonitoriaApi(monitoria.id);
+      const monitoriaActualizada = adaptarMonitoriaCatalogoBackend(resultado);
+
+      actualizarMonitoria(monitoriaActualizada);
+      setErrorMonitorias('');
+
+      return monitoriaActualizada;
+    } catch (error) {
+      setErrorMonitorias(error.message);
+      throw error;
+    }
+  };
+
+  const cancelarInscripcionEnMonitoria = async (monitoria) => {
+    if (!monitoria?.id) {
+      throw new Error('No se pudo identificar la monitoría.');
+    }
+
+    try {
+      const resultado = await cancelarInscripcionMonitoria(monitoria.id);
+      const monitoriaActualizada = adaptarMonitoriaCatalogoBackend(resultado);
+
+      actualizarMonitoria(monitoriaActualizada);
+      setErrorMonitorias('');
+
+      return monitoriaActualizada;
+    } catch (error) {
+      setErrorMonitorias(error.message);
+      throw error;
+    }
   };
 
   // ========================================
@@ -1097,33 +1246,16 @@ function App() {
   };
 
   const abrirMensajesEstudiante = (solicitud) => {
-    const contactoId = `solicitud-${solicitud.id}`;
-    const conversacionExistente = conversaciones.find(
-      (item) => item.contactoId === contactoId
-    );
-
-    if (conversacionExistente) {
-      setConversacionActiva(conversacionExistente.id);
-    } else {
-      const id = Date.now();
-      setConversaciones((actuales) => [
-        ...actuales,
-        {
-          id,
-          tipo: 'estudiante',
-          contactoId,
-          tutor: solicitud.estudiante,
-          iniciales: solicitud.iniciales || 'NE',
-          hora: 'Ahora',
-          ultimoMensaje: 'Inicia la conversación',
-          noLeidos: false,
-          mensajes: [],
-        },
-      ]);
-      setConversacionActiva(id);
+    if (!solicitud.estudianteId) {
+      setConversacionActiva(null);
+      setErrorSesion('No se pudo identificar al estudiante para abrir el chat.');
+      setPantalla('Mensajes');
+      return;
     }
 
-    setPantalla('Mensajes');
+    return abrirChatEnMensajes(() =>
+      abrirConversacionDirecta(solicitud.estudianteId)
+    );
   };
 
   const guardarHorarioDisponibilidad = async (horario) => {
@@ -1358,9 +1490,21 @@ const crearCuenta = async (datosCuenta) => {
     setPantalla('Contraseña actualizada');
   };
 
-  const guardarMonitoriaAdmin = (monitoria) => {
+  const guardarMonitoriaAdmin = async (monitoria) => {
+    if (monitoria.tipo === 'preparcial') {
+      const monitoriaCreada = await crearMonitoriaGrupal(monitoria);
+      setMonitoriasCalendarioAdmin((actuales) => [
+        monitoriaCreada,
+        ...actuales,
+      ]);
+      setErrorSesion('');
+      setPantalla('Monitoría creada admin');
+      return monitoriaCreada;
+    }
+
     setMonitoriasAdmin((actuales) => [monitoria, ...actuales]);
     setPantalla('Monitoría creada admin');
+    return monitoria;
   };
 
   const actualizarMonitoriaAdmin = (monitoria) => {
@@ -1563,7 +1707,10 @@ const crearCuenta = async (datosCuenta) => {
           onNavegar={navegar}
           onVerDetalle={abrirDetalleMonitoria}
           monitorias={monitorias}
-          onActualizarMonitoria={actualizarMonitoria}
+          onInscribir={inscribirEnMonitoria}
+          onCancelarInscripcion={cancelarInscripcionEnMonitoria}
+          cargando={cargandoMonitorias}
+          error={errorMonitorias}
         />
       )}
 
@@ -1572,7 +1719,8 @@ const crearCuenta = async (datosCuenta) => {
         <DetalleMonitoria
           onNavegar={navegar}
           monitoria={monitoriaSeleccionada}
-          onInscribirse={actualizarMonitoria}
+          onInscribirse={inscribirEnMonitoria}
+          onCancelarInscripcion={cancelarInscripcionEnMonitoria}
           onVerPerfilTutor={abrirPerfilTutor}
           modoTutor={origenMonitoria === 'tutor'}
         />
@@ -1620,7 +1768,11 @@ const crearCuenta = async (datosCuenta) => {
 
       {/* CALENDARIO */}
       {pantalla === 'Calendario' && (
-        <Calendario onNavegar={navegar} />
+        <Calendario
+          onNavegar={navegar}
+          onVerMonitoria={abrirDetalleMonitoriaCalendario}
+          onInscribirMonitoria={inscribirMonitoriaApi}
+        />
       )}
 
       {/* MIS SOLICITUDES */}
@@ -1712,8 +1864,6 @@ const crearCuenta = async (datosCuenta) => {
       {pantalla === 'Mensajes' && (
         <Mensajes
           onNavegar={navegar}
-          conversaciones={conversaciones}
-          setConversaciones={setConversaciones}
           conversacionActiva={conversacionActiva}
           setConversacionActiva={setConversacionActiva}
           tutorias={tutorias}
@@ -1806,6 +1956,7 @@ const crearCuenta = async (datosCuenta) => {
       {(pantalla === 'Crear monitoria admin' ||
         pantalla === 'Crear monitoria pre-parcial Admin') && (
         <CrearMonitoriaAdmin
+          key={pantalla}
           onNavegar={navegar}
           tipoInicial={
             pantalla === 'Crear monitoria pre-parcial Admin'
@@ -1813,6 +1964,12 @@ const crearCuenta = async (datosCuenta) => {
               : 'Obligatoria'
           }
           onCrear={guardarMonitoriaAdmin}
+          parciales={parcialesParaMonitoriaAdmin.filter(
+            (parcial) => parcial.fecha >= fechaActualLocal()
+          )}
+          tutoresDisponibles={tutoresParaMonitoriaAdmin}
+          cargandoReferencias={cargandoReferenciasMonitoriaAdmin}
+          errorReferencias={errorSesion}
         />
       )}
 
@@ -1825,6 +1982,7 @@ const crearCuenta = async (datosCuenta) => {
         <CalendarioAdmin
           onNavegar={navegar}
           examenes={examenesAdmin}
+          monitorias={monitoriasCalendarioAdmin}
           onGuardarExamen={guardarExamenAdmin}
           onEliminarExamen={eliminarExamenAdmin}
           abrirFormulario={pantalla === 'Agregar parcial Admin'}

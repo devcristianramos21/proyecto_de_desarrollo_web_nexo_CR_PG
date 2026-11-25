@@ -6,103 +6,30 @@ import Navbar from '../components/layout/navbar';
 
 import './monitorias.css';
 
-export const monitoriasIniciales = [
-  {
-    id: 1,
-    titulo: 'Monitoría Cálculo Diferencial',
-    tipo: 'Obligatoria',
-    estado: 'Disponible',
-    monitor: 'Andrés Moreno',
-    horario: 'Lunes y miércoles 2:00 – 4:00 PM',
-    inscritos: 0,
-    cupo: 20,
-  },
-  {
-    id: 2,
-    titulo: 'Pre-parcial Cálculo Diferencial',
-    tipo: 'Pre-parcial',
-    estado: 'Por confirmar',
-    monitor: 'Andrés Moreno',
-    horario: 'Sáb 20 Sep · 9:00 – 11:00 AM',
-    preparacion: 'Preparación para: Parcial Lun 23 Sep',
-    inscritos: 3,
-    cupo: 20,
-  },
-  {
-    id: 3,
-    titulo: 'Monitoría Par Programación II',
-    tipo: 'Par',
-    estado: 'Disponible',
-    monitor: 'Carlos Herrera',
-    horario: 'Viernes 4:00 – 6:00 PM',
-    inscritos: 2,
-    cupo: 5,
-  },
-  {
-    id: 4,
-    titulo: 'Monitoría Par Microeconomía',
-    tipo: 'Par',
-    estado: 'Inscrito',
-    monitor: 'Valentina Gómez',
-    horario: 'Miércoles 5:00 – 6:00 PM',
-    inscritos: 2,
-    cupo: 3,
-  },
-  {
-    id: 5,
-    titulo: 'Monitoría Álgebra Lineal',
-    tipo: 'Obligatoria',
-    estado: 'Cupo lleno',
-    monitor: 'Felipe Castro',
-    horario: 'Martes y jueves 3:00 – 5:00 PM',
-    inscritos: 25,
-    cupo: 25,
-  },
-  {
-    id: 6,
-    titulo: 'Pre-parcial Álgebra Lineal',
-    tipo: 'Pre-parcial',
-    estado: 'Disponible',
-    monitor: 'Felipe Castro',
-    horario: 'Dom 21 Sep 2026 · 10:00 AM – 12:00 PM',
-    fecha: 'Dom 21 Sep 2026',
-    hora: '10:00 AM – 12:00 PM',
-    modalidad: 'Presencial',
-    lugar: 'Edificio G, Sala 2',
-    preparacion:
-      'Preparación para: Parcial de Álgebra Lineal — Martes 24 Sep a las 10:00 AM',
-    descripcion:
-      'Sesión de repaso intensivo. Se cubrirán: espacios vectoriales, transformaciones lineales, valores y vectores propios, sistemas de ecuaciones.',
-    temas: [
-      'Espacios vectoriales',
-      'Transformaciones lineales',
-      'Valores propios',
-      'Sistemas de ecuaciones',
-    ],
-    semestreMonitor: 'Matemáticas · 10° semestre',
-    calificacion: 4.8,
-    iniciales: 'FC',
-    inscritos: 14,
-    cupo: 20,
-  },
-];
-
 const categorias = ['Todas', 'Obligatoria', 'Par', 'Pre-parcial'];
 
 function Monitorias({
   onVerDetalle,
   onNavegar,
-  monitorias = monitoriasIniciales,
-  onActualizarMonitoria,
+  monitorias = [],
+  onInscribir,
+  onCancelarInscripcion,
+  cargando = false,
+  error = '',
 }) {
   const [categoria, setCategoria] = useState('Todas');
 
-  // Monitoría seleccionada para confirmar una acción
+  // Monitoría seleccionada para confirmar una acción.
   const [monitoriaSeleccionada, setMonitoriaSeleccionada] = useState(null);
 
-  // Acción pendiente: inscribir o cancelar
+  // Acción pendiente: inscribir o cancelar.
   const [accionPendiente, setAccionPendiente] = useState(null);
 
+  // Estado de procesamiento y errores del modal.
+  const [procesando, setProcesando] = useState(false);
+  const [errorAccion, setErrorAccion] = useState('');
+
+  // Filtrar monitorías por categoría.
   const monitoriasFiltradas =
     categoria === 'Todas'
       ? monitorias
@@ -115,57 +42,85 @@ function Monitorias({
     onVerDetalle?.(monitoria);
   };
 
-  // Abrir modal de inscripción
+  // Abrir modal de inscripción.
   const abrirModalInscripcion = (monitoria) => {
-    setMonitoriaSeleccionada(monitoria);
-    setAccionPendiente('inscribir');
-  };
-
-  // Abrir modal de cancelación
-  const abrirModalCancelacion = (monitoria) => {
-    setMonitoriaSeleccionada(monitoria);
-    setAccionPendiente('cancelar');
-  };
-
-  // Cerrar modal
-  const cerrarModal = () => {
-    setMonitoriaSeleccionada(null);
-    setAccionPendiente(null);
-  };
-
-  // Confirmar inscripción o cancelación
-  const confirmarAccion = () => {
-    if (!monitoriaSeleccionada || !accionPendiente) return;
-
-    if (accionPendiente === 'inscribir') {
-      if (
-        monitoriaSeleccionada.estado === 'Inscrito' ||
-        monitoriaSeleccionada.estado === 'Cupo lleno' ||
-        monitoriaSeleccionada.inscritos >= monitoriaSeleccionada.cupo
-      ) {
-        cerrarModal();
-        return;
-      }
-
-      onActualizarMonitoria?.({
-        ...monitoriaSeleccionada,
-        estado: 'Inscrito',
-        inscritos: monitoriaSeleccionada.inscritos + 1,
-      });
-    } else {
-      onActualizarMonitoria?.({
-        ...monitoriaSeleccionada,
-        estado: 'Disponible',
-        inscritos: Math.max(0, monitoriaSeleccionada.inscritos - 1),
-      });
+    if (
+      !['preparcial', 'saber_pro'].includes(monitoria.tipoBackend) ||
+      monitoria.inscrito ||
+      monitoria.estado === 'Cupo lleno'
+    ) {
+      return;
     }
 
-    cerrarModal();
+    setMonitoriaSeleccionada(monitoria);
+    setAccionPendiente('inscribir');
+    setErrorAccion('');
+  };
+
+  // Abrir modal de cancelación.
+  const abrirModalCancelacion = (monitoria) => {
+    if (
+      !['preparcial', 'saber_pro'].includes(monitoria.tipoBackend) ||
+      !monitoria.inscrito
+    ) {
+      return;
+    }
+
+    setMonitoriaSeleccionada(monitoria);
+    setAccionPendiente('cancelar');
+    setErrorAccion('');
+  };
+
+  // Cerrar modal.
+  const cerrarModal = () => {
+    if (procesando) return;
+
+    setMonitoriaSeleccionada(null);
+    setAccionPendiente(null);
+    setErrorAccion('');
+  };
+
+  // Confirmar inscripción o cancelación mediante el backend.
+  const confirmarAccion = async () => {
+    if (!monitoriaSeleccionada || !accionPendiente || procesando) {
+      return;
+    }
+
+    setProcesando(true);
+    setErrorAccion('');
+
+    try {
+      if (accionPendiente === 'inscribir') {
+        if (typeof onInscribir !== 'function') {
+          throw new Error('El servicio de inscripción no está disponible.');
+        }
+
+        await onInscribir(monitoriaSeleccionada);
+      } else {
+        if (typeof onCancelarInscripcion !== 'function') {
+          throw new Error('El servicio de cancelación no está disponible.');
+        }
+
+        await onCancelarInscripcion(monitoriaSeleccionada);
+      }
+
+      // Cerrar únicamente cuando el backend confirme la operación.
+      setMonitoriaSeleccionada(null);
+      setAccionPendiente(null);
+    } catch (error) {
+      setErrorAccion(
+        error.message || 'No se pudo completar la operación.'
+      );
+    } finally {
+      setProcesando(false);
+    }
   };
 
   const esInscripcion = accionPendiente === 'inscribir';
-  const esPreParcial =
-    monitoriaSeleccionada?.tipo === 'Pre-parcial';
+
+  const esPreParcial = ['preparcial', 'saber_pro'].includes(
+    monitoriaSeleccionada?.tipoBackend
+  );
 
   return (
     <div className="monitorias-layout">
@@ -179,7 +134,10 @@ function Monitorias({
       <div className="monitorias-contenido">
 
         {/* NAVBAR */}
-        <Navbar titulo="Monitorías disponibles" onNavegar={onNavegar} />
+        <Navbar
+          titulo="Monitorías disponibles"
+          onNavegar={onNavegar}
+        />
 
         <main className="monitorias-main">
 
@@ -207,13 +165,11 @@ function Monitorias({
             </div>
 
             <div className="monitorias-aviso__contenido">
-              <strong>Parciales en los próximos 7 días</strong>
+              <strong>Prepárate para tus evaluaciones</strong>
 
               <p>
-                Cálculo Diferencial (Lun 23 Sep), Álgebra Lineal
-                (Mar 24 Sep), Programación II (Mié 25 Sep).
-                Inscríbete en las monitorías pre-parcial antes de que
-                se cancelen por bajo cupo.
+                Consulta las monitorías disponibles y encuentra
+                sesiones de preparación para tus próximos parciales.
               </p>
             </div>
 
@@ -244,14 +200,33 @@ function Monitorias({
           {/* LISTADO DE MONITORÍAS */}
           <section className="monitorias-lista">
 
-            {monitoriasFiltradas.map((monitoria) => {
+            {/* CARGANDO */}
+            {cargando && (
+              <p className="monitorias-vacio">
+                Cargando monitorías disponibles...
+              </p>
+            )}
+
+            {/* ERROR DE CARGA */}
+            {!cargando && error && (
+              <p
+                className="monitorias-vacio"
+                role="alert"
+              >
+                {error}
+              </p>
+            )}
+
+            {/* TARJETAS */}
+            {!cargando && !error && monitoriasFiltradas.map((monitoria) => {
               const progreso = calcularProgreso(
                 monitoria.inscritos,
                 monitoria.cupo
               );
 
               const esPorConfirmar =
-                monitoria.estado === 'Por confirmar';
+                monitoria.tipoBackend === 'saber_pro' &&
+                !monitoria.cupoMinimoAlcanzado;
 
               return (
                 <article
@@ -325,12 +300,15 @@ function Monitorias({
 
                     </div>
 
-                    {/* ALERTA DE CONFIRMACIÓN */}
+                    {/* ALERTA DE CUPO MÍNIMO */}
                     {esPorConfirmar && (
                       <small className="monitoria-alerta">
                         <span aria-hidden="true">⚠</span>
                         {' '}Necesita{' '}
-                        {Math.max(0, 10 - monitoria.inscritos)}{' '}
+                        {Math.max(
+                          0,
+                          monitoria.cupoMinimo - monitoria.inscritos
+                        )}{' '}
                         inscripciones más para confirmarse
                       </small>
                     )}
@@ -348,24 +326,29 @@ function Monitorias({
                       Ver detalle
                     </button>
 
-                    {monitoria.estado !== 'Cupo lleno' && (
-                      <button
-                        type="button"
-                        className={
-                          monitoria.estado === 'Inscrito'
-                            ? 'boton-cancelar'
-                            : 'boton-inscripcion'
-                        }
-                        onClick={() =>
-                          monitoria.estado === 'Inscrito'
-                            ? abrirModalCancelacion(monitoria)
-                            : abrirModalInscripcion(monitoria)
-                        }
-                      >
-                        {monitoria.estado === 'Inscrito'
-                          ? 'Cancelar'
-                          : 'Inscribirse'}
-                      </button>
+                    {/* Solo se permite inscripción en pre-parcial y Saber Pro */}
+                    {['preparcial', 'saber_pro'].includes(
+                      monitoria.tipoBackend
+                    ) && (
+                      <>
+                        {monitoria.inscrito ? (
+                          <button
+                            type="button"
+                            className="boton-cancelar"
+                            onClick={() => abrirModalCancelacion(monitoria)}
+                          >
+                            Cancelar
+                          </button>
+                        ) : monitoria.estado !== 'Cupo lleno' && (
+                          <button
+                            type="button"
+                            className="boton-inscripcion"
+                            onClick={() => abrirModalInscripcion(monitoria)}
+                          >
+                            Inscribirse
+                          </button>
+                        )}
+                      </>
                     )}
 
                   </div>
@@ -375,11 +358,13 @@ function Monitorias({
             })}
 
             {/* ESTADO VACÍO */}
-            {monitoriasFiltradas.length === 0 && (
-              <p className="monitorias-vacio">
-                No hay monitorías disponibles en esta categoría.
-              </p>
-            )}
+            {!cargando &&
+              !error &&
+              monitoriasFiltradas.length === 0 && (
+                <p className="monitorias-vacio">
+                  No hay monitorías disponibles en esta categoría.
+                </p>
+              )}
 
           </section>
         </main>
@@ -409,13 +394,20 @@ function Monitorias({
               <p>
                 ¿Deseas inscribirte en{' '}
                 <strong>{monitoriaSeleccionada.titulo}</strong>?
+
                 {' '}
 
-                {esPreParcial ? (
+                {esPreParcial &&
+                !monitoriaSeleccionada.cupoMinimoAlcanzado ? (
                   <>
-                    Esta monitoría aún no ha alcanzado el mínimo de
-                    inscritos para confirmarse. Si no se completa
-                    el cupo mínimo, se cancelará.
+                    Esta monitoría todavía no alcanza el mínimo de
+                    inscritos. Necesita{' '}
+                    {Math.max(
+                      0,
+                      monitoriaSeleccionada.cupoMinimo -
+                        monitoriaSeleccionada.inscritos
+                    )}{' '}
+                    inscripciones más para confirmarse.
                   </>
                 ) : (
                   <>
@@ -433,12 +425,23 @@ function Monitorias({
               </p>
             )}
 
+            {/* ERROR DE LA OPERACIÓN */}
+            {errorAccion && (
+              <p
+                role="alert"
+                className="monitorias-error"
+              >
+                {errorAccion}
+              </p>
+            )}
+
             <div className="monitorias-modal-acciones">
 
               <button
                 type="button"
                 className="monitorias-modal-cancelar"
                 onClick={cerrarModal}
+                disabled={procesando}
               >
                 Volver
               </button>
@@ -447,10 +450,13 @@ function Monitorias({
                 type="button"
                 className="monitorias-modal-confirmar"
                 onClick={confirmarAccion}
+                disabled={procesando}
               >
-                {esInscripcion
-                  ? 'Confirmar inscripción'
-                  : 'Sí, cancelar inscripción'}
+                {procesando
+                  ? 'Procesando...'
+                  : esInscripcion
+                    ? 'Confirmar inscripción'
+                    : 'Sí, cancelar inscripción'}
               </button>
 
             </div>
