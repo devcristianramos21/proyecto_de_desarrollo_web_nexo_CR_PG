@@ -10,8 +10,6 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
     contrasena: '',
     programa: '',
     semestre: '',
-    rol: 'estudiante',
-    aceptaTerminos: false,
   });
 
   const actualizarCampo = (campo, valor) => {
@@ -35,7 +33,10 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
     }
 
     if (onCrearCuenta) {
-      onCrearCuenta(formulario);
+      onCrearCuenta({
+        ...formulario,
+        rol: 'estudiante',
+      });
     } else {
       alert('El registro estará disponible próximamente.');
     }
@@ -156,50 +157,6 @@ function CrearCuenta({ onVolver, onIniciarSesion, onCrearCuenta }) {
               </select>
             </div>
           </div>
-
-          <fieldset className="crear-cuenta-roles">
-            <legend>¿Cuál es tu rol?</legend>
-
-            <div className="crear-cuenta-roles-grid">
-              <label
-                className={`crear-cuenta-rol ${
-                  formulario.rol === 'estudiante' ? 'crear-cuenta-rol-activo' : ''
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="rol"
-                  value="estudiante"
-                  checked={formulario.rol === 'estudiante'}
-                  onChange={() => actualizarCampo('rol', 'estudiante')}
-                />
-                <span className="crear-cuenta-radio"></span>
-                <span className="crear-cuenta-rol-texto">
-                  <strong>Soy estudiante</strong>
-                  <small>Busco apoyo académico</small>
-                </span>
-              </label>
-
-              <label
-                className={`crear-cuenta-rol ${
-                  formulario.rol === 'admin' ? 'crear-cuenta-rol-activo' : ''
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="rol"
-                  value="admin"
-                  checked={formulario.rol === 'admin'}
-                  onChange={() => actualizarCampo('rol', 'admin')}
-                />
-                <span className="crear-cuenta-radio"></span>
-                <span className="crear-cuenta-rol-texto">
-                  <strong>Soy administrador</strong>
-                  <small>Gestiono la plataforma</small>
-                </span>
-              </label>
-            </div>
-          </fieldset>
 
           <button type="submit" className="crear-cuenta-submit">
             Crear cuenta

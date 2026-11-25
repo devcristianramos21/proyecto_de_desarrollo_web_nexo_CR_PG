@@ -10,7 +10,6 @@ const CAMPOS_REGISTRO = [
   'password',
   'carrera',
   'semestre',
-  'rol',
 ];
 
 const CREDENCIALES_INCORRECTAS = 'Correo o contraseña incorrectos';
@@ -18,11 +17,9 @@ const CREDENCIALES_INCORRECTAS = 'Correo o contraseña incorrectos';
 export async function registrar(datos) {
   const campos = elegirCampos(datos, CAMPOS_REGISTRO);
 
-  const rolesPermitidos = ['estudiante', 'admin'];
-
-  if (!rolesPermitidos.includes(campos.rol)) {
-    campos.rol = 'estudiante';
-  }
+  // El registro público siempre crea cuentas de estudiante.
+  // El rol enviado por el cliente nunca se utiliza.
+  campos.rol = 'estudiante';
 
   if (typeof campos.correo === 'string') {
     const existe = await Usuario.exists({
@@ -32,6 +29,8 @@ export async function registrar(datos) {
     if (existe) {
       throw new AppError(409, 'Ya existe una cuenta con ese correo');
     }
+
+    campos.correo = campos.correo.trim().toLowerCase();
   }
 
   const usuario = await Usuario.create(campos);
