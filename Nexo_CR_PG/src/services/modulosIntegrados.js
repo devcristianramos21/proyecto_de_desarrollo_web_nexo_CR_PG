@@ -149,3 +149,50 @@ export function rechazarSolicitudMonitoria(id, motivo) {
     body: motivo ? { motivo } : {},
   });
 }
+
+
+// ==========================================
+// PARCIALES Y CALENDARIO ACADÉMICO
+// ==========================================
+
+export function listarParciales(filtros = {}) {
+  const parametros = new URLSearchParams();
+
+  if (filtros.materia) parametros.set('materia', filtros.materia);
+  if (filtros.desde) parametros.set('desde', filtros.desde);
+  if (filtros.hasta) parametros.set('hasta', filtros.hasta);
+
+  const query = parametros.toString();
+
+  return apiRequest(`/api/parciales${query ? `?${query}` : ''}`);
+}
+
+export function obtenerParcial(id) {
+  return apiRequest(`/api/parciales/${encodeURIComponent(id)}`);
+}
+
+export function listarPreparcialesDeParcial(id) {
+  return apiRequest(
+    `/api/parciales/${encodeURIComponent(id)}/preparciales`
+  );
+}
+
+export function crearParcial(datos) {
+  return apiRequest('/api/parciales', {
+    method: 'POST',
+    body: datos,
+  });
+}
+
+export function actualizarParcial(id, datos) {
+  return apiRequest(`/api/parciales/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    body: datos,
+  });
+}
+
+export function eliminarParcial(id) {
+  return apiRequest(`/api/parciales/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  });
+}

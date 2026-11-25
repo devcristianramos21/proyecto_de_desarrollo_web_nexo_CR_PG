@@ -58,6 +58,9 @@ import {
   cancelarMonitoria as cancelarMonitoriaApi,
   aceptarSolicitudMonitoria,
   crearEvaluacion,
+  crearParcial,
+  eliminarParcial,
+  listarParciales,
   buscarTutores as buscarTutoresApi,
   agregarTutorFavorito,
   actualizarFranjaDisponibilidad,
@@ -78,7 +81,6 @@ import {
   DEMO_ESTUDIANTES_ADMIN,
   DEMO_TUTORES_ADMIN,
   DEMO_MONITORIAS_ADMIN,
-  DEMO_EXAMENES_ADMIN,
   DEMO_PERFIL_ADMIN,
 } from './pages/admin/adminMockData';
 
@@ -471,7 +473,7 @@ function App() {
   const [estudiantesAdmin] = useState(DEMO_ESTUDIANTES_ADMIN);
   const [tutoresAdmin, setTutoresAdmin] = useState(DEMO_TUTORES_ADMIN);
   const [monitoriasAdmin, setMonitoriasAdmin] = useState(DEMO_MONITORIAS_ADMIN);
-  const [examenesAdmin, setExamenesAdmin] = useState(DEMO_EXAMENES_ADMIN);
+  const [examenesAdmin, setExamenesAdmin] = useState([]);
 
 
   // ========================================
@@ -782,6 +784,43 @@ function App() {
       .finally(() => {
         if (vigente) setCargandoSolicitudesTutor(false);
       });
+
+    return () => {
+      vigente = false;
+    };
+  }, [sesionActiva, usuario.rol, pantalla]);
+
+  // ========================================
+  // CALENDARIO ADMINISTRATIVO
+  // ========================================
+
+  useEffect(() => {
+    if (
+      !sesionActiva ||
+      usuario.rol !== 'admin' ||
+      !['Calendario Admin', 'Agregar parcial Admin'].includes(pantalla)
+    ) {
+      return undefined;
+    }
+
+    let vigente = true;
+
+    const cargarParciales = async () => {
+      try {
+        const parcialesBackend = await listarParciales();
+
+        if (vigente) {
+          setExamenesAdmin(parcialesBackend);
+          setErrorSesion('');
+        }
+      } catch (error) {
+        if (vigente) {
+          setErrorSesion(error.message || 'No se pudieron cargar los parciales.');
+        }
+      }
+    };
+
+    cargarParciales();
 
     return () => {
       vigente = false;
@@ -1321,20 +1360,6 @@ const crearCuenta = async (datosCuenta) => {
 
   const guardarMonitoriaAdmin = (monitoria) => {
     setMonitoriasAdmin((actuales) => [monitoria, ...actuales]);
-    if (monitoria.tipo === 'Pre-parcial') {
-      setExamenesAdmin((actuales) => {
-        const indice = actuales.findIndex(
-          (examen) =>
-            !examen.monitoriaAsignada &&
-            (examen.materia === monitoria.asignatura ||
-              monitoria.asignatura?.includes(examen.materia))
-        );
-        if (indice < 0) return actuales;
-        return actuales.map((examen, index) =>
-          index === indice ? { ...examen, monitoriaAsignada: true } : examen
-        );
-      });
-    }
     setPantalla('Monitoría creada admin');
   };
 
@@ -1346,14 +1371,21 @@ const crearCuenta = async (datosCuenta) => {
     );
   };
 
-  const guardarExamenAdmin = (examen) => {
-    setExamenesAdmin((actuales) => [examen, ...actuales]);
+  const guardarExamenAdmin = async (datos) => {
+    const parcialCreado = await crearParcial(datos);
+
+    setExamenesAdmin((actuales) => [parcialCreado, ...actuales]);
+    setErrorSesion('');
+    return parcialCreado;
   };
 
-  const eliminarExamenAdmin = (id) => {
+  const eliminarExamenAdmin = async (id) => {
+    await eliminarParcial(id);
+
     setExamenesAdmin((actuales) =>
-      actuales.filter((examen) => examen.id !== id)
+      actuales.filter((examen) => String(examen._id) !== String(id))
     );
+    setErrorSesion('');
   };
 
   const registrarTutorAdmin = (tutor) => {
